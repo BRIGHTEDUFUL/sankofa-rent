@@ -1,0 +1,54 @@
+import type { ReactNode } from "react";
+import { Plus, SlidersHorizontal } from "lucide-react";
+import { Card, Button } from "./AppShell";
+
+export type Column<T> = { key: string; label: string; render: (row: T) => ReactNode; className?: string };
+
+export function DataPage<T>({ title, subtitle, action, stats, columns, rows, aside }: {
+  title: string; subtitle: string; action: string;
+  stats?: { label: string; value: string; hint?: string }[];
+  columns: Column<T>[]; rows: T[]; aside?: ReactNode;
+}) {
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
+          <p className="text-sm text-muted-foreground">{subtitle}</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="ghost"><SlidersHorizontal className="h-4 w-4" />Filter</Button>
+          <Button><Plus className="h-4 w-4" />{action}</Button>
+        </div>
+      </div>
+      {stats && (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {stats.map((s) => (
+            <Card key={s.label} className="!p-5">
+              <p className="text-sm text-muted-foreground">{s.label}</p>
+              <p className="mt-1 text-2xl font-semibold">{s.value}</p>
+              {s.hint && <p className="mt-1 text-xs text-muted-foreground">{s.hint}</p>}
+            </Card>
+          ))}
+        </div>
+      )}
+      {aside}
+      <Card className="overflow-x-auto !p-0">
+        <table className="w-full min-w-[720px] text-sm">
+          <thead>
+            <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
+              {columns.map((c) => <th key={c.key} className={`px-6 py-4 font-medium ${c.className ?? ""}`}>{c.label}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, i) => (
+              <tr key={i} className="border-b last:border-0 transition-colors hover:bg-muted/60">
+                {columns.map((c) => <td key={c.key} className={`px-6 py-4 ${c.className ?? ""}`}>{c.render(r)}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </div>
+  );
+}
