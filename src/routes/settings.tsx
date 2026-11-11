@@ -101,7 +101,7 @@ function Page() {
           {tab === "team" && (
             <Section title="Team" desc="People who help you manage properties">
               <div className="space-y-3">
-                {[["Kofi Mensah", "Owner", "green"], ["Ama Owusu", "Caretaker · East Legon", "gold"], ["Yaw Boateng", "Accountant", "gray"]].map(([n, r, t]) => (
+                {([["Kofi Mensah", "Owner", "green"], ["Ama Owusu", "Caretaker · East Legon", "gold"], ["Yaw Boateng", "Accountant", "gray"]] as [string, string, string][]).map(([n, r, t]) => (
                   <div key={n} className="flex items-center justify-between rounded-2xl border border-border p-4">
                     <div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-full bg-muted text-xs font-semibold">{n.split(" ").map((x) => x[0]).join("")}</div><p className="text-sm font-semibold">{n}</p></div>
                     <Badge tone={t as "green"}>{r}</Badge>
