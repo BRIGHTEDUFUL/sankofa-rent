@@ -117,7 +117,7 @@ function Dashboard() {
       <Card className="lg:col-span-4">
         <div className="flex flex-wrap items-center gap-4">
           <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary-soft text-primary"><Megaphone className="h-5 w-5" /></div>
-          <div className="min-w-0 flex-1"><p className="font-semibold">{announcements[0].title}</p><p className="truncate text-sm text-muted-foreground">{announcements[0].body}</p></div>
+          <div className="min-w-0 flex-1"><p className="font-semibold">{announcements[0]!.title}</p><p className="truncate text-sm text-muted-foreground">{announcements[0]!.body}</p></div>
           <Link to="/announcements" className="text-sm font-semibold text-primary">All announcements</Link>
         </div>
       </Card>
