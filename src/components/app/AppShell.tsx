@@ -58,8 +58,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               })}
             </nav>
             <div className="flex flex-col items-center gap-2">
-              <button title="Settings" className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted"><Settings className="h-5 w-5" /></button>
-              <button title="Log out" className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted"><LogOut className="h-5 w-5" /></button>
+              <Link to="/settings" title="Settings" className={`grid h-11 w-11 place-items-center rounded-full ${path.startsWith("/settings") ? "bg-ink text-ink-foreground" : "text-muted-foreground hover:bg-muted"}`}><Settings className="h-5 w-5" /></Link>
+              <Link to="/login" title="Log out" className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted"><LogOut className="h-5 w-5" /></Link>
               <div className="mt-2 grid h-10 w-10 place-items-center rounded-full bg-ink text-xs font-semibold text-ink-foreground">KM</div>
             </div>
           </aside>
@@ -77,6 +77,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           );
         })}
+        <Link to="/settings" className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${path.startsWith("/settings") ? "bg-ink text-ink-foreground" : "text-muted-foreground"}`}><Settings className="h-[18px] w-[18px]" /></Link>
       </nav>
     </div>
   );

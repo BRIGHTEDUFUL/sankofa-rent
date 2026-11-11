@@ -11,11 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnnouncementsRouteImport } from './routes/announcements'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as InvoicesRouteImport } from './routes/invoices'
 import { Route as LeasesRouteImport } from './routes/leases'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as PropertiesRouteImport } from './routes/properties'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as TenantsRouteImport } from './routes/tenants'
 
 const IndexRoute = IndexRouteImport.update({
@@ -28,6 +32,11 @@ const AnnouncementsRoute = AnnouncementsRouteImport.update({
   path: '/announcements',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvoicesRoute = InvoicesRouteImport.update({
   id: '/invoices',
   path: '/invoices',
@@ -36,6 +45,11 @@ const InvoicesRoute = InvoicesRouteImport.update({
 const LeasesRoute = LeasesRouteImport.update({
   id: '/leases',
   path: '/leases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MaintenanceRoute = MaintenanceRouteImport.update({
@@ -53,6 +67,16 @@ const PropertiesRoute = PropertiesRouteImport.update({
   path: '/properties',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TenantsRoute = TenantsRouteImport.update({
   id: '/tenants',
   path: '/tenants',
@@ -62,32 +86,44 @@ const TenantsRoute = TenantsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/announcements': typeof AnnouncementsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/invoices': typeof InvoicesRoute
   '/leases': typeof LeasesRoute
+  '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/payments': typeof PaymentsRoute
   '/properties': typeof PropertiesRoute
+  '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/tenants': typeof TenantsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/announcements': typeof AnnouncementsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/invoices': typeof InvoicesRoute
   '/leases': typeof LeasesRoute
+  '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/payments': typeof PaymentsRoute
   '/properties': typeof PropertiesRoute
+  '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/tenants': typeof TenantsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/announcements': typeof AnnouncementsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/invoices': typeof InvoicesRoute
   '/leases': typeof LeasesRoute
+  '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/payments': typeof PaymentsRoute
   '/properties': typeof PropertiesRoute
+  '/settings': typeof SettingsRoute
+  '/signup': typeof SignupRoute
   '/tenants': typeof TenantsRoute
 }
 export interface FileRouteTypes {
@@ -95,42 +131,58 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/announcements'
+    | '/forgot-password'
     | '/invoices'
     | '/leases'
+    | '/login'
     | '/maintenance'
     | '/payments'
     | '/properties'
+    | '/settings'
+    | '/signup'
     | '/tenants'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/announcements'
+    | '/forgot-password'
     | '/invoices'
     | '/leases'
+    | '/login'
     | '/maintenance'
     | '/payments'
     | '/properties'
+    | '/settings'
+    | '/signup'
     | '/tenants'
   id:
     | '__root__'
     | '/'
     | '/announcements'
+    | '/forgot-password'
     | '/invoices'
     | '/leases'
+    | '/login'
     | '/maintenance'
     | '/payments'
     | '/properties'
+    | '/settings'
+    | '/signup'
     | '/tenants'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnnouncementsRoute: typeof AnnouncementsRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   InvoicesRoute: typeof InvoicesRoute
   LeasesRoute: typeof LeasesRoute
+  LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
   PaymentsRoute: typeof PaymentsRoute
   PropertiesRoute: typeof PropertiesRoute
+  SettingsRoute: typeof SettingsRoute
+  SignupRoute: typeof SignupRoute
   TenantsRoute: typeof TenantsRoute
 }
 
@@ -150,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnnouncementsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/invoices': {
       id: '/invoices'
       path: '/invoices'
@@ -162,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/leases'
       fullPath: '/leases'
       preLoaderRoute: typeof LeasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/maintenance': {
@@ -185,6 +251,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropertiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tenants': {
       id: '/tenants'
       path: '/tenants'
@@ -198,11 +278,15 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnnouncementsRoute: AnnouncementsRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   InvoicesRoute: InvoicesRoute,
   LeasesRoute: LeasesRoute,
+  LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,
   PaymentsRoute: PaymentsRoute,
   PropertiesRoute: PropertiesRoute,
+  SettingsRoute: SettingsRoute,
+  SignupRoute: SignupRoute,
   TenantsRoute: TenantsRoute,
 }
 export const routeTree = rootRouteImport
