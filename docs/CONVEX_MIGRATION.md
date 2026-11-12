@@ -168,19 +168,40 @@ export default http;
 
 Google: set `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` with `bunx convex env set`. For password reset, add `reset: ResendOTPPasswordReset` to Password (see the Convex Auth docs) and set `AUTH_RESEND_KEY`.
 
+`convex/auth.config.ts` (the `@convex-dev/auth` setup creates this; keep it):
+```ts
+export default { providers: [{ domain: process.env.CONVEX_SITE_URL, applicationID: "convex" }] };
+```
+
+**Create the landlord profile on sign-up.** Add a callback to `convexAuth({...})`:
+```ts
+callbacks: {
+  async afterUserCreatedOrUpdated(ctx, { userId, existingUserId }) {
+    if (existingUserId) return;
+    await ctx.db.insert("profiles", {
+      userId, firstName: "", lastName: "", currency: "GHS", rentDueDay: 5,
+      notifySms: true, notifyEmail: true, notifyWhatsapp: false, plan: "free",
+    });
+  },
+},
+```
+Sign-up form: pass `firstName`/`lastName`/`phone` in `signIn("password", {...})`, then call `profiles.update` right after.
+
 Shared helper — `convex/lib.ts`:
 ```ts
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { QueryCtx, MutationCtx } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 export async function requireUser(ctx: QueryCtx | MutationCtx) {
   const id = await getAuthUserId(ctx);
   if (!id) throw new Error("Not signed in");
   return id;
 }
-export async function nextNumber(ctx: MutationCtx, landlordId: any, name: string, prefix: string) {
+export async function nextNumber(ctx: MutationCtx, landlordId: Id<"users">, name: string, prefix: string) {
   const c = await ctx.db.query("counters").withIndex("by_name", q => q.eq("landlordId", landlordId).eq("name", name)).unique();
   const value = (c?.value ?? 1000) + 1;
-  c ? await ctx.db.patch(c._id, { value }) : await ctx.db.insert("counters", { landlordId, name, value });
+  if (c) await ctx.db.patch(c._id, { value });
+  else await ctx.db.insert("counters", { landlordId, name, value });
   return `${prefix}-${value}`;
 }
 ```
@@ -237,10 +258,13 @@ export const record = mutation({
           reference: v.optional(v.string()) },
   handler: async (ctx, a) => {
     const me = await requireUser(ctx);
+    if (a.amount <= 0) throw new Error("Amount must be positive");
+    const tenant = await ctx.db.get(a.tenantId);
+    if (!tenant || tenant.landlordId !== me) throw new Error("Tenant not found");
     const receiptNo = await nextNumber(ctx, me, "receipt", "RCP");
     if (a.invoiceId) {
       const inv = await ctx.db.get(a.invoiceId);
-      if (!inv || inv.landlordId !== me) throw new Error("Invoice not found");
+      if (!inv || inv.landlordId !== me || inv.tenantId !== a.tenantId) throw new Error("Invoice not found");
       const paid = inv.paid + a.amount;
       await ctx.db.patch(inv._id, { paid, status: paid >= inv.amount ? "paid" : "partial" });
     }
@@ -248,6 +272,36 @@ export const record = mutation({
   },
 });
 ```
+
+The internal jobs the crons call (`convex/invoices.ts`):
+```ts
+import { internalMutation } from "./_generated/server";
+
+export const markOverdue = internalMutation({ args: {}, handler: async (ctx) => {
+  const now = Date.now();
+  for (const status of ["sent", "partial"] as const) {
+    const rows = await ctx.db.query("invoices").filter(q => q.and(
+      q.eq(q.field("status"), status), q.lt(q.field("dueDate"), now))).collect();
+    for (const inv of rows) await ctx.db.patch(inv._id, { status: "overdue" });
+  }
+}});
+
+export const generateMonthly = internalMutation({ args: {}, handler: async (ctx) => {
+  const d = new Date(); const period = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+  const leases = await ctx.db.query("leases").filter(q => q.neq(q.field("status"), "ended")).collect();
+  for (const l of leases) {
+    const exists = await ctx.db.query("invoices").withIndex("by_tenant", q => q.eq("tenantId", l.tenantId))
+      .filter(q => q.and(q.eq(q.field("leaseId"), l._id), q.eq(q.field("period"), period))).first();
+    if (exists) continue;                        // safe to re-run
+    const profile = await ctx.db.query("profiles").withIndex("by_user", q => q.eq("userId", l.landlordId)).unique();
+    const due = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), profile?.rentDueDay ?? 5);
+    const number = await nextNumber(ctx, l.landlordId, "invoice", "INV");
+    await ctx.db.insert("invoices", { landlordId: l.landlordId, leaseId: l._id, tenantId: l.tenantId,
+      number, period, dueDate: due, amount: l.rent, paid: 0, status: "sent" });
+  }
+}});
+```
+At larger scale, process landlords in batches with `ctx.scheduler.runAfter` to stay within Convex's per-mutation limits.
 
 ---
 
@@ -280,7 +334,8 @@ export default crons;
 ```tsx
 import { ConvexReactClient } from "convex/react";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
+// create at module level (outside the component) so it isn't recreated on every render
+const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 // wrap: <ConvexAuthProvider client={convex}> ... </ConvexAuthProvider>
 ```
 
@@ -300,6 +355,8 @@ await signIn("password", { email, password, flow: "signIn" });   // signup: flow
 await signIn("google");
 ```
 Each `Field` needs a `name`, and the form should read its values from `FormData`.
+
+Auth pages: `/login`, `/signup`, `/forgot-password` render outside `AppShell` already, so they stay public.
 
 Route protection: in `AppShell`, use `useConvexAuth()`. If `!isLoading && !isAuthenticated`, run `navigate({ to: "/login" })`. Pages render on the client, and Convex queries run on the client.
 
