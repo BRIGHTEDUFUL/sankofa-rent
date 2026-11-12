@@ -38,7 +38,7 @@ export function DataPage<T>({ title, subtitle, action, stats, columns, rows, asi
           <Card key={i} className="!p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 text-sm">{columns[0]?.render(r)}</div>
-              {columns.length > 1 && <div className="shrink-0">{columns[columns.length - 1].render(r)}</div>}
+              {columns.length > 1 && <div className="shrink-0">{columns[columns.length - 1]?.render(r)}</div>}
             </div>
             <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-t pt-3 text-sm">
               {columns.slice(1, -1).map((c) => (
