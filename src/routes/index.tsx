@@ -19,7 +19,7 @@ const spark = [3, 5, 4, 7, 6, 8].map((v) => ({ v }));
 function Dashboard() {
   const pct = 89;
   return (
-    <div className="grid gap-4 sm:gap-5 lg:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
       <Card className="flex items-center justify-between">
         <div><p className="text-sm text-muted-foreground">Collected this month</p><p className="mt-1 text-2xl font-semibold">{cedi(61300)}</p></div>
         <div className="flex h-10 items-end gap-1">{[60, 90, 50, 100, 30].map((h, i) => <span key={i} style={{ height: h + "%" }} className="w-1.5 rounded-full bg-primary" />)}</div>

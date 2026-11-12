@@ -21,14 +21,14 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen p-3 sm:p-6">
       <div className="mx-auto max-w-[1400px]">
-        <header className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
+        <header className="mb-4 grid sm:mb-6 grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
           <div className="flex min-w-0 items-center gap-4">
-            <div className="grid h-12 w-12 shrink-0 place-items-center text-primary">
-              <Sun className="h-10 w-10" strokeWidth={2.5} />
+            <div className="grid h-10 w-10 shrink-0 place-items-center text-primary sm:h-12 sm:w-12">
+              <Sun className="h-8 w-8 sm:h-10 sm:w-10" strokeWidth={2.5} />
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-xl font-semibold sm:text-2xl">Akwaaba, Kofi!</h1>
-              <p className="truncate text-sm text-muted-foreground">Here's what's happening across your properties</p>
+              <h1 className="truncate text-lg font-semibold sm:text-2xl">Akwaaba, Kofi!</h1>
+              <p className="hidden truncate text-sm text-muted-foreground sm:block">Here's what's happening across your properties</p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
@@ -36,11 +36,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               <input placeholder="Search tenants, units…" className="w-56 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
               <button className="grid h-9 w-9 place-items-center rounded-full bg-ink text-ink-foreground"><Search className="h-4 w-4" /></button>
             </div>
-            <button className="relative grid h-11 w-11 place-items-center rounded-full bg-card shadow-soft">
+            <button className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-card shadow-soft">
               <MessageCircle className="h-5 w-5" />
-              <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-destructive" />
+              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive" />
             </button>
-            <button className="grid h-11 w-11 place-items-center rounded-full bg-card shadow-soft"><Bell className="h-5 w-5" /></button>
+            <button className="grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-card shadow-soft"><Bell className="h-5 w-5" /></button>
           </div>
         </header>
 
@@ -64,11 +64,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </aside>
 
-          <main className="min-w-0 flex-1 pb-24 sm:pb-0">{children}</main>
+          <main className="min-w-0 flex-1 pb-24 sm:pb-0 [padding-bottom:calc(6rem+env(safe-area-inset-bottom))] sm:![padding-bottom:0]">{children}</main>
         </div>
       </div>
 
-      <nav className="fixed inset-x-3 bottom-3 z-50 flex justify-between overflow-x-auto rounded-full bg-card p-1.5 shadow-soft sm:hidden">
+      <nav className="fixed inset-x-3 bottom-3 z-50 flex justify-between gap-1 overflow-x-auto rounded-full [scrollbar-width:none] bg-card p-1.5 shadow-soft sm:hidden">
         {nav.map((n) => {
           const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
           return (

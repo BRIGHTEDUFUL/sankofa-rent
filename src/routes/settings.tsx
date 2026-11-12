@@ -27,7 +27,7 @@ function Input({ label, value, type = "text" }: { label: string; value?: string;
 function Toggle({ label, hint, on = false }: { label: string; hint: string; on?: boolean }) {
   const [v, setV] = useState(on);
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-border py-4 last:border-0">
+    <div className="flex items-center justify-between gap-4 border-b border-border py-4 last:border-0 [&>*:first-child]:min-w-0">
       <div><p className="text-sm font-medium">{label}</p><p className="text-xs text-muted-foreground">{hint}</p></div>
       <button type="button" onClick={() => setV(!v)} className={`relative h-6 w-11 shrink-0 rounded-full transition ${v ? "bg-primary" : "bg-muted"}`}>
         <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-card shadow-soft transition-all ${v ? "left-[22px]" : "left-0.5"}`} />
@@ -46,7 +46,7 @@ function Page() {
       <div><h2 className="text-2xl font-semibold tracking-tight">Settings</h2><p className="text-sm text-muted-foreground">Manage your account and how Nyumba Rent works for you</p></div>
       <div className="grid gap-5 lg:grid-cols-[240px_1fr]">
         <Card className="h-fit !p-2">
-          <nav className="flex gap-1 overflow-x-auto lg:flex-col">
+          <nav className="-mx-1 flex gap-1 overflow-x-auto px-1 [scrollbar-width:none] lg:flex-col">
             {tabs.map((t) => (
               <button key={t.id} onClick={() => setTab(t.id)} className={`flex shrink-0 items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${tab === t.id ? "bg-ink text-ink-foreground" : "text-muted-foreground hover:bg-muted"}`}>
                 <t.icon className="h-4 w-4" />{t.label}

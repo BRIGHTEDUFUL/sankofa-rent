@@ -11,29 +11,47 @@ export function DataPage<T>({ title, subtitle, action, stats, columns, rows, asi
 }) {
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{title}</h2>
           <p className="text-sm text-muted-foreground">{subtitle}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="grid grid-cols-[auto_1fr] gap-2 sm:flex">
           <Button variant="ghost"><SlidersHorizontal className="h-4 w-4" />Filter</Button>
-          <Button><Plus className="h-4 w-4" />{action}</Button>
+          <Button className="justify-center"><Plus className="h-4 w-4" />{action}</Button>
         </div>
       </div>
       {stats && (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {stats.map((s) => (
-            <Card key={s.label} className="!p-5">
-              <p className="text-sm text-muted-foreground">{s.label}</p>
-              <p className="mt-1 text-2xl font-semibold">{s.value}</p>
+            <Card key={s.label} className="!p-4 sm:!p-5">
+              <p className="text-xs text-muted-foreground sm:text-sm">{s.label}</p>
+              <p className="mt-1 text-xl font-semibold sm:text-2xl">{s.value}</p>
               {s.hint && <p className="mt-1 text-xs text-muted-foreground">{s.hint}</p>}
             </Card>
           ))}
         </div>
       )}
       {aside}
-      <Card className="overflow-x-auto !p-0">
+      <div className="space-y-3 md:hidden">
+        {rows.map((r, i) => (
+          <Card key={i} className="!p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 text-sm">{columns[0]?.render(r)}</div>
+              {columns.length > 1 && <div className="shrink-0">{columns[columns.length - 1].render(r)}</div>}
+            </div>
+            <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-t pt-3 text-sm">
+              {columns.slice(1, -1).map((c) => (
+                <div key={c.key} className="min-w-0">
+                  <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">{c.label}</dt>
+                  <dd className="truncate">{c.render(r)}</dd>
+                </div>
+              ))}
+            </dl>
+          </Card>
+        ))}
+      </div>
+      <Card className="hidden overflow-x-auto !p-0 md:block">
         <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
