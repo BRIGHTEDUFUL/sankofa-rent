@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Authentication frontend
+
+- Keep shared auth fields and layout in `src/components/auth/AuthLayout.tsx`, with pure validation in `src/lib/auth-validation.ts`, so all auth pages share accessible controls and testable rules.
+- Until Convex is connected, auth submissions must report that nothing was sent or saved rather than simulate a session or successful delivery; demo navigation must be explicit.
