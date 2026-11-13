@@ -1,6 +1,8 @@
 # Nyumba Rent — Convex Backend Migration Guide
 
-This app's screens are complete, and every screen reads from `src/lib/mock.ts`. This guide covers everything you need to move the data, sign-in and actions to Convex (database, auth, functions, file storage, scheduled jobs).
+This app is a frontend prototype: its operational screens use `src/lib/mock.ts`, while auth and settings are presentation-only. This guide describes migration to Convex (database, auth, functions, file storage, scheduled jobs); it is not an installed or deployed backend. The function table is an implementation specification, not a claim that every function has been written.
+
+**Review status (13 November 2026):** auth examples were checked against the official [setup](https://labs.convex.dev/auth/setup), [Password provider](https://labs.convex.dev/auth/config/passwords) and [server API](https://labs.convex.dev/auth/api_reference/server) documentation. No Convex deployment, live sign-in, payment or scheduled-job tests have been run. Complete the acceptance checklist below before production use.
 
 ---
 
@@ -18,7 +20,7 @@ Add `convex/` to `tsconfig.json` "include" if it isn't picked up.
 
 ## 2. Schema — `convex/schema.ts`
 
-Money is stored as **integer pesewas** (GH₵ 1 = 100), which avoids floating-point rounding errors. Dates are stored as epoch ms. Each row has a `landlordId`, so every landlord only sees their own data.
+Money is stored as **integer pesewas** (GH₵ 1 = 100), which avoids floating-point rounding errors. Dates are stored as epoch ms. Domain rows have a `landlordId`; profiles use `userId`. These fields do not enforce access by themselves: every query and mutation must enforce ownership.
 
 ```ts
 import { defineSchema, defineTable } from "convex/server";
@@ -85,7 +87,7 @@ export default defineSchema({
     start: v.number(),
     end: v.number(),
     rent: v.number(),                  // pesewas / month
-    advanceMonths: v.number(),         // Ghana Rent Act caps at 6 — validate in mutation if desired
+    advanceMonths: v.number(),         // validate the applicable legal limit for the tenancy before launch
     deposit: v.optional(v.number()),
     status: v.union(v.literal("active"), v.literal("expiring"), v.literal("ended")),
     documentId: v.optional(v.id("_storage")),
@@ -166,7 +168,18 @@ auth.addHttpRoutes(http);
 export default http;
 ```
 
-Google: set `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` with `bunx convex env set`. For password reset, add `reset: ResendOTPPasswordReset` to Password (see the Convex Auth docs) and set `AUTH_RESEND_KEY`.
+Google: set `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` in the Convex deployment. Configure the Google callback URL to the deployment's HTTP actions URL plus `/api/auth/callback/google` (use the `.convex.site` URL, not `.convex.cloud`). Set `SITE_URL` to the actual frontend origin, separately for development and production. Store secrets in Convex's environment settings, never frontend `VITE_*` variables or committed files.
+
+Password reset is **not** enabled by `providers: [Password, Google]`. Create `convex/ResendOTPPasswordReset.ts` using the custom email-provider example in the [Password provider docs](https://labs.convex.dev/auth/config/passwords), install its additional dependencies with `bun add resend @oslojs/crypto`, import the exported provider into `convex/auth.ts`, and replace `Password` with `Password({ reset: ResendOTPPasswordReset })`. `ResendOTPPasswordReset` is a file you create, not a built-in export. Set `AUTH_RESEND_KEY` on Convex and use a verified sender domain; the example sender is not a production sender.
+
+The forgot-password page needs two states, with errors and a pending state on both:
+```ts
+// Step 1: request the email code; preserve email for step 2.
+await signIn("password", { email, flow: "reset" });
+// Step 2: submit the emailed code and the replacement password.
+await signIn("password", { email, code, newPassword, flow: "reset-verification" });
+```
+Never show a success message unless the request succeeded. Email verification is a separate Password `verify` configuration and is not enabled in the minimal example.
 
 `convex/auth.config.ts` (the `@convex-dev/auth` setup creates this; keep it):
 ```ts
@@ -176,8 +189,10 @@ export default { providers: [{ domain: process.env.CONVEX_SITE_URL, applicationI
 **Create the landlord profile on sign-up.** Add a callback to `convexAuth({...})`:
 ```ts
 callbacks: {
-  async afterUserCreatedOrUpdated(ctx, { userId, existingUserId }) {
-    if (existingUserId) return;
+  async afterUserCreatedOrUpdated(ctx, { userId }) {
+    const existing = await ctx.db.query("profiles")
+      .withIndex("by_user", q => q.eq("userId", userId)).unique();
+    if (existing) return;
     await ctx.db.insert("profiles", {
       userId, firstName: "", lastName: "", currency: "GHS", rentDueDay: 5,
       notifySms: true, notifyEmail: true, notifyWhatsapp: false, plan: "free",
@@ -185,13 +200,13 @@ callbacks: {
   },
 },
 ```
-Sign-up form: pass `firstName`/`lastName`/`phone` in `signIn("password", {...})`, then call `profiles.update` right after.
+The existence check prevents duplicate profiles on account linking and also creates a missing profile when this callback runs for an existing account. Keep `profiles.update` an authenticated mutation that derives `userId` from `requireUser`; do not accept a user ID or client-controlled `plan`. Save the sign-up names and phone through that mutation only after `useConvexAuth().isAuthenticated` becomes true, not merely after `signIn` resolves (email verification may still be pending). If custom fields are passed to Password, configure its `profile` callback and extend the auth users schema accordingly; the default provider does not persist arbitrary form fields.
 
 Shared helper — `convex/lib.ts`:
 ```ts
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { QueryCtx, MutationCtx } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
+import type { QueryCtx, MutationCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 export async function requireUser(ctx: QueryCtx | MutationCtx) {
   const id = await getAuthUserId(ctx);
   if (!id) throw new Error("Not signed in");
@@ -231,6 +246,7 @@ export const create = mutation({
     if (a.unitId) {
       const u = await ctx.db.get(a.unitId);
       if (!u || u.landlordId !== me) throw new Error("Unit not found");
+      if (u.status !== "vacant") throw new Error("Unit is not available");
       await ctx.db.patch(a.unitId, { status: "occupied" });
     }
     return ctx.db.insert("tenants", { ...a, landlordId: me, since: Date.now(), archived: false });
@@ -252,21 +268,28 @@ export const create = mutation({
 
 Recording a payment:
 ```ts
+// convex/payments.ts
+import { mutation } from "./_generated/server";
+import { v } from "convex/values";
+import { requireUser, nextNumber } from "./lib";
+
 export const record = mutation({
   args: { tenantId: v.id("tenants"), invoiceId: v.optional(v.id("invoices")), amount: v.number(),
           method: v.union(v.literal("mtn_momo"), v.literal("telecel_cash"), v.literal("airteltigo_money"), v.literal("bank"), v.literal("cash")),
           reference: v.optional(v.string()) },
   handler: async (ctx, a) => {
     const me = await requireUser(ctx);
-    if (a.amount <= 0) throw new Error("Amount must be positive");
+    if (!Number.isSafeInteger(a.amount) || a.amount <= 0) throw new Error("Amount must be positive integer pesewas");
     const tenant = await ctx.db.get(a.tenantId);
     if (!tenant || tenant.landlordId !== me) throw new Error("Tenant not found");
     const receiptNo = await nextNumber(ctx, me, "receipt", "RCP");
     if (a.invoiceId) {
       const inv = await ctx.db.get(a.invoiceId);
       if (!inv || inv.landlordId !== me || inv.tenantId !== a.tenantId) throw new Error("Invoice not found");
+      if (inv.status === "draft") throw new Error("Invoice has not been issued");
+      if (a.amount > inv.amount - inv.paid) throw new Error("Payment exceeds invoice balance");
       const paid = inv.paid + a.amount;
-      await ctx.db.patch(inv._id, { paid, status: paid >= inv.amount ? "paid" : "partial" });
+      await ctx.db.patch(inv._id, { paid, status: paid === inv.amount ? "paid" : inv.dueDate < Date.now() ? "overdue" : "partial" });
     }
     return ctx.db.insert("payments", { ...a, landlordId: me, receiptNo, paidAt: Date.now() });
   },
@@ -276,6 +299,7 @@ export const record = mutation({
 The internal jobs the crons call (`convex/invoices.ts`):
 ```ts
 import { internalMutation } from "./_generated/server";
+import { nextNumber } from "./lib";
 
 export const markOverdue = internalMutation({ args: {}, handler: async (ctx) => {
   const now = Date.now();
@@ -288,20 +312,47 @@ export const markOverdue = internalMutation({ args: {}, handler: async (ctx) => 
 
 export const generateMonthly = internalMutation({ args: {}, handler: async (ctx) => {
   const d = new Date(); const period = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
-  const leases = await ctx.db.query("leases").filter(q => q.neq(q.field("status"), "ended")).collect();
+  const monthStart = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+  const nextMonth = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+  const leases = await ctx.db.query("leases").filter(q => q.and(
+    q.neq(q.field("status"), "ended"), q.lt(q.field("start"), nextMonth),
+    q.gt(q.field("end"), monthStart))).collect();
   for (const l of leases) {
     const exists = await ctx.db.query("invoices").withIndex("by_tenant", q => q.eq("tenantId", l.tenantId))
       .filter(q => q.and(q.eq(q.field("leaseId"), l._id), q.eq(q.field("period"), period))).first();
     if (exists) continue;                        // safe to re-run
     const profile = await ctx.db.query("profiles").withIndex("by_user", q => q.eq("userId", l.landlordId)).unique();
-    const due = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), profile?.rentDueDay ?? 5);
+    const day = profile?.rentDueDay ?? 5;
+    if (!Number.isInteger(day) || day < 1 || day > 31) throw new Error("Invalid rent due day");
+    const daysInMonth = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
+    // Due through the end of the selected Ghana/UTC calendar day.
+    const due = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), Math.min(day, daysInMonth) + 1) - 1;
     const number = await nextNumber(ctx, l.landlordId, "invoice", "INV");
     await ctx.db.insert("invoices", { landlordId: l.landlordId, leaseId: l._id, tenantId: l.tenantId,
-      number, period, dueDate: due, amount: l.rent, paid: 0, status: "sent" });
+      number, period, dueDate: due, amount: l.rent, paid: 0, status: "draft" });
   }
 }});
 ```
 At larger scale, process landlords in batches with `ctx.scheduler.runAfter` to stay within Convex's per-mutation limits.
+
+These examples assume exclusive lease end timestamps and full monthly charges for a lease overlapping the month; decide on proration and advance-rent allocation before implementing billing. Creating an invoice is not sending it: `invoices.send` must explicitly issue a draft, with delivery recorded separately. Failed SMS/email must be retryable without issuing a second invoice. Drafts are deliberately excluded from the overdue job.
+
+The third job referenced below also needs an implementation (`convex/leases.ts`):
+```ts
+import { internalMutation } from "./_generated/server";
+
+export const flagExpiring = internalMutation({ args: {}, handler: async (ctx) => {
+  const now = Date.now();
+  const horizon = now + 60 * 24 * 60 * 60 * 1000;
+  const rows = await ctx.db.query("leases")
+    .filter(q => q.neq(q.field("status"), "ended")).collect();
+  for (const lease of rows) {
+    const status = lease.end <= now ? "ended" : lease.end <= horizon ? "expiring" : "active";
+    if (lease.status !== status) await ctx.db.patch(lease._id, { status });
+  }
+}});
+```
+Lease status changes alone do not vacate a unit. End/renew/archive mutations must keep occupancy consistent and check for another current lease or tenant before freeing a unit.
 
 ---
 
@@ -330,20 +381,34 @@ export default crons;
 
 ## 7. Wire up the frontend
 
-`src/routes/__root.tsx`, inside `RootComponent`:
+For this SSR app, put the Convex client and provider in a dedicated React module, then render that subtree beneath TanStack's `ClientOnly` with a stable loading fallback. Keep `QueryClientProvider` and the document shell intact; auth/provider initialization must not read browser storage during SSR. Do not use Next.js-only Convex Auth helpers or introduce another router.
+
+Provider module sketch (create it before importing it from the root):
 ```tsx
+import { useState, type ReactNode } from "react";
 import { ConvexReactClient } from "convex/react";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
-// create at module level (outside the component) so it isn't recreated on every render
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
-// wrap: <ConvexAuthProvider client={convex}> ... </ConvexAuthProvider>
+
+export function ConvexProviders({ children }: { children: ReactNode }) {
+  const [client] = useState(() => {
+    const url = import.meta.env.VITE_CONVEX_URL;
+    if (!url) throw new Error("VITE_CONVEX_URL is required");
+    return new ConvexReactClient(url);
+  });
+  return <ConvexAuthProvider client={client}>{children}</ConvexAuthProvider>;
+}
 ```
+Place both public auth screens and the protected app beneath that provider after hydration; keep their current outside/inside `AppShell` distinction. Ensure the OAuth `code` query parameter survives the router's auth-page search validation until the provider consumes it. Verify Google return navigation with the actual deployed origin.
 
 Replacing mock data on a page (example: `src/routes/tenants.tsx`):
 ```tsx
 import { useQuery } from "convex/react";
+import { useConvexAuth } from "convex/react";
 import { api } from "../../convex/_generated/api";
-const rows = useQuery(api.tenants.list) ?? [];   // was: data.tenants
+// Inside the component, after it is placed under the provider:
+const { isAuthenticated } = useConvexAuth();
+const rows = useQuery(api.tenants.list, isAuthenticated ? {} : "skip");
+// undefined means loading/skipped, not an empty collection. Render an empty state only for [].
 ```
 Format money as `cedi(row.rent / 100)`.
 
@@ -358,7 +423,9 @@ Each `Field` needs a `name`, and the form should read its values from `FormData`
 
 Auth pages: `/login`, `/signup`, `/forgot-password` render outside `AppShell` already, so they stay public.
 
-Route protection: in `AppShell`, use `useConvexAuth()`. If `!isLoading && !isAuthenticated`, run `navigate({ to: "/login" })`. Pages render on the client, and Convex queries run on the client.
+For the initial client-only migration, gate protected children with `useConvexAuth`: show only the loading state while `isLoading`, and render no private children when signed out. Redirect from an effect with `navigate({ to: "/login", replace: true })`, never during render. Protected queries must use `"skip"` until authenticated. An effect-only redirect that still renders children can flash private content and run unauthorized queries. For subsequent protected loaders, move auth into router context and a pathless authenticated `beforeLoad` layout with `<Outlet />`; keep exactly one route claiming `/`.
+
+Use `useAuthActions().signOut()` (not a custom mutation called `auth.signOut`), cancel and clear any TanStack Query private caches, then replace navigation to `/login`. Test Back after sign-out and signing into a second landlord account. UI gates are not authorization: `requireUser` and ownership checks remain mandatory inside Convex functions.
 
 ---
 
@@ -373,3 +440,15 @@ Route protection: in `AppShell`, use `useConvexAuth()`. If `!isLoading && !isAut
 7. Add crons, SMS and MoMo webhooks.
 8. Delete `src/lib/mock.ts`.
 9. Deploy: `bunx convex deploy`, then set `VITE_CONVEX_URL` to the production URL.
+
+### Required implementation and acceptance checks
+
+- **Missing functions:** implement every named query and mutation in section 4, `profiles.me/update`, `files.generateUploadUrl`, and the delivery/webhook actions before connecting their controls. The examples above do not provide a complete executable backend.
+- **Ownership:** with two real test accounts, attempt reads and changes to the other landlord's properties, units, tenants, leases, invoices, payments, maintenance, announcements and files; reject each. Validate all linked records belong to the same owner and each other (including a maintenance unit's property). Never trust a submitted `landlordId`.
+- **Settings:** validate money as safe integer pesewas, due day as an integer 1–31, nonnegative percentages and ordered lease dates. Allowlist writable profile fields; plan changes require trusted billing confirmation. Do not persist sample bank or contact details as real account defaults.
+- **Payments:** test fractional, negative and zero amounts, a mismatched invoice, full settlement, partial overdue settlement and payment above the balance. The example rejects overpayment; implement a separate credit/allocation ledger if advance or excess payments are needed. Provider webhooks need signature verification over the raw body, server-side payment verification, amount/currency checks and a unique provider event/reference record written atomically with the payment, so retries cannot double-credit rent.
+- **Jobs:** run monthly generation twice and assert one invoice per lease/period; test future and expired leases, month-end due days, late partial payments and the 60-day expiry boundary. Add indexes and pagination/batched jobs before using unbounded examples at scale. Test lease creation after the monthly job, so the first invoice is not missed.
+- **Files:** require authentication to request uploads and register each uploaded storage ID with an owner. Verify ownership before attaching, downloading, replacing or deleting photos, agreements and receipts; a storage ID alone is not proof of ownership. Validate type and size, and clean up orphan uploads.
+- **Auth:** test sign-up, duplicate email, wrong password, refresh persistence, Google callback, reset request plus code/new-password verification, and sign-out/Back in the real browser. Confirm exactly one profile per user and correct onboarding fields. Configure reset delivery before enabling password sign-in in production.
+- **Data mapping:** Convex returns `_id`, epoch dates, enums and integer money, whereas mock rows contain display strings. Build explicit view adapters and relational joins; do not replace imports blindly. Derive dashboard totals from stored invoices/payments, never the mock statistics. Never import the made-up sample tenant data into a live landlord account.
+- **Go-live:** keep development and production deployments and secrets separate. Run Convex code generation and checks against the actual deployment, then browser-test every page and action. Delete mock data only after the real flows pass. Until then, the current app remains frontend-only.
