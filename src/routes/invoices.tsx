@@ -152,7 +152,7 @@ export function Page() {
                       setActionError(friendlyError(err, "Could not send the invoice.")),
                     );
                   }}
-                  className="rounded-full px-2.5 py-1 text-xs font-semibold text-primary hover:bg-muted"
+                  className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
                 >
                   Send
                 </button>

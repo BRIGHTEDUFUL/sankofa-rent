@@ -156,13 +156,13 @@ export function Page() {
               <div className="flex justify-end gap-1">
                 <button
                   onClick={() => setEditing(r)}
-                  className="rounded-full px-2.5 py-1 text-xs font-semibold text-primary hover:bg-muted"
+                  className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
                 >
                   Update
                 </button>
                 <button
                   onClick={() => updateStatus({ id: r._id, status: nextStatus[r.status] })}
-                  className="rounded-full px-2.5 py-1 text-xs font-semibold text-muted-foreground hover:bg-muted"
+                  className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-muted-foreground hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
                 >
                   {nextStatus[r.status].replace("_", " ")}
                 </button>

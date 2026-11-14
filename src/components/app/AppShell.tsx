@@ -259,16 +259,16 @@ function BottomTabBar({
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 400, damping: 40 }}
-              className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-card sm:hidden"
+              className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-card sm:hidden flex flex-col max-h-[90dvh]"
               style={{ paddingBottom: "calc(var(--sab) + 1.25rem)" }}
             >
               {/* Drag handle */}
-              <div className="flex justify-center pt-3 pb-1">
+              <div className="flex justify-center pt-3 pb-1 shrink-0">
                 <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
               </div>
 
               {/* User info */}
-              <div className="flex items-center gap-3 px-5 py-3 border-b border-border/60">
+              <div className="flex items-center gap-3 px-5 py-3 border-b border-border/60 shrink-0">
                 <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-ink-foreground">
                   {avatarInitials}
                 </div>
@@ -287,55 +287,59 @@ function BottomTabBar({
                 </button>
               </div>
 
-              {/* Navigation items */}
-              <div className="grid grid-cols-3 gap-2 p-4">
-                {MORE_ITEMS.filter((m) => m.to !== "/settings").map((m) => (
+              {/* Scrollable content */}
+              <div className="overflow-y-auto overscroll-contain">
+                {/* Navigation items */}
+                <div className="grid grid-cols-3 gap-2 p-4">
+                  {MORE_ITEMS.filter((m) => m.to !== "/settings").map((m) => (
+                    <Link
+                      key={m.to}
+                      to={m.to}
+                      onClick={() => {
+                        hapticTap();
+                        setMoreOpen(false);
+                      }}
+                      className={`flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-muted px-2 py-4 pressable ${
+                        path.startsWith(m.to) ? "bg-primary-soft text-primary" : ""
+                      }`}
+                    >
+                      <m.icon className="h-5 w-5" strokeWidth={path.startsWith(m.to) ? 2.2 : 1.8} />
+                      <span className="text-center text-[11px] font-semibold leading-tight">
+                        {m.label}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Settings + Sign out */}
+                <div className="mx-4 overflow-hidden rounded-2xl bg-muted divide-y divide-border/70">
                   <Link
-                    key={m.to}
-                    to={m.to}
+                    to="/settings"
                     onClick={() => {
                       hapticTap();
                       setMoreOpen(false);
                     }}
-                    className={`flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-muted px-2 py-4 pressable ${
-                      path.startsWith(m.to) ? "bg-primary-soft text-primary" : ""
-                    }`}
+                    className="flex min-h-[52px] items-center gap-3 px-4 text-sm font-semibold pressable hover:bg-muted/80"
                   >
-                    <m.icon className="h-5 w-5" strokeWidth={path.startsWith(m.to) ? 2.2 : 1.8} />
-                    <span className="text-center text-[11px] font-semibold leading-tight">
-                      {m.label}
-                    </span>
+                    <Settings className="h-5 w-5 text-primary" />
+                    Settings
                   </Link>
-                ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMoreOpen(false);
+                      onLogout();
+                    }}
+                    className="flex min-h-[52px] w-full items-center gap-3 px-4 text-sm font-semibold text-destructive pressable hover:bg-muted/80"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    Sign out
+                  </button>
+                </div>
+                <p className="mt-3 mb-2 text-center text-[11px] text-muted-foreground">
+                  Sankofa Rent · v1.0
+                </p>
               </div>
-
-              {/* Settings + Sign out */}
-              <div className="mx-4 overflow-hidden rounded-2xl bg-muted divide-y divide-border/70">
-                <Link
-                  to="/settings"
-                  onClick={() => {
-                    hapticTap();
-                    setMoreOpen(false);
-                  }}
-                  className="flex min-h-[52px] items-center gap-3 px-4 text-sm font-semibold pressable hover:bg-muted/80"
-                >
-                  <Settings className="h-5 w-5 text-primary" />
-                  Settings
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMoreOpen(false);
-                    onLogout();
-                  }}
-                  className="flex min-h-[52px] w-full items-center gap-3 px-4 text-sm font-semibold text-destructive pressable hover:bg-muted/80"
-                >
-                  <LogOut className="h-5 w-5" /> Sign out
-                </button>
-              </div>
-              <p className="mt-3 text-center text-[11px] text-muted-foreground">
-                Sankofa Rent · v1.0
-              </p>
             </motion.div>
           </>
         )}

@@ -3,7 +3,7 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { Users, Banknote, Wrench, Smartphone, ArrowUpRight, Megaphone } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Card, Badge, Button } from "@/components/app/AppShell";
+import { Card, Badge } from "@/components/app/AppShell";
 import { Progress } from "@/components/ui/progress";
 import { cediFromPesewas, formatDateTime, initials, PAYMENT_METHODS } from "@/lib/format";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -366,13 +366,6 @@ function Dashboard() {
           </Link>
         </div>
       </Card>
-
-      {/* Button is imported to suppress unused-import lint warning */}
-      <span className="sr-only hidden">
-        <Button variant="ghost" aria-hidden>
-          hidden
-        </Button>
-      </span>
     </div>
   );
 }

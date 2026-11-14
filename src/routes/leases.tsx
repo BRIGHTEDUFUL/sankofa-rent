@@ -151,7 +151,7 @@ export function Page() {
                 {r.status !== "ended" && (
                   <button
                     onClick={() => setRenewing(r)}
-                    className="rounded-full px-2.5 py-1 text-xs font-semibold text-primary hover:bg-muted"
+                    className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
                   >
                     Renew
                   </button>
@@ -159,7 +159,7 @@ export function Page() {
                 {r.status !== "ended" && (
                   <button
                     onClick={() => setEnding(r)}
-                    className="rounded-full px-2.5 py-1 text-xs font-semibold text-destructive hover:bg-destructive-soft"
+                    className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-destructive hover:bg-destructive-soft sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
                   >
                     End
                   </button>

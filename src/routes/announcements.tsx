@@ -68,73 +68,75 @@ export function Page() {
 
   return (
     <>
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
-        <div className="min-w-0">
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Announcements</h2>
-          <p className="text-sm text-muted-foreground">
-            {announcements.length} {announcements.length === 1 ? "notice" : "notices"} sent to your
-            tenants
-          </p>
+      <div className="space-y-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Announcements</h2>
+            <p className="text-sm text-muted-foreground">
+              {announcements.length} {announcements.length === 1 ? "notice" : "notices"} sent to
+              your tenants
+            </p>
+          </div>
+          <Button
+            className="h-12 w-full justify-center sm:h-auto sm:w-auto sm:justify-start"
+            onClick={() => setCreateOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+            New announcement
+          </Button>
         </div>
-        <Button
-          className="h-12 w-full justify-center sm:h-auto sm:w-auto sm:justify-start"
-          onClick={() => setCreateOpen(true)}
-        >
-          <Plus className="h-4 w-4" />
-          New announcement
-        </Button>
-      </div>
 
-      {announcements.length === 0 && (
-        <Card className="py-12 text-center text-sm text-muted-foreground">
-          No announcements yet. Send one to keep tenants informed.
-        </Card>
-      )}
-
-      <div className="space-y-3">
-        {announcements.map((a) => (
-          <Card key={a._id} className={a.pinned ? "border border-primary/30" : ""}>
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-semibold">{a.title}</h3>
-                  {a.pinned && <Badge tone="gold">Pinned</Badge>}
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{a.body}</p>
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  <span>
-                    {a.propertyId
-                      ? (propertyName.get(a.propertyId) ?? "Property")
-                      : "All properties"}
-                  </span>
-                  <span>·</span>
-                  <span>{formatDate(a._creationTime)}</span>
-                  {a.channels.map((c) => (
-                    <Badge key={c} tone="gray">
-                      {c}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-              <div className="flex shrink-0 gap-1">
-                <button
-                  onClick={() => togglePin({ id: a._id })}
-                  className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
-                  title={a.pinned ? "Unpin" : "Pin"}
-                >
-                  <Pin className={`h-4 w-4 ${a.pinned ? "text-primary" : ""}`} />
-                </button>
-                <button
-                  onClick={() => setRemoving(a)}
-                  className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
-                  title="Delete"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+        {announcements.length === 0 && (
+          <Card className="py-12 text-center text-sm text-muted-foreground">
+            No announcements yet. Send one to keep tenants informed.
           </Card>
-        ))}
+        )}
+
+        <div className="space-y-3">
+          {announcements.map((a) => (
+            <Card key={a._id} className={a.pinned ? "border border-primary/30" : ""}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="font-semibold">{a.title}</h3>
+                    {a.pinned && <Badge tone="gold">Pinned</Badge>}
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{a.body}</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <span>
+                      {a.propertyId
+                        ? (propertyName.get(a.propertyId) ?? "Property")
+                        : "All properties"}
+                    </span>
+                    <span>·</span>
+                    <span>{formatDate(a._creationTime)}</span>
+                    {a.channels.map((c) => (
+                      <Badge key={c} tone="gray">
+                        {c}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex shrink-0 gap-1">
+                  <button
+                    onClick={() => togglePin({ id: a._id })}
+                    className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                    title={a.pinned ? "Unpin" : "Pin"}
+                  >
+                    <Pin className={`h-4 w-4 ${a.pinned ? "text-primary" : ""}`} />
+                  </button>
+                  <button
+                    onClick={() => setRemoving(a)}
+                    className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                    title="Delete"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
       </div>
 
       <FormDialog
