@@ -33,3 +33,4 @@ use the editor.
 
 - Keep shared auth fields and layout in `src/components/auth/AuthLayout.tsx`, with pure validation in `src/lib/auth-validation.ts`, so all auth pages share accessible controls and testable rules.
 - Until Convex is connected, auth submissions must report that nothing was sent or saved rather than simulate a session or successful delivery; demo navigation must be explicit.
+- Convex backend code lives in `convex/` (excluded from the app tsconfig and eslint) so it can be deployed with `bunx convex dev` without affecting the frontend build.

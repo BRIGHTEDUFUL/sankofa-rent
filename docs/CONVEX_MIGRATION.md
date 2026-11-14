@@ -14,7 +14,7 @@ bunx convex dev            # creates the convex/ folder + deployment, writes VIT
 bunx @convex-dev/auth      # sets JWT_PRIVATE_KEY, JWKS, SITE_URL on the deployment
 ```
 
-Add `convex/` to `tsconfig.json` "include" if it isn't picked up.
+The ready-made backend files are already in `convex/` (see `convex/README.md`). This guide explains them.
 
 ---
 
