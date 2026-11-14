@@ -134,6 +134,12 @@ docs/              # Assets (screenshots), CONVEX_MIGRATION.md (full runbook)
 - **Sign-out is bulletproof** — a hard reload recreates the module-level Convex client instead of leaving stale websocket state behind.
 - **14/14 unit tests** on branding validation, the cedi parser and auth rules; zero console errors in production.
 
+## Docs & report
+
+- **[Final-Year Project Report](docs/FINAL_YEAR_PROJECT.md)** — full write-up: objectives, scope, functional/non-functional requirements, architecture, data model, implementation, test evidence, deployment, limitations.
+- **[Convex migration runbook](docs/CONVEX_MIGRATION.md)** — schema walk-through, auth wiring, deployment pipelines, operator commands.
+- **[Backend map](convex/README.md)** — one function file per domain.
+
 ## Roadmap
 
 - [x] Live on Cloudflare Workers (`edith-nonnon-project`)
