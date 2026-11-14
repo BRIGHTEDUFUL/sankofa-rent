@@ -19,8 +19,9 @@ export function AuthLayout({
   const { appName, tagline, logoUrl } = useBranding();
   return (
     <div className="grid min-h-dvh bg-card lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
-      <div className="flex min-w-0 flex-col justify-between px-5 py-6 sm:px-10 sm:py-8 lg:px-16">
-        <Link to="/" className="flex items-center gap-2 text-primary">
+      <div className="flex min-w-0 flex-col px-5 py-6 sm:px-10 sm:py-8 lg:px-16">
+        {/* Brand header */}
+        <Link to="/" className="flex shrink-0 items-center gap-2 text-primary">
           {logoUrl ? (
             <img
               src={logoUrl}
@@ -34,7 +35,9 @@ export function AuthLayout({
           )}
           <span className="truncate text-lg font-semibold text-foreground">{appName}</span>
         </Link>
-        <div className="mx-auto w-full max-w-md animate-rise py-9 sm:py-12">
+
+        {/* Form content — centred, scrollable on very short screens */}
+        <div className="mx-auto w-full max-w-md flex-1 animate-rise py-8 sm:py-12">
           <p className="mb-5 text-xs font-semibold uppercase text-primary">{tagline}</p>
           <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{title}</h1>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{subtitle}</p>
@@ -45,7 +48,9 @@ export function AuthLayout({
             </div>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-3 border-t border-border pt-5 text-xs text-muted-foreground">
+
+        {/* Footer — hidden on short viewports so it never crowds the form */}
+        <div className="hidden shrink-0 flex-wrap items-center gap-3 border-t border-border pt-5 text-xs text-muted-foreground sm:flex">
           <span>© 2026 {appName}</span>
         </div>
       </div>
@@ -99,7 +104,7 @@ export function Field({ label, name, type = "text", right, hint, error, ...props
           type={password && visible ? "text" : type}
           aria-invalid={Boolean(error)}
           aria-describedby={description}
-          className={`h-12 w-full min-w-0 rounded-lg border bg-card px-3 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm ${password ? "pr-12" : ""} ${error ? "border-destructive" : "border-foreground/15 hover:border-foreground/30"}`}
+          className={`h-12 w-full min-w-0 rounded-lg border bg-card px-3 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 ${password ? "pr-12" : ""} ${error ? "border-destructive" : "border-foreground/15 hover:border-foreground/30"}`}
         />
         {password && (
           <Button
