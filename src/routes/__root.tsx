@@ -86,13 +86,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Nyumba Rent — Rent management for Ghanaian landlords" },
+      { title: "Sankofa Rent — Rent management for Ghanaian landlords" },
       {
         name: "description",
         content:
           "Properties, tenants, leases, rent invoicing, payments and maintenance in one place.",
       },
-      { property: "og:title", content: "Nyumba Rent — Rent management for Ghanaian landlords" },
+      { property: "og:title", content: "Sankofa Rent — Rent management for Ghanaian landlords" },
       {
         property: "og:description",
         content:

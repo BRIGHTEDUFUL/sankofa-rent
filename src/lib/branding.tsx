@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
@@ -6,7 +6,7 @@ import { api } from "../../convex/_generated/api";
 // first query is in flight and on any error, so the UI never renders blank.
 // (The server copy is authoritative for validation.)
 export const DEFAULT_BRANDING = {
-  appName: "Nyumba Rent",
+  appName: "Sankofa Rent",
   tagline: "Your property. Your peace of mind.",
   accentColor: "#4E735A",
 } as const;
@@ -125,6 +125,9 @@ function applyFavicon(url: string | null, contentType: string | null) {
 // Route head() meta stays static (SSR/build-time) — see docs note.
 export function BrandingEffects() {
   const { appName, accentColor, logoUrl, logoContentType } = useBranding();
+  // Tracks the previous brand name so a reset-to-defaults can revert titles
+  // that were already rewritten to the old custom name.
+  const prevBrandNameRef = useRef<string>(DEFAULT_BRANDING.appName);
 
   useEffect(() => {
     applyAccentColor(accentColor);
@@ -135,25 +138,38 @@ export function BrandingEffects() {
   }, [logoUrl, logoContentType]);
 
   useEffect(() => {
-    // Route titles are "Page — Nyumba Rent" from static head(); swap the
-    // default name for the custom one. The router rewrites document.title
-    // from head() on every navigation, so watch for that too.
+    // Route titles are "Page — Sankofa Rent" from static head(); swap them for
+    // the custom name. The router rewrites document.title from head() on
+    // every navigation, so watch for that too.
     //
     // Termination guarantees (a MutationObserver that writes the title it
     // observes can easily spin forever):
-    //  1. no-op when the name is still the default (no write, no mutation);
-    //  2. only rewrite titles we recognise (default name as suffix/prefix);
-    //  3. remember our own write and never re-enter on it.
-    if (appName === DEFAULT_BRANDING.appName) return;
-    const suffix = ` — ${DEFAULT_BRANDING.appName}`;
-    const prefix = `${DEFAULT_BRANDING.appName} `;
+    //  1. if nothing about the title matches the default or the previous
+    //     custom name, leave it alone (no write, no mutation);
+    //  2. remember our own write and never re-enter on it.
+    // The `previous` ref handles the reset-to-defaults transition: titles
+    // still holding the old custom name revert to the default.
+    const suffixDefault = ` — ${DEFAULT_BRANDING.appName}`;
+    const prefixDefault = `${DEFAULT_BRANDING.appName} `;
     let lastApplied: string | null = null;
+    const previous = prevBrandNameRef.current;
+    prevBrandNameRef.current = appName;
     const rewrite = () => {
       const current = document.title;
       if (current === lastApplied) return;
       let next = current;
-      if (next.endsWith(suffix)) next = next.slice(0, -suffix.length) + ` — ${appName}`;
-      else if (next.startsWith(prefix)) next = appName + next.slice(DEFAULT_BRANDING.appName.length);
+      if (appName !== DEFAULT_BRANDING.appName) {
+        if (next.endsWith(suffixDefault))
+          next = next.slice(0, -suffixDefault.length) + ` — ${appName}`;
+        else if (next.startsWith(prefixDefault))
+          next = appName + next.slice(DEFAULT_BRANDING.appName.length);
+      } else if (previous !== DEFAULT_BRANDING.appName) {
+        const suffixPrev = ` — ${previous}`;
+        const prefixPrev = `${previous} `;
+        if (next.endsWith(suffixPrev)) next = next.slice(0, -suffixPrev.length) + suffixDefault;
+        else if (next.startsWith(prefixPrev))
+          next = DEFAULT_BRANDING.appName + next.slice(previous.length);
+      }
       if (next === current) return;
       lastApplied = next;
       document.title = next;

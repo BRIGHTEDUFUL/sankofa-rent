@@ -12,14 +12,15 @@ import {
   formatMonth,
   msFromDateInput,
   pesewasFromCedi,
+  friendlyError,
 } from "@/lib/format";
 
 export const Route = createFileRoute("/invoices")({
   head: () => ({
     meta: [
-      { title: "Rent invoices — Nyumba Rent" },
+      { title: "Rent invoices — Sankofa Rent" },
       { name: "description", content: "Create and send rent invoices to tenants." },
-      { property: "og:title", content: "Rent invoices — Nyumba Rent" },
+      { property: "og:title", content: "Rent invoices — Sankofa Rent" },
       { property: "og:description", content: "Create and send rent invoices to tenants." },
     ],
   }),
@@ -44,6 +45,7 @@ export function Page() {
   const sendInvoice = useMutation(api.invoices.send);
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [actionError, setActionError] = useState("");
 
   if (!invoices || !tenants || !leases) {
     return (
@@ -88,6 +90,14 @@ export function Page() {
 
   return (
     <>
+      {actionError && (
+        <p
+          role="alert"
+          className="mb-4 border-l-2 border-destructive py-2 pl-3 text-sm text-destructive"
+        >
+          {actionError}
+        </p>
+      )}
       <DataPage
         title="Rent invoices"
         subtitle={`${formatMonth(currentPeriod)} billing cycle`}
@@ -136,7 +146,12 @@ export function Page() {
             render: (r) =>
               r.status === "draft" ? (
                 <button
-                  onClick={() => sendInvoice({ id: r._id })}
+                  onClick={() => {
+                    setActionError("");
+                    sendInvoice({ id: r._id }).catch((err: unknown) =>
+                      setActionError(friendlyError(err, "Could not send the invoice.")),
+                    );
+                  }}
                   className="rounded-full px-2.5 py-1 text-xs font-semibold text-primary hover:bg-muted"
                 >
                   Send

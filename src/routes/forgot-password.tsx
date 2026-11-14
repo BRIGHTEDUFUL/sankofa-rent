@@ -5,10 +5,10 @@ import { AuthLayout, AuthNotice } from "@/components/auth/AuthLayout";
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
     meta: [
-      { title: "Reset password — Nyumba Rent" },
-      { name: "description", content: "Reset your Nyumba Rent password." },
-      { property: "og:title", content: "Reset password — Nyumba Rent" },
-      { property: "og:description", content: "Reset your Nyumba Rent password." },
+      { title: "Reset password — Sankofa Rent" },
+      { name: "description", content: "Reset your Sankofa Rent password." },
+      { property: "og:title", content: "Reset password — Sankofa Rent" },
+      { property: "og:description", content: "Reset your Sankofa Rent password." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

@@ -12,9 +12,9 @@ import { cediFromPesewas, formatDate, initials } from "@/lib/format";
 export const Route = createFileRoute("/tenants")({
   head: () => ({
     meta: [
-      { title: "Tenants — Nyumba Rent" },
+      { title: "Tenants — Sankofa Rent" },
       { name: "description", content: "Keep track of every tenant, contact and balance." },
-      { property: "og:title", content: "Tenants — Nyumba Rent" },
+      { property: "og:title", content: "Tenants — Sankofa Rent" },
       { property: "og:description", content: "Keep track of every tenant, contact and balance." },
     ],
   }),

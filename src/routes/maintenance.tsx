@@ -22,13 +22,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { friendlyError } from "@/lib/format";
 
 export const Route = createFileRoute("/maintenance")({
   head: () => ({
     meta: [
-      { title: "Maintenance — Nyumba Rent" },
+      { title: "Maintenance — Sankofa Rent" },
       { name: "description", content: "Requests from tenants and caretakers." },
-      { property: "og:title", content: "Maintenance — Nyumba Rent" },
+      { property: "og:title", content: "Maintenance — Sankofa Rent" },
       { property: "og:description", content: "Requests from tenants and caretakers." },
     ],
   }),
@@ -255,7 +256,7 @@ function MaintenanceDialog({
       setUnitId("");
       setPriority("medium");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not create the request.");
+      setError(friendlyError(err, "Could not create the request."));
     } finally {
       setSubmitting(false);
     }
@@ -391,7 +392,7 @@ function StatusDialog({
     try {
       await onSubmit({ status, cost: pesewas });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save.");
+      setError(friendlyError(err, "Could not save."));
     } finally {
       setSubmitting(false);
     }

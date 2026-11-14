@@ -25,6 +25,10 @@ export const create = mutation({
     const me = await requireUser(ctx);
     const [t, u] = [await ctx.db.get(a.tenantId), await ctx.db.get(a.unitId)];
     if (!t || t.landlordId !== me || !u || u.landlordId !== me) throw new Error("Tenant or unit not found");
+    // The unit must be free, or already assigned to this same tenant (it was
+    // occupied when the tenant was created without a lease) — anything else
+    // would double-book a unit that another tenant is living in.
+    if (u.status !== "vacant" && t.unitId !== a.unitId) throw new Error("Unit is not available");
     if (a.end <= a.start) throw new Error("End date must be after start date");
     if (!Number.isSafeInteger(a.rent) || a.rent <= 0) throw new Error("Rent must be positive integer pesewas");
     if (!Number.isSafeInteger(a.advanceMonths) || a.advanceMonths < 0) throw new Error("Advance months must be zero or more");

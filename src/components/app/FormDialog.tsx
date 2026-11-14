@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { friendlyError } from "@/lib/format";
 
 type Props = {
   open: boolean;
@@ -59,9 +60,7 @@ export function FormDialog({
             try {
               await onSubmit(values);
             } catch (err) {
-              setError(
-                err instanceof Error ? err.message : "Something went wrong. Please try again.",
-              );
+              setError(friendlyError(err));
             } finally {
               setSubmitting(false);
             }
@@ -69,7 +68,9 @@ export function FormDialog({
         >
           {children}
           {error && (
-            <p className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>
+            <p role="alert" className="border-l-2 border-destructive pl-3 text-sm text-destructive">
+              {error}
+            </p>
           )}
           <DialogFooter>
             <Button type="submit" disabled={submitting}>
@@ -103,16 +104,19 @@ export function SelectField({
   name,
   options,
   placeholder = "Select…",
+  onValueChange,
 }: {
   label: string;
   name: string;
   options: { value: string; label: string }[];
   placeholder?: string;
+  /** Optional hook to track the choice (e.g. to filter other fields' options). */
+  onValueChange?: (value: string) => void;
 }) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
-      <Select name={name}>
+      <Select name={name} onValueChange={onValueChange}>
         <SelectTrigger>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
@@ -175,7 +179,7 @@ export function ConfirmDialog({
               try {
                 await onConfirm();
               } catch (err) {
-                setError(err instanceof Error ? err.message : "Something went wrong.");
+                setError(friendlyError(err, "Something went wrong."));
               } finally {
                 setBusy(false);
               }

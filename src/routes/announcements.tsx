@@ -11,9 +11,9 @@ import { formatDate } from "@/lib/format";
 export const Route = createFileRoute("/announcements")({
   head: () => ({
     meta: [
-      { title: "Announcements — Nyumba Rent" },
+      { title: "Announcements — Sankofa Rent" },
       { name: "description", content: "Send notices to your tenants." },
-      { property: "og:title", content: "Announcements — Nyumba Rent" },
+      { property: "og:title", content: "Announcements — Sankofa Rent" },
       { property: "og:description", content: "Send notices to your tenants." },
     ],
   }),

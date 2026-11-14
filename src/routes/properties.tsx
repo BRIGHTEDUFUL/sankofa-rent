@@ -11,9 +11,9 @@ import { cediFromPesewas, pesewasFromCedi } from "@/lib/format";
 export const Route = createFileRoute("/properties")({
   head: () => ({
     meta: [
-      { title: "Properties & units — Nyumba Rent" },
+      { title: "Properties & units — Sankofa Rent" },
       { name: "description", content: "Manage your properties and rental units across Ghana." },
-      { property: "og:title", content: "Properties & units — Nyumba Rent" },
+      { property: "og:title", content: "Properties & units — Sankofa Rent" },
       {
         property: "og:description",
         content: "Manage your properties and rental units across Ghana.",

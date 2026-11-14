@@ -50,6 +50,12 @@ export const create = mutation({
     if (!lease || lease.landlordId !== me) throw new Error("Lease not found");
     if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(a.period)) throw new Error("Period must be YYYY-MM");
     if (!Number.isSafeInteger(a.amount) || a.amount <= 0) throw new Error("Amount must be positive integer pesewas");
+    // Never silently tip the same month of the same lease twice.
+    const existing = await ctx.db.query("invoices")
+      .withIndex("by_tenant", (q) => q.eq("tenantId", lease.tenantId))
+      .filter((q) => q.and(q.eq(q.field("leaseId"), a.leaseId), q.eq(q.field("period"), a.period)))
+      .first();
+    if (existing) throw new Error(`Invoice ${existing.number} already covers this lease and period`);
     const number = await nextNumber(ctx, me, "invoice", "INV");
     return ctx.db.insert("invoices", {
       landlordId: me, leaseId: a.leaseId, tenantId: lease.tenantId, number,

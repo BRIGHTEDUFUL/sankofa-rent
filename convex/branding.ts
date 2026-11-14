@@ -6,7 +6,7 @@ import { requireAdmin } from "./lib";
 // server can validate updates against the same limits and the UI can fall
 // back to identical values while the first query is in flight.
 export const DEFAULT_BRANDING = {
-  appName: "Nyumba Rent",
+  appName: "Sankofa Rent",
   tagline: "Your property. Your peace of mind.",
   accentColor: "#4E735A",
 } as const;

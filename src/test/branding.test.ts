@@ -1,14 +1,9 @@
 import { describe, expect, it } from "vitest";
-import {
-  DEFAULT_BRANDING,
-  contrastVsWhite,
-  isHexColor,
-  isUsableAccent,
-} from "@/lib/branding";
+import { DEFAULT_BRANDING, contrastVsWhite, isHexColor, isUsableAccent } from "@/lib/branding";
 
 describe("Branding defaults", () => {
   it("ships a readable default accent", () => {
-    expect(DEFAULT_BRANDING.appName).toBe("Nyumba Rent");
+    expect(DEFAULT_BRANDING.appName).toBe("Sankofa Rent");
     expect(DEFAULT_BRANDING.tagline.length).toBeGreaterThan(0);
     expect(isUsableAccent(DEFAULT_BRANDING.accentColor)).toBe(true);
   });

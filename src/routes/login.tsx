@@ -3,13 +3,14 @@ import { useState, type FormEvent } from "react";
 import { AuthLayout, AuthNotice, Field, SubmitButton } from "@/components/auth/AuthLayout";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useBranding } from "@/lib/branding";
+import { friendlyError } from "@/lib/format";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign in — Nyumba Rent" },
+      { title: "Sign in — Sankofa Rent" },
       { name: "description", content: "Sign in to manage your properties, tenants and rent." },
-      { property: "og:title", content: "Sign in — Nyumba Rent" },
+      { property: "og:title", content: "Sign in — Sankofa Rent" },
       {
         property: "og:description",
         content: "Sign in to manage your properties, tenants and rent.",
@@ -39,9 +40,7 @@ function Page() {
       await signIn("password", { email, password, flow: "signIn" });
       navigate({ to: "/", replace: true });
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Sign-in failed. Check your details and try again.",
-      );
+      setError(friendlyError(err, "Sign-in failed. Check your details and try again."));
     } finally {
       setPending(false);
     }

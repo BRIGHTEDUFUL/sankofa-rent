@@ -4,14 +4,15 @@ import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
 import { useMutation } from "convex/react";
 import { AuthLayout, AuthNotice, Field, SubmitButton } from "@/components/auth/AuthLayout";
 import { validatePassword } from "@/lib/auth-validation";
+import { friendlyError } from "@/lib/format";
 import { api } from "../../convex/_generated/api";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
     meta: [
-      { title: "Create account — Nyumba Rent" },
+      { title: "Create account — Sankofa Rent" },
       { name: "description", content: "Start managing your rental properties in Ghana." },
-      { property: "og:title", content: "Create account — Nyumba Rent" },
+      { property: "og:title", content: "Create account — Sankofa Rent" },
       { property: "og:description", content: "Start managing your rental properties in Ghana." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -49,9 +50,7 @@ function Page() {
         navigate({ to: "/", replace: true });
       } catch (err) {
         setError(
-          err instanceof Error
-            ? err.message
-            : "Your account was created, but the profile could not be saved.",
+          friendlyError(err, "Your account was created, but the profile could not be saved."),
         );
       }
     })();
@@ -81,11 +80,7 @@ function Page() {
       await signIn("password", { email, password, flow: "signUp" });
       setPendingProfile({ firstName, lastName, phone: phone || undefined });
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Account creation failed. Check your details and try again.",
-      );
+      setError(friendlyError(err, "Account creation failed. Check your details and try again."));
     } finally {
       setPending(false);
     }

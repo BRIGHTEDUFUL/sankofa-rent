@@ -25,6 +25,40 @@ export const backfillAdmin = internalMutation({
   },
 });
 
+// One-time product rename: upgrade branding rows that still hold the old
+// default name to the new default. Customised brands (anything not exactly
+// "Nyumba Rent") are deliberately left alone.
+//   npx convex run migration:renameDefaultBrand
+export const renameDefaultBrand = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const row = await ctx.db.query("branding").first();
+    if (!row) return { renamed: false, reason: "no branding row yet" };
+    if (row.appName !== "Nyumba Rent") {
+      return { renamed: false, reason: "brand is customised — left alone" };
+    }
+    await ctx.db.patch(row._id, { appName: "Sankofa Rent", updatedAt: Date.now() });
+    return { renamed: true };
+  },
+});
+
+// Operator cleanup: delete a DRAFT invoice by its number (never touches
+// sent/partial/paid records). Used to remove accidental duplicates created
+// while testing:  npx convex run migration:deleteDraftInvoiceByNumber '{"number":"INV-1002"}'
+export const deleteDraftInvoiceByNumber = internalMutation({
+  args: { number: v.string() },
+  handler: async (ctx, { number }) => {
+    const inv = await ctx.db
+      .query("invoices")
+      .filter((q) => q.eq(q.field("number"), number.trim()))
+      .first();
+    if (!inv) return { deleted: false, reason: "not found" };
+    if (inv.status !== "draft") return { deleted: false, reason: "only draft invoices can be deleted" };
+    await ctx.db.delete(inv._id);
+    return { deleted: true, number };
+  },
+});
+
 // Escape hatch if backfillAdmin promoted the wrong account:
 //   npx convex run migration:setAdmin '{"email":"you@example.com"}'
 // Demotes every other admin so exactly one account holds the role.

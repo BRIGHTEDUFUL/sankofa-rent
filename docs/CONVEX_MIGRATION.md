@@ -1,4 +1,4 @@
-# Nyumba Rent — Convex Backend Migration Guide
+# Sankofa Rent — Convex Backend Migration Guide
 
 This guide describes the migration of this app to Convex (database, auth, functions, file storage, scheduled jobs).
 

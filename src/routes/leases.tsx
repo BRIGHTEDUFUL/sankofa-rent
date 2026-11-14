@@ -11,9 +11,9 @@ import { cediFromPesewas, formatDate, msFromDateInput, pesewasFromCedi } from "@
 export const Route = createFileRoute("/leases")({
   head: () => ({
     meta: [
-      { title: "Leases — Nyumba Rent" },
+      { title: "Leases — Sankofa Rent" },
       { name: "description", content: "Terms, advances and renewals." },
-      { property: "og:title", content: "Leases — Nyumba Rent" },
+      { property: "og:title", content: "Leases — Sankofa Rent" },
       { property: "og:description", content: "Terms, advances and renewals." },
     ],
   }),
@@ -33,6 +33,7 @@ export function Page() {
   const endLease = useMutation(api.leases.end);
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [createTenantId, setCreateTenantId] = useState("");
   const [renewing, setRenewing] = useState<LeaseRow | null>(null);
   const [ending, setEnding] = useState<LeaseRow | null>(null);
 
@@ -50,10 +51,21 @@ export function Page() {
   const unitLabel = new Map<string, string>();
   for (const p of properties)
     for (const u of p.units) unitLabel.set(u._id, `${p.name} · ${u.label}`);
-  const vacantUnits = properties.flatMap((p) =>
+  // A tenant's pre-assigned unit is occupied but belongs to this lease flow —
+  // offer it alongside genuinely vacant units so it can be papered over.
+  const selectedTenantUnitId = createTenantId
+    ? tenants.find((t) => t._id === createTenantId)?.unitId
+    : undefined;
+  const selectableUnits = properties.flatMap((p) =>
     p.units
-      .filter((u) => u.status === "vacant")
-      .map((u) => ({ value: u._id, label: `${p.name} · ${u.label}` })),
+      .filter((u) => u.status === "vacant" || u._id === selectedTenantUnitId)
+      .map((u) => ({
+        value: u._id,
+        label:
+          u._id === selectedTenantUnitId && u.status !== "vacant"
+            ? `${p.name} · ${u.label} (their unit)`
+            : `${p.name} · ${u.label}`,
+      })),
   );
 
   async function submitCreate(values: FormData) {
@@ -81,6 +93,7 @@ export function Page() {
       deposit: depositRaw ? pesewasFromCedi(depositRaw) : undefined,
     });
     setCreateOpen(false);
+    setCreateTenantId("");
   }
 
   async function submitRenew(values: FormData) {
@@ -160,7 +173,10 @@ export function Page() {
 
       <FormDialog
         open={createOpen}
-        onOpenChange={setCreateOpen}
+        onOpenChange={(o) => {
+          setCreateOpen(o);
+          if (!o) setCreateTenantId("");
+        }}
         title="New lease"
         onSubmit={submitCreate}
         submitLabel="Create lease"
@@ -170,12 +186,13 @@ export function Page() {
           name="tenantId"
           placeholder="Select a tenant"
           options={tenants.map((t) => ({ value: t._id, label: t.name }))}
+          onValueChange={setCreateTenantId}
         />
         <SelectField
           label="Unit"
           name="unitId"
-          placeholder="Select a vacant unit"
-          options={vacantUnits}
+          placeholder="Select a unit"
+          options={selectableUnits}
         />
         <div className="grid grid-cols-2 gap-3">
           <TextField label="Start date" name="start" type="date" required />

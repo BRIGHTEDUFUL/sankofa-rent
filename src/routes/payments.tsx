@@ -22,17 +22,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cediFromPesewas, formatDateTime, PAYMENT_METHODS, pesewasFromCedi } from "@/lib/format";
+import {
+  cediFromPesewas,
+  formatDateTime,
+  PAYMENT_METHODS,
+  pesewasFromCedi,
+  friendlyError,
+} from "@/lib/format";
 
 export const Route = createFileRoute("/payments")({
   head: () => ({
     meta: [
-      { title: "Payments & receipts — Nyumba Rent" },
+      { title: "Payments & receipts — Sankofa Rent" },
       {
         name: "description",
         content: "Record mobile money, bank and cash payments and issue receipts.",
       },
-      { property: "og:title", content: "Payments & receipts — Nyumba Rent" },
+      { property: "og:title", content: "Payments & receipts — Sankofa Rent" },
       {
         property: "og:description",
         content: "Record mobile money, bank and cash payments and issue receipts.",
@@ -202,7 +208,7 @@ function RecordPaymentDialog({
       setMethod("mtn_momo");
       setReference("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not record the payment.");
+      setError(friendlyError(err, "Could not record the payment."));
     } finally {
       setSubmitting(false);
     }

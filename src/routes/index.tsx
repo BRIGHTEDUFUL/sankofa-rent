@@ -9,13 +9,13 @@ import { cediFromPesewas, formatDateTime, initials, PAYMENT_METHODS } from "@/li
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Nyumba Rent" },
+      { title: "Dashboard — Sankofa Rent" },
       {
         name: "description",
         content:
           "Rent management for small landlords in Ghana: properties, tenants, invoices and payments in one place.",
       },
-      { property: "og:title", content: "Nyumba Rent — Rent management for Ghanaian landlords" },
+      { property: "og:title", content: "Sankofa Rent — Rent management for Ghanaian landlords" },
       {
         property: "og:description",
         content:

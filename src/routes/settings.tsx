@@ -16,17 +16,18 @@ import { api } from "../../convex/_generated/api";
 import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { Badge, Button, Card } from "@/components/app/AppShell";
 import { TextField } from "@/components/app/FormDialog";
-import { useBranding, isHexColor, isUsableAccent } from "@/lib/branding";
+import { useBranding, isHexColor, isUsableAccent, DEFAULT_BRANDING } from "@/lib/branding";
+import { friendlyError } from "@/lib/format";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Settings — Nyumba Rent" },
+      { title: "Settings — Sankofa Rent" },
       {
         name: "description",
         content: "Manage your profile, business, notifications, payments and team.",
       },
-      { property: "og:title", content: "Settings — Nyumba Rent" },
+      { property: "og:title", content: "Settings — Sankofa Rent" },
       {
         property: "og:description",
         content: "Manage your profile, business, notifications, payments and team.",
@@ -48,7 +49,7 @@ type Tab = (typeof tabs)[number]["id"];
 
 // Curated accents — all clear 4.5:1 against white so button text stays readable.
 const ACCENT_SWATCHES = [
-  "#4E735A", // Nyumba green (default)
+  "#4E735A", // default brand green
   "#1F6F5C", // teal green
   "#2563EB", // blue
   "#7C3AED", // violet
@@ -235,7 +236,7 @@ function Page() {
       setForm(next);
       setMessage("Saved.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save your changes.");
+      setError(friendlyError(err, "Could not save your changes."));
     } finally {
       setSaving(false);
     }
@@ -282,23 +283,24 @@ function Page() {
       setLogoRemoved(false);
       setBrandMessage("Branding saved. It's live across the app already.");
     } catch (err) {
-      setBrandError(err instanceof Error ? err.message : "Could not save branding.");
+      setBrandError(friendlyError(err, "Could not save branding."));
     } finally {
       setBrandSaving(false);
     }
   }
 
+  // Stage the shipped defaults (name/tagline/accent, no custom logo) in the
+  // editor — the user still has to press Save to apply them.
   function resetBrandingForm() {
-    if (!brandingData) return;
     setBrand({
-      appName: brandingData.appName,
-      tagline: brandingData.tagline,
-      accentColor: brandingData.accentColor,
+      appName: DEFAULT_BRANDING.appName,
+      tagline: DEFAULT_BRANDING.tagline,
+      accentColor: DEFAULT_BRANDING.accentColor,
     });
     setLogoFile(null);
-    setLogoRemoved(false);
+    setLogoRemoved(true);
     setBrandError("");
-    setBrandMessage("");
+    setBrandMessage("Defaults staged — press Save branding to apply them.");
   }
 
   return (
@@ -469,7 +471,7 @@ function Page() {
                   value={brand.appName}
                   maxLength={60}
                   onChange={(e) => setBrand({ ...brand, appName: e.target.value })}
-                  placeholder="Nyumba Rent"
+                  placeholder="Sankofa Rent"
                   hint="Up to 60 characters. Shown in the header, login page and tab title."
                 />
                 <TextField
@@ -527,6 +529,7 @@ function Page() {
                       type="file"
                       accept="image/*"
                       className="sr-only"
+                      aria-label="Upload logo file"
                       onChange={(e) => {
                         const f = e.target.files?.[0];
                         setBrandError("");
