@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { useQuery } from "convex/react";
 import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
@@ -72,7 +72,7 @@ const TOP_LEVEL = new Set(["/", "/properties", "/tenants", "/payments"]);
 // ─── Mobile top bar ──────────────────────────────────────────────────────────
 
 function MobileTopBar({ path, avatar }: { path: string; avatar: string }) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const platform = usePlatform();
   const [scrolled, setScrolled] = useState(false);
   const isTop = TOP_LEVEL.has(path);
@@ -111,7 +111,7 @@ function MobileTopBar({ path, avatar }: { path: string; avatar: string }) {
             </div>
           ) : (
             <button
-              onClick={() => navigate({ to: "..", from: path })}
+              onClick={() => router.history.back()}
               aria-label="Go back"
               className="grid h-10 w-10 place-items-center rounded-full text-foreground pressable hover:bg-muted"
             >
