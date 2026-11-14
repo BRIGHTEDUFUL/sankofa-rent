@@ -12,7 +12,7 @@ frontend is deployed on Cloudflare Workers:**
 |---|---|---|---|
 | `dev:adorable-pig-437` (`.env.local`) | development | SITE_URL/JWT/JWKS ✅ | Kojo + Ama test accounts |
 | `prod:usable-penguin-827` (`.env.production.local`, gitignored) | production backend | SITE_URL/JWT/JWKS ✅ | One seeded admin account + minimal data |
-| `rentwise-ghana` (Cloudflare Worker) | production frontend | n/a | https://rentwise-ghana.edimamfaidol.workers.dev — HTTP 200 (2026-11-14) |
+| `edith-nonnon-project` (Cloudflare Worker) | production frontend | n/a | https://edith-nonnon-project.edimamfaidol.workers.dev — renamed from `rentwise-ghana` 2026-11-14 |
 
 The full user journey was browser-verified against **dev** (sign-up, login, CRUD, invoice,
 payment, branding, non-admin gating) and against **prod** (sign-up → first account becomes
@@ -513,9 +513,9 @@ the gitignored env files; never commit them.
    `VITE_CONVEX_URL=https://usable-penguin-827.convex.cloud`; a host-set build variable
    overrides it.
 6. Prod frontend (Cloudflare Workers, 2026-11-14): `npm run build` → `npx wrangler deploy`
-   (root `wrangler.jsonc`; Worker `rentwise-ghana`; assets served via the `ASSETS` binding).
-   Live at https://rentwise-ghana.edimamfaidol.workers.dev — HTTP 200, title
-   *Dashboard - Sankofa Rent*. Pushes to `main` also trigger the Workers Builds build.
+   (root `wrangler.jsonc`; Worker `edith-nonnon-project` (renamed from `rentwise-ghana`); assets served via the `ASSETS` binding).
+   Live at https://edith-nonnon-project.edimamfaidol.workers.dev. The old `rentwise-ghana`
+   Worker remains live until deleted in the Cloudflare dashboard. Pushes to `main` also trigger the Workers Builds build.
    CI is npm-only — `bun.lock`/`bunfig.toml` were removed because a stale bun lockfile was
    failing `bun install --frozen-lockfile` on every push.
 7. Prod smoke test: `npx convex run branding:get --env-file .env.production.local` →

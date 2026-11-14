@@ -42,8 +42,8 @@ use the editor.
   (`dev:adorable-pig-437`), `.env.production.local` = prod (`prod:usable-penguin-827`).
   `npx convex deploy --env-file <file>` for prod; `npx convex dev --once` for dev.
 - **Frontend** (Cloudflare Workers, Nitro `cloudflare-module`): `npm run build` →
-  `npx wrangler deploy` (root `wrangler.jsonc`, Worker `rentwise-ghana`), live at
-  https://rentwise-ghana.edimamfaidol.workers.dev. Pushes to `main` trigger Workers Builds.
+  `npx wrangler deploy` (root `wrangler.jsonc`, Worker `edith-nonnon-project`), live at
+  https://edith-nonnon-project.edimamfaidol.workers.dev. Pushes to `main` trigger Workers Builds.
   The public prod `VITE_CONVEX_URL` is pinned in the committed `.env.production` (not a secret).
 - **Branding** is a global singleton (`convex/branding.ts` + `src/lib/branding.tsx`), publicly
   readable, admin-writable only. Route `head()` titles are build-time static; `BrandingEffects`

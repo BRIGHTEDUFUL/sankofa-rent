@@ -83,10 +83,10 @@ npx convex deploy --env-file .env.production.local   # schema + functions to pro
 
 ```sh
 npm run build          # → .output/  (Nitro cloudflare-module)
-npx wrangler deploy    # honors wrangler.jsonc (Worker `rentwise-ghana`)
+npx wrangler deploy    # honors wrangler.jsonc (Worker `edith-nonnon-project`)
 ```
 
-Live: **https://rentwise-ghana.edimamfaidol.workers.dev** (verified 2026-11-14 — HTTP 200).
+Live: **https://edith-nonnon-project.edimamfaidol.workers.dev** (verified 2026-11-14 — HTTP 200).
 `wrangler.jsonc` points the Worker at `.output/server/index.mjs` (SSR shell) and serves
 `.output/public/` as static assets (`ASSETS` binding). Pushes to `main` also trigger the
 Workers Builds build for this repo. A host-set `VITE_CONVEX_URL` build variable overrides

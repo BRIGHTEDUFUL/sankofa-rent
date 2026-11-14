@@ -10,7 +10,7 @@
 - [x] Custom branding: app name, tagline, logo, accent color — admin-only, live everywhere (auth pages, header, tab title, favicon, theme)
 - [x] Roles: admin / member
 - [x] Duplicate-invoice guard, parser tolerance for UI cedi formats, error surfacing (`friendlyError`)
-- [x] Frontend live on Cloudflare Workers — `rentwise-ghana` (Nitro `cloudflare-module`), https://rentwise-ghana.edimamfaidol.workers.dev (verified 2026-11-14, HTTP 200; `.env.production` pins the public prod `VITE_CONVEX_URL`; pushes to `main` trigger Workers Builds)
+- [x] Frontend live on Cloudflare Workers — `edith-nonnon-project` (Nitro `cloudflare-module`; renamed from `rentwise-ghana`, 2026-11-14), https://edith-nonnon-project.edimamfaidol.workers.dev (`.env.production` pins the public prod `VITE_CONVEX_URL`; pushes to `main` trigger Workers Builds)
 - [x] CI fix: `bun.lock`/`bunfig.toml` dropped — the repo pins npm; a stale bun lockfile was failing `bun install --frozen-lockfile` on every build
 
 ## Next
