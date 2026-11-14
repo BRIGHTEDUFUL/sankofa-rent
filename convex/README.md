@@ -27,18 +27,20 @@ settings.
 
 | File | Exports |
 |---|---|
-| `schema.ts` | All tables (`profiles`, `properties`, `units`, `tenants`, `leases`, `invoices`, `payments`, `maintenance`, `announcements`, `counters`) plus `authTables` |
-| `auth.ts`, `auth.config.ts`, `http.ts` | Password sign-in; `afterUserCreatedOrUpdated` creates a profile |
-| `lib.ts` | `requireUser`, `nextNumber` (invoice/receipt numbering) |
+| `schema.ts` | All tables (`profiles`, `branding`, `properties`, `units`, `tenants`, `leases`, `invoices`, `payments`, `maintenance`, `announcements`, `counters`) plus `authTables` |
+| `auth.ts`, `auth.config.ts`, `http.ts` | Password sign-in; `afterUserCreatedOrUpdated` creates the profile (**first account on a deployment becomes admin**) |
+| `lib.ts` | `requireUser`, `requireAdmin`, `nextNumber` (invoice/receipt numbering) |
 | `dashboard.ts` | `summary`, `monthly` |
 | `properties.ts` | `list`, `create`, `update`, `remove`, `addUnit`, `updateUnit` |
 | `tenants.ts` | `list` (with derived balance), `create`, `update`, `archive` |
 | `leases.ts` | `list`, `create`, `renew`, `end`, `flagExpiring` |
-| `invoices.ts` | `list`, `create`, `send`, `markOverdue`, `generateMonthly` |
+| `invoices.ts` | `list`, `create` (duplicate-safe per lease+period), `send`, `markOverdue`, `generateMonthly` |
 | `payments.ts` | `list`, `record` (writes a receipt number and settles the invoice) |
 | `maintenance.ts` | `list`, `create`, `updateStatus` |
 | `announcements.ts` | `list`, `create`, `togglePin`, `remove` |
 | `profiles.ts` | `me`, `update` (allowlisted, validated fields only) |
+| `branding.ts` | `get` (public singleton), `update` (admin-only; logo verify + replace/delete) |
+| `migration.ts` | `backfillAdmin`, `setAdmin`, `renameDefaultBrand`, `deleteDraftInvoiceByNumber` |
 | `files.ts` | `generateUploadUrl` |
 | `crons.ts` | Daily overdue marking, monthly invoice generation, 60-day lease expiry flagging |
 

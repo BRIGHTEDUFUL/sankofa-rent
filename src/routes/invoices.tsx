@@ -110,7 +110,7 @@ export function Page() {
           {
             label: "Overdue",
             value: cediFromPesewas(overdue),
-            hint: `${cycle.filter((i) => i.status === "overdue").length} invoices`,
+            hint: `${cycle.filter((i) => i.status === "overdue").length} overdue`,
           },
           { label: "Collection rate", value: `${rate}%` },
         ]}

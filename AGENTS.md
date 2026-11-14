@@ -33,4 +33,19 @@ use the editor.
 
 - Keep shared auth fields and layout in `src/components/auth/AuthLayout.tsx`, with pure validation in `src/lib/auth-validation.ts`, so all auth pages share accessible controls and testable rules.
 - Auth is email + password through Convex (`@convex-dev/auth`); submissions must surface real server errors rather than simulate a session or successful delivery.
-- Convex backend code lives in `convex/` (excluded from the app tsconfig and eslint) so it can be deployed with `bunx convex dev` without affecting the frontend build.
+- Convex backend code lives in `convex/` (excluded from the app tsconfig and eslint) so it can be deployed with `npx convex dev` without affecting the frontend build.
+
+## Backend & deployment
+
+- **npm only** — no bun/pnpm/yarn; `package-lock.json` is the source of truth.
+- Deployments are driven by gitignored env files, never from the repo: `.env.local` = dev
+  (`dev:adorable-pig-437`), `.env.production.local` = prod (`prod:usable-penguin-827`).
+  `npx convex deploy --env-file <file>` for prod; `npx convex dev --once` for dev.
+- **Branding** is a global singleton (`convex/branding.ts` + `src/lib/branding.tsx`), publicly
+  readable, admin-writable only. Route `head()` titles are build-time static; `BrandingEffects`
+  rewrites `document.title` at runtime. Keep both `DEFAULT_BRANDING` copies in sync.
+- **Roles**: first account on a deployment becomes `admin`, the rest `user`. Admins only get the
+  Branding tab; the server enforces it via `requireAdmin` — UI gates are not authorization.
+- Operator migrations live in `convex/migration.ts` — promote admins
+  (`migration:backfillAdmin`), force one admin (`setAdmin`), rename the default brand
+  (`renameDefaultBrand`), delete a draft invoice by number. Run them with `--env-file` for prod.

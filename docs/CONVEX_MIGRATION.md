@@ -2,22 +2,30 @@
 
 This guide describes the migration of this app to Convex (database, auth, functions, file storage, scheduled jobs).
 
-**Implementation status (14 November 2026):** the migration described here is complete for the
-email + password scope. `convex/` holds the schema and one function file per screen; the frontend
-reads live data through `useQuery` and writes through dialogs calling mutations; `src/lib/mock.ts`
-is no longer imported by any route. Still out of scope: Google sign-in, password-reset emails,
-SMS/WhatsApp delivery, MoMo collection webhooks and the file ownership registry — see
-`convex/README.md`. Before production use, complete the acceptance checklist at the end of this
-document.
+**Implementation status (14 November 2026): complete, including deployments.**
+`convex/` holds the schema and one function file per screen; the frontend reads live data
+through `useQuery`; `src/lib/mock.ts` is deleted. Auth is email + password only
+(`@convex-dev/auth` 0.0.98). **Both deployments are live and verified:**
+
+| Deployment | Role | Auth keys | Live test |
+|---|---|---|---|
+| `dev:adorable-pig-437` (`.env.local`) | development | SITE_URL/JWT/JWKS ✅ | Kojo + Ama test accounts |
+| `prod:usable-penguin-827` (`.env.production.local`, gitignored) | production | SITE_URL/JWT/JWKS ✅ | One seeded admin account + minimal data |
+
+The full user journey was browser-verified against **dev** (sign-up, login, CRUD, invoice,
+payment, branding, non-admin gating) and against **prod** (sign-up → first account becomes
+admin → minimal data set → dashboard). See the **As-built & runbook** section at the end.
+Still out of scope: Google sign-in, password-reset emails, SMS/WhatsApp delivery, MoMo
+collection webhooks, file ownership registry — see `convex/README.md`.
 
 ---
 
 ## 1. Install
 
 ```bash
-bun add convex @convex-dev/auth @auth/core
-bunx convex dev            # creates the convex/ folder + deployment, writes VITE_CONVEX_URL to .env.local
-bunx @convex-dev/auth      # sets JWT_PRIVATE_KEY, JWKS, SITE_URL on the deployment
+npm install convex @convex-dev/auth @auth/core
+npx convex dev            # creates the convex/ folder + deployment, writes VITE_CONVEX_URL to .env.local
+npx @convex-dev/auth      # sets JWT_PRIVATE_KEY, JWKS, SITE_URL on the deployment
 ```
 
 The ready-made backend files are already in `convex/` (see `convex/README.md`). This guide explains them.
@@ -176,7 +184,7 @@ export default http;
 
 Google: set `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` in the Convex deployment. Configure the Google callback URL to the deployment's HTTP actions URL plus `/api/auth/callback/google` (use the `.convex.site` URL, not `.convex.cloud`). Set `SITE_URL` to the actual frontend origin, separately for development and production. Store secrets in Convex's environment settings, never frontend `VITE_*` variables or committed files.
 
-Password reset is **not** enabled by `providers: [Password, Google]`. Create `convex/ResendOTPPasswordReset.ts` using the custom email-provider example in the [Password provider docs](https://labs.convex.dev/auth/config/passwords), install its additional dependencies with `bun add resend @oslojs/crypto`, import the exported provider into `convex/auth.ts`, and replace `Password` with `Password({ reset: ResendOTPPasswordReset })`. `ResendOTPPasswordReset` is a file you create, not a built-in export. Set `AUTH_RESEND_KEY` on Convex and use a verified sender domain; the example sender is not a production sender.
+Password reset is **not** enabled by `providers: [Password, Google]`. Create `convex/ResendOTPPasswordReset.ts` using the custom email-provider example in the [Password provider docs](https://labs.convex.dev/auth/config/passwords), install its additional dependencies with `npm install resend @oslojs/crypto`, import the exported provider into `convex/auth.ts`, and replace `Password` with `Password({ reset: ResendOTPPasswordReset })`. `ResendOTPPasswordReset` is a file you create, not a built-in export. Set `AUTH_RESEND_KEY` on Convex and use a verified sender domain; the example sender is not a production sender.
 
 The forgot-password page needs two states, with errors and a pending state on both:
 ```ts
@@ -378,7 +386,7 @@ export default crons;
 
 ## 6. External services (Convex actions, `"use node"` if needed)
 
-- **SMS** (rent reminders, announcements): Hubtel, Arkesel or mNotify. Run `bunx convex env set ARKESEL_API_KEY ...`
+- **SMS** (rent reminders, announcements): Hubtel, Arkesel or mNotify. Run `npx convex env set ARKESEL_API_KEY ...`
 - **Mobile money collection**: Paystack (supports MTN, Telecel and AirtelTigo) or Hubtel. Set up a webhook route in `convex/http.ts` that verifies the signature and then calls `internal.payments.recordFromWebhook`.
 - **Receipts as PDF**: an action that generates the PDF and stores it with `ctx.storage.store()`.
 - **Email**: Resend.
@@ -445,7 +453,7 @@ Use `useAuthActions().signOut()` (not a custom mutation called `auth.signOut`), 
 6. Connect the action buttons (Add tenant, Record payment, New lease, and so on) to dialogs that call mutations.
 7. Add crons, SMS and MoMo webhooks.
 8. Delete `src/lib/mock.ts`.
-9. Deploy: `bunx convex deploy`, then set `VITE_CONVEX_URL` to the production URL.
+9. Deploy: `npx convex deploy`, then set `VITE_CONVEX_URL` to the production URL.
 
 ### Required implementation and acceptance checks
 
@@ -458,3 +466,80 @@ Use `useAuthActions().signOut()` (not a custom mutation called `auth.signOut`), 
 - **Auth:** test sign-up, duplicate email, wrong password, refresh persistence, Google callback, reset request plus code/new-password verification, and sign-out/Back in the real browser. Confirm exactly one profile per user and correct onboarding fields. Configure reset delivery before enabling password sign-in in production.
 - **Data mapping:** Convex returns `_id`, epoch dates, enums and integer money, whereas mock rows contain display strings. Build explicit view adapters and relational joins; do not replace imports blindly. Derive dashboard totals from stored invoices/payments, never the mock statistics. Never import the made-up sample tenant data into a live landlord account.
 - **Go-live:** keep development and production deployments and secrets separate. Run Convex code generation and checks against the actual deployment, then browser-test every page and action. Delete mock data only after the real flows pass. Until then, the current app remains frontend-only.
+
+---
+
+## As-built & runbook (14 November 2026)
+
+### Branding & roles
+
+- Global **branding** singleton in `convex/branding.ts` (`appName`, `tagline`, `accentColor`,
+  optional `logoId` + `logoContentType`). **Publicly readable** (the login page shows it before
+  any auth) and **writable by admins only** via `requireAdmin` in `convex/lib.ts`.
+  A fresh deployment auto-creates no row; the UI falls back to `DEFAULT_BRANDING` in
+  `src/lib/branding.tsx` (keep both copies in sync).
+- `profiles.role: "admin" | "user"` (optional; `undefined` = member). The **first account on a
+  deployment becomes admin** (`afterUserCreatedOrUpdated` in `convex/auth.ts`); later accounts
+  are members. Admins see **Settings → Branding**; members don't (and the server rejects writes).
+- The client drives **tab title**, **favicon** (root `<link rel="icon">`), and **accent color**
+  (`--primary`/`--ring`/`--accent`/gradient via `color-mix`) from the stored brand. Route
+  `head()` titles stay static because SSR cannot read the client-only Convex provider —
+  `BrandingEffects` rewrites `document.title` at runtime instead.
+- Resetting to defaults in Settings reverts name/tagline/accent and clears the custom logo;
+  the tab title reverts too (`prevBrandNameRef` handles the transition).
+
+### Operator commands (`npx convex run <file:function>`)
+
+| Command | Purpose |
+|---|---|
+| `migration:backfillAdmin` | Promote earliest profile to admin iff none exists (safe to re-run) |
+| `migration:setAdmin` | Force-set one admin by email; demotes other admins |
+| `migration:renameDefaultBrand` | One-time rename of the default brand; skips customised rows |
+| `migration:deleteDraftInvoiceByNumber` | Delete a DRAFT invoice (e.g. an accidental duplicate) |
+
+Add `--env-file .env.production.local` to target prod instead of dev. Deploy keys live only in
+the gitignored env files; never commit them.
+
+### Deployment runbook
+
+1. Dev loop: `npm run dev` (talks to `dev:adorable-pig-437` from `.env.local`).
+2. Backend-only sync: `npx convex dev --once`.
+3. Auth keys (once per deployment): `npx @convex-dev/auth` — sets `SITE_URL`, `JWT_PRIVATE_KEY`, `JWKS`.
+4. Prod backend: `npx convex deploy --env-file .env.production.local` (already done — schema,
+   indexes, functions and auth keys pushed on 2026-11-14).
+5. Prod frontend env: hosting must define `VITE_CONVEX_URL=https://usable-penguin-827.convex.cloud`.
+6. Prod smoke test: `npx convex run branding:get --env-file .env.production.local` →
+   returns `{ appName: "Sankofa Rent", tagline: "…", accentColor: "#4E735A", logoUrl: null }`.
+
+### Test evidence (2026-11-14)
+
+Browser-verified against **dev** (Kojo admin + Ama member):
+- Signup → profile auto-created; first account = admin; second = member.
+- Empty states everywhere; dashboard zeros; cross-tenant isolation (Ama sees none of Kojo's data).
+- Property → 2 units → tenant → lease (double-book rejected) → invoice INV-1001 → send →
+  payment RCP-1001 (invoice flips to paid, collected GH₵ 1,600.00, rate 100%).
+- Duplicate invoice creation rejected with a friendly error (`Invoice INV-1001 already covers…`).
+- Settings: profile/business/payment-methods saved; branding changed live (name, tagline,
+  color, logo) and restored via *Reset to defaults*.
+- Non-admin: Branding tab hidden; Security shows *Member*.
+- Forgot-password shows the honest not-enabled state; demo links/Google button removed.
+- Unit tests: 14/14 (`npm test`) — branding, pesewasFromCedi, auth validation.
+
+Seeded against **prod** (fresh deployment):
+- One admin account signup (first-account rule) → `Admin` role confirmed in Security tab.
+- Minimal display dataset: 1 property (Adenta Court), units A1/A2, 1 tenant (Kwame Asante),
+  lease to 2027-12-31, INV-1001 sent, payment RCP-1001 (invoice paid), 1 open maintenance
+  request, 1 announcement; dashboard shows occupancy 50%, collected GH₵ 1,850.00, rate 100%.
+
+### Credentials
+
+The seeded prod admin credentials are delivered privately with this delivery (not in the
+repo). Rotate the password after the first login.
+
+### Known limitations
+
+- SSR `head()`/og meta are static at build time — crawlers see the default name/tagline;
+  the in-app tab title updates at runtime.
+- Brief first-paint of default accent before branding loads (client-only provider).
+- Custom logo serves from Convex storage (`*.convex.cloud`), not same-origin.
+- `branding.get` is readable pre-auth by design; do not store anything sensitive in it.

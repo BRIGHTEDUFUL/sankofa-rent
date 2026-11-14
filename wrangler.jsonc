@@ -1,6 +1,6 @@
 {
   // Cloudflare Workers config for the Nitro `cloudflare-module` build output.
-  // Build first (`bun run build`), which emits:
+  // Build first (`npm run build`), which emits:
   //   .output/server/index.mjs  -> Worker entry (SSR shell)
   //   .output/public/           -> static assets, served by the ASSETS binding
   // No `vars` block: VITE_CONVEX_URL is inlined at build time, never at runtime.

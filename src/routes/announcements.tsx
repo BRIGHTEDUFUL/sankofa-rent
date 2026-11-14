@@ -72,7 +72,8 @@ export function Page() {
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">Announcements</h2>
           <p className="text-sm text-muted-foreground">
-            {announcements.length} notices sent to your tenants
+            {announcements.length} {announcements.length === 1 ? "notice" : "notices"} sent to your
+            tenants
           </p>
         </div>
         <Button onClick={() => setCreateOpen(true)}>
