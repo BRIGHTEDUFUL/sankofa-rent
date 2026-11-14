@@ -5,13 +5,7 @@ import { api } from "../../convex/_generated/api";
 import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { DataPage } from "@/components/app/DataPage";
 import { Badge, Card } from "@/components/app/AppShell";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/app/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -263,104 +257,104 @@ function MaintenanceDialog({
   }
 
   return (
-    <Dialog
+    <ResponsiveDialog
       open={open}
       onOpenChange={(next) => {
         onOpenChange(next);
         if (!next) setError("");
       }}
+      title="New maintenance request"
     >
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>New maintenance request</DialogTitle>
-        </DialogHeader>
-        <form className="space-y-4" onSubmit={submit}>
+      <form className="space-y-4" onSubmit={submit}>
+        <div className="space-y-1.5">
+          <Label>Title</Label>
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Leaking kitchen tap"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Description</Label>
+          <Input
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="What happened?"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Property</Label>
+          <Select
+            value={propertyId}
+            onValueChange={(v) => {
+              setPropertyId(v);
+              setUnitId("");
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a property" />
+            </SelectTrigger>
+            <SelectContent>
+              {properties.map((p) => (
+                <SelectItem key={p._id} value={p._id}>
+                  {p.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label>Title</Label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Leaking kitchen tap"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Description</Label>
-            <Input
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="What happened?"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Property</Label>
-            <Select
-              value={propertyId}
-              onValueChange={(v) => {
-                setPropertyId(v);
-                setUnitId("");
-              }}
-            >
+            <Label>Unit</Label>
+            <Select value={unitId} onValueChange={setUnitId} disabled={!property}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a property" />
+                <SelectValue placeholder="Whole property" />
               </SelectTrigger>
               <SelectContent>
-                {properties.map((p) => (
-                  <SelectItem key={p._id} value={p._id}>
-                    {p.name}
+                {property?.units.map((u) => (
+                  <SelectItem key={u._id} value={u._id}>
+                    {u.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>Unit</Label>
-              <Select value={unitId} onValueChange={setUnitId} disabled={!property}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Whole property" />
-                </SelectTrigger>
-                <SelectContent>
-                  {property?.units.map((u) => (
-                    <SelectItem key={u._id} value={u._id}>
-                      {u.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Priority</Label>
-              <Select value={priority} onValueChange={setPriority}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
           <div className="space-y-1.5">
-            <Label>Reported by</Label>
-            <Input
-              value={reportedBy}
-              onChange={(e) => setReportedBy(e.target.value)}
-              placeholder="Tenant or caretaker"
-            />
+            <Label>Priority</Label>
+            <Select value={priority} onValueChange={setPriority}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          {error && (
-            <p className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>
-          )}
-          <DialogFooter>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? "Saving…" : "Create request"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Reported by</Label>
+          <Input
+            value={reportedBy}
+            onChange={(e) => setReportedBy(e.target.value)}
+            placeholder="Tenant or caretaker"
+          />
+        </div>
+        {error && (
+          <p className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>
+        )}
+        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="h-12 w-full justify-center sm:h-auto sm:w-auto"
+          >
+            {submitting ? "Saving…" : "Create request"}
+          </Button>
+        </div>
+      </form>
+    </ResponsiveDialog>
   );
 }
 
@@ -399,52 +393,53 @@ function StatusDialog({
   }
 
   return (
-    <Dialog
+    <ResponsiveDialog
       open={open}
       onOpenChange={(next) => {
         onOpenChange(next);
         if (!next) setError("");
       }}
+      title="Update request"
+      className="sm:max-w-md"
     >
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Update request</DialogTitle>
-        </DialogHeader>
-        <form className="space-y-4" onSubmit={submit}>
-          <p className="text-sm text-muted-foreground">{item?.title}</p>
-          <div className="space-y-1.5">
-            <Label>Status</Label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="open">Open</SelectItem>
-                <SelectItem value="in_progress">In progress</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="cost">Cost (GH₵)</Label>
-            <Input
-              id="cost"
-              value={cost}
-              onChange={(e) => setCost(e.target.value)}
-              inputMode="decimal"
-              placeholder="Optional"
-            />
-          </div>
-          {error && (
-            <p className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>
-          )}
-          <DialogFooter>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? "Saving…" : "Save changes"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <form className="space-y-4" onSubmit={submit}>
+        <p className="text-sm text-muted-foreground">{item?.title}</p>
+        <div className="space-y-1.5">
+          <Label>Status</Label>
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="open">Open</SelectItem>
+              <SelectItem value="in_progress">In progress</SelectItem>
+              <SelectItem value="resolved">Resolved</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="cost">Cost (GH₵)</Label>
+          <Input
+            id="cost"
+            value={cost}
+            onChange={(e) => setCost(e.target.value)}
+            inputMode="decimal"
+            placeholder="Optional"
+          />
+        </div>
+        {error && (
+          <p className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>
+        )}
+        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="h-12 w-full justify-center sm:h-auto sm:w-auto"
+          >
+            {submitting ? "Saving…" : "Save changes"}
+          </Button>
+        </div>
+      </form>
+    </ResponsiveDialog>
   );
 }

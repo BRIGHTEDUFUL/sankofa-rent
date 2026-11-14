@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useQuery } from "convex/react";
 import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
 import {
@@ -13,14 +13,21 @@ import {
   Megaphone,
   Settings,
   LogOut,
-  Search,
   Bell,
-  MessageCircle,
+  Menu,
+  ChevronRight,
   Sun,
 } from "lucide-react";
 import { api } from "../../../convex/_generated/api";
 import { useBranding } from "@/lib/branding";
 import { initials } from "@/lib/format";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+} from "@/components/ui/drawer";
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutGrid },
@@ -32,6 +39,127 @@ const nav = [
   { to: "/maintenance", label: "Maintenance", icon: Wrench },
   { to: "/announcements", label: "Announcements", icon: Megaphone },
 ] as const;
+
+const PRIMARY_TABS = [
+  { to: "/", label: "Dashboard", icon: LayoutGrid },
+  { to: "/invoices", label: "Invoices", icon: Receipt },
+  { to: "/payments", label: "Payments", icon: Wallet },
+] as const;
+
+const MORE_ITEMS = [
+  { to: "/properties", label: "Properties & units", icon: Building2 },
+  { to: "/tenants", label: "Tenants", icon: Users },
+  { to: "/leases", label: "Leases", icon: FileSignature },
+  { to: "/maintenance", label: "Maintenance", icon: Wrench },
+  { to: "/announcements", label: "Announcements", icon: Megaphone },
+] as const;
+
+function MobileTabBar({
+  path,
+  onLogout,
+}: {
+  path: string;
+  avatar: string;
+  onLogout: () => void | Promise<void>;
+}) {
+  const [moreOpen, setMoreOpen] = useState(false);
+  const isActive = (to: string) => (to === "/" ? path === "/" : path.startsWith(to));
+  const moreActive = [...MORE_ITEMS, { to: "/settings" }].some((m) => path.startsWith(m.to));
+  return (
+    <>
+      <nav
+        aria-label="Primary navigation"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/85 backdrop-blur-xl pb-safe sm:hidden"
+      >
+        <div className="mx-auto grid h-16 max-w-lg grid-cols-4">
+          {PRIMARY_TABS.map((tab) => (
+            <Link
+              key={tab.to}
+              to={tab.to}
+              aria-current={isActive(tab.to) ? "page" : undefined}
+              onClick={() => {
+                try {
+                  navigator.vibrate?.(8);
+                } catch {
+                  // Haptics are a progressive enhancement — ignore failures.
+                }
+              }}
+              className={`flex flex-col items-center justify-center gap-0.5 pressable ${isActive(tab.to) ? "text-primary" : "text-muted-foreground"}`}
+            >
+              <tab.icon className="h-6 w-6" strokeWidth={isActive(tab.to) ? 2.2 : 1.8} />
+              <span className="text-[10px] font-semibold leading-none">{tab.label}</span>
+            </Link>
+          ))}
+          <button
+            type="button"
+            onClick={() => setMoreOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={moreOpen}
+            aria-label="More sections"
+            className={`flex flex-col items-center justify-center gap-0.5 pressable ${moreActive ? "text-primary" : "text-muted-foreground"}`}
+          >
+            <Menu className="h-6 w-6" strokeWidth={moreActive ? 2.2 : 1.8} />
+            <span className="text-[10px] font-semibold leading-none">More</span>
+          </button>
+        </div>
+      </nav>
+
+      <Drawer open={moreOpen} onOpenChange={setMoreOpen}>
+        <DrawerContent className="max-h-[85dvh] overflow-y-auto rounded-t-3xl border-0 bg-card">
+          <DrawerHeader className="px-5 pb-2 pt-1 text-left">
+            <DrawerTitle className="text-base font-semibold">More</DrawerTitle>
+            <DrawerDescription className="sr-only">
+              More sections and account actions
+            </DrawerDescription>
+          </DrawerHeader>
+          <div className="grid grid-cols-3 gap-2 px-4">
+            {MORE_ITEMS.map((m) => (
+              <Link
+                key={m.to}
+                to={m.to}
+                onClick={() => setMoreOpen(false)}
+                className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-muted px-2 py-4 pressable"
+              >
+                <m.icon className="h-6 w-6 text-primary" />
+                <span className="text-center text-[11px] font-semibold leading-tight text-foreground">
+                  {m.label}
+                </span>
+              </Link>
+            ))}
+          </div>
+          <div className="px-4 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-3">
+            <div className="overflow-hidden rounded-2xl bg-muted">
+              <Link
+                to="/settings"
+                onClick={() => setMoreOpen(false)}
+                className="flex min-h-[52px] items-center gap-3 px-4 text-sm font-semibold pressable"
+              >
+                <Settings className="h-5 w-5 text-primary" /> Settings
+                <span className="ml-auto text-muted-foreground">
+                  <ChevronRight className="h-5 w-5" />
+                </span>
+              </Link>
+              <div className="h-px bg-border" />
+              <button
+                type="button"
+                onClick={() => {
+                  setMoreOpen(false);
+                  onLogout();
+                }}
+                className="flex min-h-[52px] w-full items-center gap-3 px-4 text-sm font-semibold text-destructive pressable"
+              >
+                <LogOut className="h-5 w-5" /> Sign out
+              </button>
+            </div>
+            <p className="mt-4 text-center text-[11px] text-muted-foreground">
+              Sankofa Rent · v1.0
+            </p>
+          </div>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -71,53 +199,53 @@ export function AppShell({ children }: { children: ReactNode }) {
   const avatar = initials(fullName);
 
   return (
-    <div className="min-h-screen p-3 sm:p-6">
-      <div className="mx-auto max-w-[1400px]">
-        <header className="mb-4 grid sm:mb-6 grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-          <div className="flex min-w-0 items-center gap-4">
-            <div className="grid h-10 w-10 shrink-0 place-items-center text-primary sm:h-12 sm:w-12">
+    <div className="min-h-screen sm:p-6">
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl pt-safe">
+        <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between gap-3 px-4 sm:h-16 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2.5 sm:gap-4">
+            <div className="grid h-7 w-7 shrink-0 place-items-center text-primary sm:h-12 sm:w-12">
               {logoUrl ? (
                 <img
                   src={logoUrl}
                   alt=""
-                  className="h-8 w-8 rounded-lg object-contain sm:h-10 sm:w-10"
-                  width={40}
-                  height={40}
+                  className="h-7 w-7 rounded-lg object-contain sm:h-10 sm:w-10"
+                  width={28}
+                  height={28}
                 />
               ) : (
-                <Sun className="h-8 w-8 sm:h-10 w-10" strokeWidth={2.5} />
+                <Sun className="h-7 w-7 sm:h-10 sm:w-10" strokeWidth={2.5} />
               )}
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-semibold sm:text-2xl">{greeting}</h1>
+              <h1 className="truncate text-base font-bold sm:text-2xl sm:font-semibold">
+                {greeting}
+              </h1>
               <p className="hidden truncate text-sm text-muted-foreground sm:block">
                 Here's what's happening across your properties
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden items-center rounded-full bg-card py-1.5 pl-5 pr-1.5 shadow-soft md:flex">
-              <input
-                placeholder="Search tenants, units…"
-                className="w-56 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-              />
-              <button className="grid h-9 w-9 place-items-center rounded-full bg-ink text-ink-foreground">
-                <Search className="h-4 w-4" />
-              </button>
-            </div>
-            <button className="relative grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-card shadow-soft">
-              <MessageCircle className="h-5 w-5" />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive" />
-            </button>
-            <button className="grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-card shadow-soft">
+            <Link
+              to="/announcements"
+              aria-label="Announcements"
+              className="grid h-11 w-11 place-items-center rounded-full text-foreground pressable hover:bg-muted"
+            >
               <Bell className="h-5 w-5" />
-            </button>
+            </Link>
+            <Link to="/settings" aria-label="Settings">
+              <div className="grid h-11 w-11 place-items-center rounded-full bg-ink text-xs font-semibold text-ink-foreground pressable">
+                {avatar}
+              </div>
+            </Link>
           </div>
-        </header>
+        </div>
+      </header>
 
-        <div className="flex gap-4 sm:gap-6">
+      <div className="mx-auto max-w-[1400px]">
+        <div className="flex gap-6 sm:pt-6">
           <aside className="sticky top-6 hidden h-[calc(100vh-8rem)] w-16 shrink-0 flex-col items-center justify-between rounded-full bg-card py-4 shadow-soft sm:flex">
-            <nav className="flex flex-col items-center gap-2">
+            <nav className="flex flex-col items-center gap-2" aria-label="Primary">
               {nav.map((n) => {
                 const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
                 return (
@@ -125,7 +253,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                     key={n.to}
                     to={n.to}
                     title={n.label}
-                    className={`grid h-11 w-11 place-items-center rounded-full transition-colors ${active ? "bg-ink text-ink-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                    aria-label={n.label}
+                    aria-current={active ? "page" : undefined}
+                    className={`grid h-11 w-11 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active ? "bg-ink text-ink-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
                   >
                     <n.icon className="h-5 w-5" />
                   </Link>
@@ -136,49 +266,37 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 to="/settings"
                 title="Settings"
-                className={`grid h-11 w-11 place-items-center rounded-full ${path.startsWith("/settings") ? "bg-ink text-ink-foreground" : "text-muted-foreground hover:bg-muted"}`}
+                aria-label="Settings"
+                aria-current={path.startsWith("/settings") ? "page" : undefined}
+                className={`grid h-11 w-11 place-items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${path.startsWith("/settings") ? "bg-ink text-ink-foreground" : "text-muted-foreground hover:bg-muted"}`}
               >
                 <Settings className="h-5 w-5" />
               </Link>
               <button
                 onClick={logout}
                 title="Log out"
-                className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                aria-label="Log out"
+                className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <LogOut className="h-5 w-5" />
               </button>
-              <div className="mt-2 grid h-10 w-10 place-items-center rounded-full bg-ink text-xs font-semibold text-ink-foreground">
+              <div
+                role="img"
+                aria-label={fullName ? `Account avatar for ${fullName}` : "Your account"}
+                className="mt-2 grid h-10 w-10 place-items-center rounded-full bg-ink text-xs font-semibold text-ink-foreground"
+              >
                 {avatar}
               </div>
             </div>
           </aside>
 
-          <main className="min-w-0 flex-1 pb-24 sm:pb-0 [padding-bottom:calc(6rem+env(safe-area-inset-bottom))] sm:![padding-bottom:0]">
+          <main className="min-w-0 flex-1 px-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-4 sm:px-0 sm:pb-0 sm:pt-0">
             {children}
           </main>
         </div>
       </div>
 
-      <nav className="fixed inset-x-3 bottom-3 z-50 flex justify-between gap-1 overflow-x-auto rounded-full [scrollbar-width:none] bg-card p-1.5 shadow-soft sm:hidden">
-        {nav.map((n) => {
-          const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
-          return (
-            <Link
-              key={n.to}
-              to={n.to}
-              className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${active ? "bg-ink text-ink-foreground" : "text-muted-foreground"}`}
-            >
-              <n.icon className="h-[18px] w-[18px]" />
-            </Link>
-          );
-        })}
-        <Link
-          to="/settings"
-          className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${path.startsWith("/settings") ? "bg-ink text-ink-foreground" : "text-muted-foreground"}`}
-        >
-          <Settings className="h-[18px] w-[18px]" />
-        </Link>
-      </nav>
+      <MobileTabBar path={path} avatar={avatar} onLogout={logout} />
     </div>
   );
 }

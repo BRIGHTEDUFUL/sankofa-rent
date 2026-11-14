@@ -4,6 +4,7 @@ import { Users, Banknote, Wrench, Smartphone, ArrowUpRight, Megaphone } from "lu
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Card, Badge, Button } from "@/components/app/AppShell";
+import { Progress } from "@/components/ui/progress";
 import { cediFromPesewas, formatDateTime, initials, PAYMENT_METHODS } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
@@ -47,9 +48,9 @@ function Dashboard() {
     !profile
   ) {
     return (
-      <div className="grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i} className="h-24 animate-pulse bg-muted/40" />
+          <Card key={i} className="h-28 animate-pulse bg-muted/40" />
         ))}
       </div>
     );
@@ -68,11 +69,11 @@ function Dashboard() {
   const fullName = `${profile.firstName} ${profile.lastName}`.trim();
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
-      <Card className="flex items-center justify-between">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+      <Card className="!p-4 flex items-center justify-between sm:!p-6">
         <div>
-          <p className="text-sm text-muted-foreground">Collected this month</p>
-          <p className="mt-1 text-2xl font-semibold">
+          <p className="text-xs text-muted-foreground sm:text-sm">Collected this month</p>
+          <p className="mt-1 whitespace-nowrap text-xl font-semibold sm:text-2xl">
             {cediFromPesewas(summary.collectedThisMonth)}
           </p>
         </div>
@@ -82,28 +83,30 @@ function Dashboard() {
           ))}
         </div>
       </Card>
-      <Card className="flex items-center gap-4">
-        <div className="grid h-12 w-12 place-items-center rounded-full bg-primary-soft text-primary">
+      <Card className="flex items-center gap-3 !p-4 sm:gap-4 sm:!p-6">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-soft text-primary sm:h-12 sm:w-12">
           <Users className="h-5 w-5" />
         </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Occupancy</p>
-          <p className="text-2xl font-semibold">{summary.occupancyPercent}%</p>
+        <div className="min-w-0">
+          <p className="text-xs text-muted-foreground sm:text-sm">Occupancy</p>
+          <p className="whitespace-nowrap text-xl font-semibold sm:text-2xl">{summary.occupancyPercent}%</p>
         </div>
       </Card>
-      <Card className="flex items-center gap-4">
-        <div className="grid h-12 w-12 place-items-center rounded-full bg-gold-soft text-gold">
+      <Card className="flex items-center gap-3 !p-4 sm:gap-4 sm:!p-6">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold-soft text-gold sm:h-12 sm:w-12">
           <Banknote className="h-5 w-5" />
         </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Arrears</p>
-          <p className="text-2xl font-semibold">{cediFromPesewas(summary.arrears)}</p>
+        <div className="min-w-0">
+          <p className="text-xs text-muted-foreground sm:text-sm">Arrears</p>
+          <p className="whitespace-nowrap text-xl font-semibold sm:text-2xl">{cediFromPesewas(summary.arrears)}</p>
         </div>
       </Card>
-      <Card className="relative overflow-hidden bg-gradient-primary text-primary-foreground">
-        <p className="text-sm opacity-80">Expected this month</p>
-        <p className="mt-1 text-2xl font-semibold">{cediFromPesewas(summary.expectedThisMonth)}</p>
-        <div className="absolute bottom-2 right-3 h-12 w-24 opacity-70">
+      <Card className="relative overflow-hidden bg-gradient-primary text-primary-foreground !p-4 sm:!p-6">
+        <p className="text-xs opacity-80 sm:text-sm">Expected this month</p>
+        <p className="mt-1 whitespace-nowrap text-lg font-semibold sm:text-2xl">
+          {cediFromPesewas(summary.expectedThisMonth)}
+        </p>
+        <div className="absolute bottom-2 right-2 h-8 w-16 opacity-70 sm:right-3 sm:h-10 sm:w-20">
           <ResponsiveContainer>
             <AreaChart data={monthly}>
               <Area
@@ -118,10 +121,10 @@ function Dashboard() {
         </div>
       </Card>
 
-      <Card className="lg:col-span-2">
+      <Card className="col-span-2 lg:col-span-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold">Rent collection</h3>
+            <h3 className="text-lg font-semibold sm:text-xl">Rent collection</h3>
             <Badge tone="green">Last 6 months</Badge>
           </div>
         </div>
@@ -139,7 +142,7 @@ function Dashboard() {
             </p>
           </div>
         </div>
-        <div className="mt-4 h-48">
+        <div className="mt-4 h-44 sm:h-48">
           <ResponsiveContainer>
             <BarChart data={monthly} barGap={4}>
               <XAxis
@@ -166,57 +169,49 @@ function Dashboard() {
       </Card>
 
       <Card>
-        <h3 className="text-lg font-semibold">Collection rate</h3>
-        <p className="text-sm text-muted-foreground">This month</p>
-        <p className="mt-3 text-2xl font-semibold text-primary">{collectionRate}%</p>
-        <div className="relative mx-auto mt-4 w-44">
-          <svg viewBox="0 0 100 55" className="w-full">
-            <path
-              d="M10 50 A40 40 0 0 1 90 50"
-              fill="none"
-              stroke="var(--muted)"
-              strokeWidth="14"
-            />
-            <path
-              d="M10 50 A40 40 0 0 1 90 50"
-              fill="none"
-              stroke="var(--primary)"
-              strokeWidth="14"
-              pathLength={100}
-              strokeDasharray={`${collectionRate} 100`}
-            />
-          </svg>
-          <p className="absolute inset-x-0 bottom-0 text-center text-2xl font-semibold">
-            {collectionRate}%
-          </p>
-        </div>
-      </Card>
-
-      <Card className="flex flex-col items-center text-center">
-        <div className="grid h-16 w-16 place-items-center rounded-full bg-ink text-lg font-semibold text-ink-foreground">
-          {initials(fullName)}
-        </div>
-        <h3 className="mt-3 text-lg font-semibold">{fullName || "Your profile"}</h3>
-        <p className="text-sm text-muted-foreground">
-          {profile.businessName || profile.phone || "Add your business details in Settings"}
+        <h3 className="text-lg font-semibold sm:text-xl">Collection rate</h3>
+        <p className="text-xs text-muted-foreground sm:text-sm">This month</p>
+        <p className="mt-3 text-3xl font-semibold text-primary sm:text-4xl">{collectionRate}%</p>
+        <Progress value={collectionRate} className="mt-4 h-2" />
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          {cediFromPesewas(summary.collectedThisMonth)} of{" "}
+          {cediFromPesewas(summary.expectedThisMonth)} expected
         </p>
-        <div className="mt-5 grid w-full grid-cols-3">
-          {[
-            ["Properties", properties.length],
-            ["Units", unitCount],
-            ["Tenants", tenants.length],
-          ].map(([l, v]) => (
-            <div key={l as string}>
-              <p className="text-xs text-muted-foreground">{l}</p>
-              <p className="text-xl font-semibold">{v}</p>
-            </div>
-          ))}
+      </Card>
+
+      <Card className="col-span-2 sm:col-span-1">
+        <div className="flex flex-row items-center gap-4 sm:flex-col sm:text-center">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-base font-semibold text-ink-foreground sm:h-16 sm:w-16 sm:text-lg">
+            {initials(fullName)}
+          </div>
+          <div className="min-w-0">
+            <h3 className="truncate text-base font-semibold sm:mt-3 sm:text-lg">
+              {fullName || "Your profile"}
+            </h3>
+            <p className="truncate text-xs text-muted-foreground sm:text-sm">
+              {profile.businessName || profile.phone || "Add your business details in Settings"}
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 w-full border-t border-border pt-4">
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              ["Properties", properties.length],
+              ["Units", unitCount],
+              ["Tenants", tenants.length],
+            ].map(([l, v]) => (
+              <div key={l as string}>
+                <p className="text-xs text-muted-foreground">{l}</p>
+                <p className="text-lg font-semibold sm:text-xl">{v}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </Card>
 
-      <Card className="lg:col-span-2">
+      <Card className="col-span-2 lg:col-span-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Recent payments</h3>
+          <h3 className="text-lg font-semibold sm:text-xl">Recent payments</h3>
           <Link
             to="/payments"
             className="flex items-center gap-1 text-sm font-semibold text-primary"
@@ -234,8 +229,10 @@ function Dashboard() {
               key={p._id}
               className="flex items-center justify-between border-l-4 border-primary pl-3"
             >
-              <div>
-                <p className="font-semibold">{tenantById.get(p.tenantId)?.name ?? "Tenant"}</p>
+              <div className="min-w-0">
+                <p className="truncate font-semibold">
+                  {tenantById.get(p.tenantId)?.name ?? "Tenant"}
+                </p>
                 <p className="text-xs text-muted-foreground">
                   {PAYMENT_METHODS[p.method] ?? p.method} · {formatDateTime(p.paidAt)}
                 </p>
@@ -246,9 +243,9 @@ function Dashboard() {
         </div>
       </Card>
 
-      <Card>
+      <Card className="col-span-2 sm:col-span-1">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Maintenance</h3>
+          <h3 className="text-lg font-semibold sm:text-xl">Maintenance</h3>
           <Wrench className="h-4 w-4 text-muted-foreground" />
         </div>
         <div className="mt-4 space-y-3">
@@ -259,10 +256,14 @@ function Dashboard() {
             .filter((m) => m.status !== "resolved")
             .slice(0, 3)
             .map((m) => (
-              <div key={m._id}>
+              <Link
+                key={m._id}
+                to="/maintenance"
+                className="block rounded-2xl transition active:opacity-70"
+              >
                 <p className="text-sm font-semibold">{m.title}</p>
-                <div className="mt-1 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">
+                <div className="mt-1 flex items-center justify-between gap-2">
+                  <span className="min-w-0 truncate text-xs text-muted-foreground">
                     {(m.unitId ? unitById.get(m.unitId)?.property.name : undefined) ?? "Property"}
                   </span>
                   <Badge
@@ -271,23 +272,27 @@ function Dashboard() {
                     {m.status.replace("_", " ")}
                   </Badge>
                 </div>
-              </div>
+              </Link>
             ))}
         </div>
       </Card>
 
-      <Card className="flex flex-col items-center justify-center text-center">
-        <Smartphone className="h-12 w-12 text-primary" strokeWidth={1.5} />
-        <h3 className="mt-3 text-lg font-semibold">Get paid by MoMo</h3>
+      <Card className="col-span-2 flex flex-col items-center justify-center text-center lg:col-span-1">
+        <Smartphone className="h-10 w-10 text-primary sm:h-12 sm:w-12" strokeWidth={1.5} />
+        <h3 className="mt-3 text-lg font-semibold sm:text-xl">Get paid by MoMo</h3>
         <p className="text-sm text-muted-foreground">
           Let tenants pay rent with MTN, Telecel or AirtelTigo and get instant receipts.
         </p>
-        <Button className="mt-4" variant="ghost">
-          Set up MoMo
-        </Button>
+        <Link
+          to="/settings"
+          search={{ tab: "payments" }}
+          className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-muted px-4 text-sm font-semibold transition hover:bg-accent sm:w-auto"
+        >
+          Set up MoMo <ArrowUpRight className="h-4 w-4" />
+        </Link>
       </Card>
 
-      <Card className="lg:col-span-4">
+      <Card className="col-span-2 lg:col-span-4">
         <div className="flex flex-wrap items-center gap-4">
           <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary-soft text-primary">
             <Megaphone className="h-5 w-5" />

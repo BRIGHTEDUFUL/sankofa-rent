@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Plus, SlidersHorizontal } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Card, Button } from "./AppShell";
 
 export type Column<T> = {
@@ -37,12 +37,11 @@ export function DataPage<T>({
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{title}</h2>
           <p className="text-sm text-muted-foreground">{subtitle}</p>
         </div>
-        <div className="grid grid-cols-[auto_1fr] gap-2 sm:flex">
-          <Button variant="ghost">
-            <SlidersHorizontal className="h-4 w-4" />
-            Filter
-          </Button>
-          <Button className="justify-center" onClick={onAction}>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+          <Button
+            className="h-12 w-full justify-center sm:h-auto sm:w-auto sm:justify-start"
+            onClick={onAction}
+          >
             <Plus className="h-4 w-4" />
             {action}
           </Button>
@@ -72,7 +71,7 @@ export function DataPage<T>({
         <>
           <div className="space-y-3 md:hidden">
             {rows.map((r, i) => (
-              <Card key={i} className="!p-4">
+              <Card key={i} className="!p-4 active:bg-muted/40 transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 text-sm">{columns[0]?.render(r)}</div>
                   {columns.length > 1 && (

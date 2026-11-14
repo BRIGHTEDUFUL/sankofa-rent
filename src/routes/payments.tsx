@@ -5,13 +5,7 @@ import { api } from "../../convex/_generated/api";
 import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { DataPage } from "@/components/app/DataPage";
 import { Badge, Card } from "@/components/app/AppShell";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/app/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -215,100 +209,100 @@ function RecordPaymentDialog({
   }
 
   return (
-    <Dialog
+    <ResponsiveDialog
       open={open}
       onOpenChange={(next) => {
         onOpenChange(next);
         if (!next) setError("");
       }}
+      title="Record payment"
     >
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Record payment</DialogTitle>
-        </DialogHeader>
-        <form className="space-y-4" onSubmit={submit}>
+      <form className="space-y-4" onSubmit={submit}>
+        <div className="space-y-1.5">
+          <Label>Tenant</Label>
+          <Select
+            value={tenantId}
+            onValueChange={(v) => {
+              setTenantId(v);
+              setInvoiceId("");
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a tenant" />
+            </SelectTrigger>
+            <SelectContent>
+              {tenants.map((t) => (
+                <SelectItem key={t._id} value={t._id}>
+                  {t.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Invoice (optional)</Label>
+          <Select value={invoiceId} onValueChange={setInvoiceId} disabled={!tenantId}>
+            <SelectTrigger>
+              <SelectValue placeholder="No specific invoice" />
+            </SelectTrigger>
+            <SelectContent>
+              {unpaid.map((i) => (
+                <SelectItem key={i._id} value={i._id}>
+                  {i.number} · {cediFromPesewas(i.amount - i.paid)} outstanding
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label>Tenant</Label>
-            <Select
-              value={tenantId}
-              onValueChange={(v) => {
-                setTenantId(v);
-                setInvoiceId("");
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a tenant" />
-              </SelectTrigger>
-              <SelectContent>
-                {tenants.map((t) => (
-                  <SelectItem key={t._id} value={t._id}>
-                    {t.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label>Invoice (optional)</Label>
-            <Select value={invoiceId} onValueChange={setInvoiceId} disabled={!tenantId}>
-              <SelectTrigger>
-                <SelectValue placeholder="No specific invoice" />
-              </SelectTrigger>
-              <SelectContent>
-                {unpaid.map((i) => (
-                  <SelectItem key={i._id} value={i._id}>
-                    {i.number} · {cediFromPesewas(i.amount - i.paid)} outstanding
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="amount">Amount (GH₵)</Label>
-              <Input
-                id="amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                inputMode="decimal"
-                placeholder="1,600"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Method</Label>
-              <Select value={method} onValueChange={setMethod}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {methods.map((m) => (
-                    <SelectItem key={m.value} value={m.value}>
-                      {m.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="reference">Reference (optional)</Label>
+            <Label htmlFor="amount">Amount (GH₵)</Label>
             <Input
-              id="reference"
-              value={reference}
-              onChange={(e) => setReference(e.target.value)}
-              placeholder="MoMo transaction ID"
+              id="amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              inputMode="decimal"
+              placeholder="1,600"
             />
           </div>
-          {error && (
-            <p className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>
-          )}
-          <DialogFooter>
-            <Button type="submit" disabled={submitting || busy}>
-              {submitting || busy ? "Saving…" : "Record payment"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+          <div className="space-y-1.5">
+            <Label>Method</Label>
+            <Select value={method} onValueChange={setMethod}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {methods.map((m) => (
+                  <SelectItem key={m.value} value={m.value}>
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="reference">Reference (optional)</Label>
+          <Input
+            id="reference"
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
+            placeholder="MoMo transaction ID"
+          />
+        </div>
+        {error && (
+          <p className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>
+        )}
+        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button
+            type="submit"
+            disabled={submitting || busy}
+            className="h-12 w-full justify-center sm:h-auto sm:w-auto"
+          >
+            {submitting || busy ? "Saving…" : "Record payment"}
+          </Button>
+        </div>
+      </form>
+    </ResponsiveDialog>
   );
 }

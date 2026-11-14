@@ -1,11 +1,5 @@
 import { useState, type InputHTMLAttributes, type ReactNode } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/app/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,47 +33,47 @@ export function FormDialog({
   const [submitting, setSubmitting] = useState(false);
 
   return (
-    <Dialog
+    <ResponsiveDialog
       open={open}
       onOpenChange={(next) => {
         onOpenChange(next);
         if (!next) setError("");
       }}
+      title={title}
     >
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-        </DialogHeader>
-        <form
-          className="space-y-4"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const values = new FormData(e.currentTarget);
-            setError("");
-            setSubmitting(true);
-            try {
-              await onSubmit(values);
-            } catch (err) {
-              setError(friendlyError(err));
-            } finally {
-              setSubmitting(false);
-            }
-          }}
-        >
-          {children}
-          {error && (
-            <p role="alert" className="border-l-2 border-destructive pl-3 text-sm text-destructive">
-              {error}
-            </p>
-          )}
-          <DialogFooter>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? "Saving…" : submitLabel}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <form
+        className="space-y-4"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const values = new FormData(e.currentTarget);
+          setError("");
+          setSubmitting(true);
+          try {
+            await onSubmit(values);
+          } catch (err) {
+            setError(friendlyError(err));
+          } finally {
+            setSubmitting(false);
+          }
+        }}
+      >
+        {children}
+        {error && (
+          <p role="alert" className="border-l-2 border-destructive pl-3 text-sm text-destructive">
+            {error}
+          </p>
+        )}
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="h-12 w-full justify-center sm:h-auto sm:w-auto"
+          >
+            {submitting ? "Saving…" : submitLabel}
+          </Button>
+        </div>
+      </form>
+    </ResponsiveDialog>
   );
 }
 
@@ -150,45 +144,48 @@ export function ConfirmDialog({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   return (
-    <Dialog
+    <ResponsiveDialog
       open={open}
       onOpenChange={(next) => {
         onOpenChange(next);
         if (!next) setError("");
       }}
+      title={title}
+      className="sm:max-w-md"
     >
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-        </DialogHeader>
-        <p className="text-sm text-muted-foreground">{message}</p>
-        {error && (
-          <p className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>
-        )}
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            disabled={busy}
-            onClick={async () => {
-              setBusy(true);
-              setError("");
-              try {
-                await onConfirm();
-              } catch (err) {
-                setError(friendlyError(err, "Something went wrong."));
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            {busy ? "Working…" : (confirming ?? "Delete")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <p className="text-sm text-muted-foreground">{message}</p>
+      {error && (
+        <p className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>
+      )}
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => onOpenChange(false)}
+          className="h-12 w-full justify-center sm:h-auto sm:w-auto"
+        >
+          Cancel
+        </Button>
+        <Button
+          type="button"
+          variant="destructive"
+          disabled={busy}
+          className="h-12 w-full justify-center sm:h-auto sm:w-auto"
+          onClick={async () => {
+            setBusy(true);
+            setError("");
+            try {
+              await onConfirm();
+            } catch (err) {
+              setError(friendlyError(err, "Something went wrong."));
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          {busy ? "Working…" : (confirming ?? "Delete")}
+        </Button>
+      </div>
+    </ResponsiveDialog>
   );
 }
