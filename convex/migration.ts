@@ -135,7 +135,7 @@ export const adoptLandlordData = internalMutation({
     for (const row of counters) {
       await ctx.db.patch(row._id, { landlordId: toUser._id });
     }
-    moved.counters = counters.length;
+    moved["counters"] = counters.length;
 
     await ctx.db.patch(toProfile._id, {
       // Personal names stay with each account — only business identity copies.
