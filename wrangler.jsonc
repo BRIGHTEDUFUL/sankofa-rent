@@ -1,0 +1,26 @@
+{
+  // Cloudflare Workers config for the Nitro `cloudflare-module` build output.
+  // Build first (`bun run build`), which emits:
+  //   .output/server/index.mjs  -> Worker entry (SSR shell)
+  //   .output/public/           -> static assets, served by the ASSETS binding
+  // No `vars` block: VITE_CONVEX_URL is inlined at build time, never at runtime.
+  "name": "rentwise-ghana",
+  "main": "./.output/server/index.mjs",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Nitro emits pre-bundled ESM; let wrangler ship it as-is.
+  "no_bundle": true,
+  "rules": [
+    {
+      "type": "ESModule",
+      "globs": ["**/*.mjs", "**/*.js"]
+    }
+  ],
+  "assets": {
+    "directory": "./.output/public",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

@@ -2,35 +2,84 @@ import { Link } from "@tanstack/react-router";
 import { useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { ArrowRight, Eye, EyeOff, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useBranding } from "@/lib/branding";
 import courtyard from "@/assets/auth-courtyard.jpg";
 
-export function AuthLayout({ title, subtitle, children, footer }: { title: string; subtitle: string; children: ReactNode; footer?: ReactNode }) {
+export function AuthLayout({
+  title,
+  subtitle,
+  children,
+  footer,
+}: {
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+  footer?: ReactNode;
+}) {
+  const { appName, tagline, logoUrl } = useBranding();
   return (
     <div className="grid min-h-svh bg-card lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
       <div className="flex min-w-0 flex-col justify-between px-5 py-6 sm:px-10 sm:py-8 lg:px-16">
-        <Link to="/" className="flex items-center gap-2 text-primary"><Sun className="h-8 w-8" strokeWidth={2.5} /><span className="text-lg font-semibold text-foreground">Nyumba Rent</span></Link>
+        <Link to="/" className="flex items-center gap-2 text-primary">
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt=""
+              className="h-8 w-8 rounded-lg object-contain"
+              width={32}
+              height={32}
+            />
+          ) : (
+            <Sun className="h-8 w-8" strokeWidth={2.5} />
+          )}
+          <span className="text-lg font-semibold text-foreground">{appName}</span>
+        </Link>
         <div className="mx-auto w-full max-w-md animate-rise py-9 sm:py-12">
-          <p className="mb-5 text-xs font-semibold uppercase text-primary">Your property. Your peace of mind.</p>
+          <p className="mb-5 text-xs font-semibold uppercase text-primary">{tagline}</p>
           <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{title}</h1>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{subtitle}</p>
           <div className="mt-7">{children}</div>
-          {footer && <div className="mt-7 text-center text-sm leading-relaxed text-muted-foreground">{footer}</div>}
+          {footer && (
+            <div className="mt-7 text-center text-sm leading-relaxed text-muted-foreground">
+              {footer}
+            </div>
+          )}
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-5 text-xs text-muted-foreground"><span>© 2026 Nyumba Rent</span><Link to="/" className="inline-flex items-center gap-1.5 font-medium text-primary">Explore demo <ArrowRight className="h-3.5 w-3.5" /></Link></div>
+        <div className="flex flex-wrap items-center gap-3 border-t border-border pt-5 text-xs text-muted-foreground">
+          <span>© 2026 {appName}</span>
+        </div>
       </div>
       <aside className="relative hidden min-h-svh overflow-hidden bg-ink lg:block">
-        <img src={courtyard} alt="Sunlit rental courtyard with palms and green shutters" width={1024} height={1536} className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          src={courtyard}
+          alt="Sunlit rental courtyard with palms and green shutters"
+          width={1024}
+          height={1536}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <div className="absolute inset-x-0 bottom-0 bg-ink px-10 py-8 text-ink-foreground">
-          <p className="mb-3 text-xs font-medium uppercase text-ink-foreground/70">For landlords in Ghana</p>
-          <h2 className="max-w-lg text-3xl font-semibold leading-tight">A better home for your rental business.</h2>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-foreground/75">Nyumba Rent · Properties, people and rent, together.</p>
+          <p className="mb-3 text-xs font-medium uppercase text-ink-foreground/70">
+            For landlords in Ghana
+          </p>
+          <h2 className="max-w-lg text-3xl font-semibold leading-tight">
+            A better home for your rental business.
+          </h2>
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-foreground/75">
+            {appName} · Properties, people and rent, together.
+          </p>
         </div>
       </aside>
     </div>
   );
 }
 
-type FieldProps = InputHTMLAttributes<HTMLInputElement> & { label: string; name: string; right?: ReactNode; hint?: string | undefined; error?: string | undefined };
+type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
+  label: string;
+  name: string;
+  right?: ReactNode;
+  hint?: string | undefined;
+  error?: string | undefined;
+};
 
 export function Field({ label, name, type = "text", right, hint, error, ...props }: FieldProps) {
   const [visible, setVisible] = useState(false);
@@ -38,24 +87,62 @@ export function Field({ label, name, type = "text", right, hint, error, ...props
   const description = hint || error ? `${name}-description` : undefined;
   return (
     <div className="min-w-0">
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-sm font-medium"><label htmlFor={name}>{label}</label>{right}</div>
-      <div className="relative">
-        <input {...props} id={name} name={name} type={password && visible ? "text" : type} aria-invalid={Boolean(error)} aria-describedby={description} className={`h-12 w-full min-w-0 rounded-lg border bg-card px-3 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm ${password ? "pr-12" : ""} ${error ? "border-destructive" : "border-foreground/15 hover:border-foreground/30"}`} />
-        {password && <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1 h-10 w-10 text-muted-foreground" aria-label={visible ? "Hide password" : "Show password"} title={visible ? "Hide password" : "Show password"} onClick={() => setVisible(!visible)}>{visible ? <EyeOff /> : <Eye />}</Button>}
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-sm font-medium">
+        <label htmlFor={name}>{label}</label>
+        {right}
       </div>
-      {description && <p id={description} className={`mt-2 text-xs leading-relaxed ${error ? "text-destructive" : "text-muted-foreground"}`}>{error || hint}</p>}
+      <div className="relative">
+        <input
+          {...props}
+          id={name}
+          name={name}
+          type={password && visible ? "text" : type}
+          aria-invalid={Boolean(error)}
+          aria-describedby={description}
+          className={`h-12 w-full min-w-0 rounded-lg border bg-card px-3 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm ${password ? "pr-12" : ""} ${error ? "border-destructive" : "border-foreground/15 hover:border-foreground/30"}`}
+        />
+        {password && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute right-1 top-1 h-10 w-10 text-muted-foreground"
+            aria-label={visible ? "Hide password" : "Show password"}
+            title={visible ? "Hide password" : "Show password"}
+            onClick={() => setVisible(!visible)}
+          >
+            {visible ? <EyeOff /> : <Eye />}
+          </Button>
+        )}
+      </div>
+      {description && (
+        <p
+          id={description}
+          className={`mt-2 text-xs leading-relaxed ${error ? "text-destructive" : "text-muted-foreground"}`}
+        >
+          {error || hint}
+        </p>
+      )}
     </div>
   );
 }
 
 export function SubmitButton({ children }: { children: ReactNode }) {
-  return <Button type="submit" className="h-12 w-full rounded-lg font-semibold">{children}<ArrowRight className="h-4 w-4" /></Button>;
+  return (
+    <Button type="submit" className="h-12 w-full rounded-lg font-semibold">
+      {children}
+      <ArrowRight className="h-4 w-4" />
+    </Button>
+  );
 }
 
 export function AuthNotice({ children, error = false }: { children: ReactNode; error?: boolean }) {
-  return <p role={error ? "alert" : "status"} className={`border-l-2 py-2 pl-3 text-sm leading-relaxed ${error ? "border-destructive text-destructive" : "border-primary text-muted-foreground"}`}>{children}</p>;
-}
-
-export function GoogleButton({ onClick }: { onClick: () => void }) {
-  return <Button type="button" variant="outline" className="h-12 w-full rounded-lg border-foreground/15 bg-card shadow-none hover:bg-muted" onClick={onClick}><span className="text-lg font-bold text-foreground" aria-hidden="true">G</span>Continue with Google</Button>;
+  return (
+    <p
+      role={error ? "alert" : "status"}
+      className={`border-l-2 py-2 pl-3 text-sm leading-relaxed ${error ? "border-destructive text-destructive" : "border-primary text-muted-foreground"}`}
+    >
+      {children}
+    </p>
+  );
 }

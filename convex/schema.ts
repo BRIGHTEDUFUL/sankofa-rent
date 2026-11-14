@@ -5,8 +5,23 @@ import { authTables } from "@convex-dev/auth/server";
 export default defineSchema({
   ...authTables,
 
+  // Global, per-deployment app branding (one row). Publicly readable so the
+  // login page can show it before anyone signs in; writable by admins only.
+  branding: defineTable({
+    appName: v.string(), // ≤ 60 chars
+    tagline: v.string(), // ≤ 120 chars
+    accentColor: v.string(), // "#rrggbb", must clear 4.5:1 vs white
+    logoId: v.optional(v.id("_storage")),
+    logoContentType: v.optional(v.string()),
+    updatedBy: v.optional(v.id("users")),
+    updatedAt: v.optional(v.number()),
+  }),
+
   profiles: defineTable({
     userId: v.id("users"),
+    // Optional (not required) so the schema pushes cleanly while existing
+    // rows exist. undefined = regular user; only admins may edit branding.
+    role: v.optional(v.union(v.literal("admin"), v.literal("user"))),
     firstName: v.string(),
     lastName: v.string(),
     phone: v.optional(v.string()),

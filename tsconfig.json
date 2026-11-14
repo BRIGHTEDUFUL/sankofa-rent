@@ -27,7 +27,10 @@
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    // Off: Convex types optional function args as `prop?: T` (no `| undefined`),
+    // so passing `undefined` to omit a field — the idiomatic Convex pattern —
+    // is a type error with this flag on. All other strict flags stay enabled.
+    "exactOptionalPropertyTypes": false,
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": ["./src/*"]

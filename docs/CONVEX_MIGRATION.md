@@ -1,8 +1,14 @@
 # Nyumba Rent — Convex Backend Migration Guide
 
-This app is a frontend prototype: its operational screens use `src/lib/mock.ts`, while auth and settings are presentation-only. This guide describes migration to Convex (database, auth, functions, file storage, scheduled jobs); it is not an installed or deployed backend. The function table is an implementation specification, not a claim that every function has been written.
+This guide describes the migration of this app to Convex (database, auth, functions, file storage, scheduled jobs).
 
-**Review status (13 November 2026):** auth examples were checked against the official [setup](https://labs.convex.dev/auth/setup), [Password provider](https://labs.convex.dev/auth/config/passwords) and [server API](https://labs.convex.dev/auth/api_reference/server) documentation. No Convex deployment, live sign-in, payment or scheduled-job tests have been run. Complete the acceptance checklist below before production use.
+**Implementation status (14 November 2026):** the migration described here is complete for the
+email + password scope. `convex/` holds the schema and one function file per screen; the frontend
+reads live data through `useQuery` and writes through dialogs calling mutations; `src/lib/mock.ts`
+is no longer imported by any route. Still out of scope: Google sign-in, password-reset emails,
+SMS/WhatsApp delivery, MoMo collection webhooks and the file ownership registry — see
+`convex/README.md`. Before production use, complete the acceptance checklist at the end of this
+document.
 
 ---
 

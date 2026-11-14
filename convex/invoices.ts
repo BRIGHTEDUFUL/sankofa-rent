@@ -3,6 +3,7 @@ import { nextNumber } from "./lib";
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireUser } from "./lib";
+
 export const markOverdue = internalMutation({ args: {}, handler: async (ctx) => {
   const now = Date.now();
   for (const status of ["sent", "partial"] as const) {
@@ -35,11 +36,27 @@ export const generateMonthly = internalMutation({ args: {}, handler: async (ctx)
   }
 }});
 
-
 export const list = query({ args: {}, handler: async (ctx) => {
   const me = await requireUser(ctx);
   return ctx.db.query("invoices").withIndex("by_landlord", (q) => q.eq("landlordId", me)).order("desc").collect();
 }});
+
+// Create a draft invoice for a lease. Sending is a separate explicit step.
+export const create = mutation({
+  args: { leaseId: v.id("leases"), period: v.string(), dueDate: v.number(), amount: v.number() },
+  handler: async (ctx, a) => {
+    const me = await requireUser(ctx);
+    const lease = await ctx.db.get(a.leaseId);
+    if (!lease || lease.landlordId !== me) throw new Error("Lease not found");
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(a.period)) throw new Error("Period must be YYYY-MM");
+    if (!Number.isSafeInteger(a.amount) || a.amount <= 0) throw new Error("Amount must be positive integer pesewas");
+    const number = await nextNumber(ctx, me, "invoice", "INV");
+    return ctx.db.insert("invoices", {
+      landlordId: me, leaseId: a.leaseId, tenantId: lease.tenantId, number,
+      period: a.period, dueDate: a.dueDate, amount: a.amount, paid: 0, status: "draft",
+    });
+  },
+});
 
 // Issue a draft invoice (SMS/email delivery can be added later as an action).
 export const send = mutation({ args: { id: v.id("invoices") }, handler: async (ctx, { id }) => {

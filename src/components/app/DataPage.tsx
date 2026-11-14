@@ -2,12 +2,33 @@ import type { ReactNode } from "react";
 import { Plus, SlidersHorizontal } from "lucide-react";
 import { Card, Button } from "./AppShell";
 
-export type Column<T> = { key: string; label: string; render: (row: T) => ReactNode; className?: string };
+export type Column<T> = {
+  key: string;
+  label: string;
+  render: (row: T) => ReactNode;
+  className?: string;
+};
 
-export function DataPage<T>({ title, subtitle, action, stats, columns, rows, aside }: {
-  title: string; subtitle: string; action: string;
+export function DataPage<T>({
+  title,
+  subtitle,
+  action,
+  onAction,
+  stats,
+  columns,
+  rows,
+  aside,
+  loading,
+}: {
+  title: string;
+  subtitle: string;
+  action: string;
+  onAction?: () => void;
   stats?: { label: string; value: string; hint?: string }[];
-  columns: Column<T>[]; rows: T[]; aside?: ReactNode;
+  columns: Column<T>[];
+  rows: T[];
+  aside?: ReactNode;
+  loading?: boolean;
 }) {
   return (
     <div className="space-y-5">
@@ -17,8 +38,14 @@ export function DataPage<T>({ title, subtitle, action, stats, columns, rows, asi
           <p className="text-sm text-muted-foreground">{subtitle}</p>
         </div>
         <div className="grid grid-cols-[auto_1fr] gap-2 sm:flex">
-          <Button variant="ghost"><SlidersHorizontal className="h-4 w-4" />Filter</Button>
-          <Button className="justify-center"><Plus className="h-4 w-4" />{action}</Button>
+          <Button variant="ghost">
+            <SlidersHorizontal className="h-4 w-4" />
+            Filter
+          </Button>
+          <Button className="justify-center" onClick={onAction}>
+            <Plus className="h-4 w-4" />
+            {action}
+          </Button>
         </div>
       </div>
       {stats && (
@@ -33,40 +60,67 @@ export function DataPage<T>({ title, subtitle, action, stats, columns, rows, asi
         </div>
       )}
       {aside}
-      <div className="space-y-3 md:hidden">
-        {rows.map((r, i) => (
-          <Card key={i} className="!p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0 text-sm">{columns[0]?.render(r)}</div>
-              {columns.length > 1 && <div className="shrink-0">{columns[columns.length - 1]?.render(r)}</div>}
-            </div>
-            <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-t pt-3 text-sm">
-              {columns.slice(1, -1).map((c) => (
-                <div key={c.key} className="min-w-0">
-                  <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">{c.label}</dt>
-                  <dd className="truncate">{c.render(r)}</dd>
-                </div>
-              ))}
-            </dl>
-          </Card>
-        ))}
-      </div>
-      <Card className="hidden overflow-x-auto !p-0 md:block">
-        <table className="w-full min-w-[720px] text-sm">
-          <thead>
-            <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
-              {columns.map((c) => <th key={c.key} className={`px-6 py-4 font-medium ${c.className ?? ""}`}>{c.label}</th>)}
-            </tr>
-          </thead>
-          <tbody>
+      {loading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="h-20 animate-pulse bg-muted/40" />
+          ))}
+        </div>
+      ) : rows.length === 0 ? (
+        <Card className="py-12 text-center text-sm text-muted-foreground">Nothing here yet.</Card>
+      ) : (
+        <>
+          <div className="space-y-3 md:hidden">
             {rows.map((r, i) => (
-              <tr key={i} className="border-b last:border-0 transition-colors hover:bg-muted/60">
-                {columns.map((c) => <td key={c.key} className={`px-6 py-4 ${c.className ?? ""}`}>{c.render(r)}</td>)}
-              </tr>
+              <Card key={i} className="!p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 text-sm">{columns[0]?.render(r)}</div>
+                  {columns.length > 1 && (
+                    <div className="shrink-0">{columns[columns.length - 1]?.render(r)}</div>
+                  )}
+                </div>
+                <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-t pt-3 text-sm">
+                  {columns.slice(1, -1).map((c) => (
+                    <div key={c.key} className="min-w-0">
+                      <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                        {c.label}
+                      </dt>
+                      <dd className="truncate">{c.render(r)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </Card>
             ))}
-          </tbody>
-        </table>
-      </Card>
+          </div>
+          <Card className="hidden overflow-x-auto !p-0 md:block">
+            <table className="w-full min-w-[720px] text-sm">
+              <thead>
+                <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  {columns.map((c) => (
+                    <th key={c.key} className={`px-6 py-4 font-medium ${c.className ?? ""}`}>
+                      {c.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r, i) => (
+                  <tr
+                    key={i}
+                    className="border-b last:border-0 transition-colors hover:bg-muted/60"
+                  >
+                    {columns.map((c) => (
+                      <td key={c.key} className={`px-6 py-4 ${c.className ?? ""}`}>
+                        {c.render(r)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        </>
+      )}
     </div>
   );
 }

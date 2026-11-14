@@ -1,25 +1,53 @@
-# Convex backend (ready to connect)
+# Convex backend
 
-These files are the full backend for Nyumba Rent. They are not running yet.
+Email + password auth, a full rent-management schema and one function file per screen.
+Money is stored as **integer pesewas** (GH₵ 1 = 100); dates are epoch ms. Every query and
+mutation derives `landlordId` from the signed-in user — never from client input.
 
-## Connect in 4 steps
-1. `bun add convex @convex-dev/auth @auth/core`
-2. `bunx convex dev` — log in, create a project. This creates `convex/_generated/` and writes `VITE_CONVEX_URL` to `.env.local`.
-3. `bunx @convex-dev/auth` — sets up sign-in keys.
-4. Wrap the app in `ConvexAuthProvider` and swap `src/lib/mock.ts` data for `useQuery(api.<file>.list)` (see `docs/CONVEX_MIGRATION.md`, section 7).
+## Setup
+
+```sh
+npm install convex @convex-dev/auth @auth/core
+npx convex dev            # connects to the deployment in .env.local, generates convex/_generated/
+npx @convex-dev/auth      # sets JWT_PRIVATE_KEY, JWKS, SITE_URL on the deployment
+```
+
+`.env.local` (gitignored) must define:
+
+```
+CONVEX_DEPLOYMENT=dev:<project>|<token>
+VITE_CONVEX_URL=https://<project>.convex.cloud
+```
+
+The frontend reads only `VITE_CONVEX_URL`. Production sets that variable in the hosting
+environment (never in the repo), and Convex secrets live in the deployment's environment
+settings.
 
 ## Files
-| File | What it does |
-|---|---|
-| schema.ts | All tables (money stored in pesewas: GH₵1 = 100) |
-| auth.ts, auth.config.ts, http.ts | Email + password sign-in; creates a profile on sign-up |
-| lib.ts | `requireUser`, invoice/receipt numbering |
-| dashboard.ts | Dashboard totals |
-| properties.ts | Properties + units |
-| tenants.ts, leases.ts | Tenants, leases (create/end) |
-| invoices.ts, payments.ts | Invoices, record payment + receipt number |
-| maintenance.ts, announcements.ts | Maintenance requests, announcements |
-| profiles.ts | Settings page (my profile) |
-| crons.ts | Daily overdue marking, monthly invoice generation, expiring leases |
 
-Password reset emails are optional — see the guide if you want them.
+| File | Exports |
+|---|---|
+| `schema.ts` | All tables (`profiles`, `properties`, `units`, `tenants`, `leases`, `invoices`, `payments`, `maintenance`, `announcements`, `counters`) plus `authTables` |
+| `auth.ts`, `auth.config.ts`, `http.ts` | Password sign-in; `afterUserCreatedOrUpdated` creates a profile |
+| `lib.ts` | `requireUser`, `nextNumber` (invoice/receipt numbering) |
+| `dashboard.ts` | `summary`, `monthly` |
+| `properties.ts` | `list`, `create`, `update`, `remove`, `addUnit`, `updateUnit` |
+| `tenants.ts` | `list` (with derived balance), `create`, `update`, `archive` |
+| `leases.ts` | `list`, `create`, `renew`, `end`, `flagExpiring` |
+| `invoices.ts` | `list`, `create`, `send`, `markOverdue`, `generateMonthly` |
+| `payments.ts` | `list`, `record` (writes a receipt number and settles the invoice) |
+| `maintenance.ts` | `list`, `create`, `updateStatus` |
+| `announcements.ts` | `list`, `create`, `togglePin`, `remove` |
+| `profiles.ts` | `me`, `update` (allowlisted, validated fields only) |
+| `files.ts` | `generateUploadUrl` |
+| `crons.ts` | Daily overdue marking, monthly invoice generation, 60-day lease expiry flagging |
+
+## Not yet enabled
+
+- **Google sign-in** — add the provider in `auth.ts` plus `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`.
+- **Password reset** — needs a custom OTP email provider (e.g. Resend) and `AUTH_RESEND_KEY`.
+- **SMS / WhatsApp delivery** for announcements, and **MoMo collection** webhooks.
+- **File ownership registry** — `generateUploadUrl` exists, but uploaded storage IDs are not yet
+  tied to an owner.
+
+See `docs/CONVEX_MIGRATION.md` for the design notes and the pre-production acceptance checklist.

@@ -15,4 +15,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  nitro: {
+    // Hard-pin the deploy target so every build (local and CI) emits the
+    // Workers layout that wrangler.jsonc expects: .output/server + .output/public.
+    preset: "cloudflare-module",
+  },
 });

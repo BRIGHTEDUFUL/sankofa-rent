@@ -15,7 +15,19 @@ export const create = mutation({
   args: { name: v.string(), area: v.string(), region: v.optional(v.string()), ghanaPostGps: v.optional(v.string()) },
   handler: async (ctx, a) => {
     const me = await requireUser(ctx);
-    return ctx.db.insert("properties", { ...a, landlordId: me });
+    if (!a.name.trim()) throw new Error("Name is required");
+    return ctx.db.insert("properties", { ...a, name: a.name.trim(), landlordId: me });
+  },
+});
+
+export const update = mutation({
+  args: { id: v.id("properties"), name: v.string(), area: v.string(), region: v.optional(v.string()), ghanaPostGps: v.optional(v.string()) },
+  handler: async (ctx, a) => {
+    const me = await requireUser(ctx);
+    const p = await ctx.db.get(a.id);
+    if (!p || p.landlordId !== me) throw new Error("Property not found");
+    if (!a.name.trim()) throw new Error("Name is required");
+    await ctx.db.patch(a.id, { name: a.name.trim(), area: a.area, region: a.region, ghanaPostGps: a.ghanaPostGps });
   },
 });
 
@@ -35,6 +47,23 @@ export const addUnit = mutation({
     const me = await requireUser(ctx);
     const p = await ctx.db.get(a.propertyId);
     if (!p || p.landlordId !== me) throw new Error("Property not found");
-    return ctx.db.insert("units", { ...a, landlordId: me, status: "vacant" });
+    if (!a.label.trim()) throw new Error("Unit label is required");
+    if (!Number.isSafeInteger(a.rent) || a.rent <= 0) throw new Error("Rent must be positive integer pesewas");
+    return ctx.db.insert("units", { ...a, label: a.label.trim(), landlordId: me, status: "vacant" });
+  },
+});
+
+export const updateUnit = mutation({
+  args: {
+    id: v.id("units"), label: v.string(), bedrooms: v.optional(v.number()), rent: v.number(),
+    status: v.union(v.literal("vacant"), v.literal("occupied"), v.literal("maintenance")),
+  },
+  handler: async (ctx, a) => {
+    const me = await requireUser(ctx);
+    const u = await ctx.db.get(a.id);
+    if (!u || u.landlordId !== me) throw new Error("Unit not found");
+    if (!a.label.trim()) throw new Error("Unit label is required");
+    if (!Number.isSafeInteger(a.rent) || a.rent <= 0) throw new Error("Rent must be positive integer pesewas");
+    await ctx.db.patch(a.id, { label: a.label.trim(), bedrooms: a.bedrooms, rent: a.rent, status: a.status });
   },
 });

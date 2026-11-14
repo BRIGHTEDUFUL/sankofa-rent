@@ -14,6 +14,9 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppShell } from "../components/app/AppShell";
+import { ClientOnly } from "../components/app/ClientOnly";
+import { ConvexProviders } from "../lib/convex";
+import { BrandingEffects, BrandingProvider } from "../lib/branding";
 
 function NotFoundComponent() {
   return (
@@ -84,19 +87,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Nyumba Rent — Rent management for Ghanaian landlords" },
-      { name: "description", content: "Properties, tenants, leases, rent invoicing, payments and maintenance in one place." },
-      { name: "author", content: "Lovable" },
+      {
+        name: "description",
+        content:
+          "Properties, tenants, leases, rent invoicing, payments and maintenance in one place.",
+      },
       { property: "og:title", content: "Nyumba Rent — Rent management for Ghanaian landlords" },
-      { property: "og:description", content: "Properties, tenants, leases, rent invoicing, payments and maintenance in one place." },
+      {
+        property: "og:description",
+        content:
+          "Properties, tenants, leases, rent invoicing, payments and maintenance in one place.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
+      },
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
     ],
   }),
   shellComponent: RootShell,
@@ -126,8 +138,30 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      {isAuth ? <Outlet /> : <AppShell><Outlet /></AppShell>}
+      {/* Convex auth reads browser storage, so the app subtree renders only after hydration. */}
+      <ClientOnly
+        fallback={
+          <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
+            Loading…
+          </div>
+        }
+      >
+        <ConvexProviders>
+          {/* Branding is global (login page included) and drives the tab
+              title, favicon and accent color via <BrandingEffects />. */}
+          <BrandingProvider>
+            <BrandingEffects />
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            {isAuth ? (
+              <Outlet />
+            ) : (
+              <AppShell>
+                <Outlet />
+              </AppShell>
+            )}
+          </BrandingProvider>
+        </ConvexProviders>
+      </ClientOnly>
     </QueryClientProvider>
   );
 }
