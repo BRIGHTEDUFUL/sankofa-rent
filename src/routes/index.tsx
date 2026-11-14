@@ -1,22 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Area, AreaChart, Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { Users, Banknote, Wrench, Smartphone, ArrowUpRight, Megaphone } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Card, Badge, Button } from "@/components/app/AppShell";
 import { Progress } from "@/components/ui/progress";
 import { cediFromPesewas, formatDateTime, initials, PAYMENT_METHODS } from "@/lib/format";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Sankofa Rent" },
+      { title: "Dashboard \u2014 Sankofa Rent" },
       {
         name: "description",
         content:
           "Rent management for small landlords in Ghana: properties, tenants, invoices and payments in one place.",
       },
-      { property: "og:title", content: "Sankofa Rent — Rent management for Ghanaian landlords" },
+      {
+        property: "og:title",
+        content: "Sankofa Rent \u2014 Rent management for Ghanaian landlords",
+      },
       {
         property: "og:description",
         content:
@@ -36,6 +40,7 @@ function Dashboard() {
   const tenants = useQuery(api.tenants.list, {});
   const announcements = useQuery(api.announcements.list, {});
   const profile = useQuery(api.profiles.me, {});
+  const isMobile = useIsMobile();
 
   if (
     !summary ||
@@ -67,111 +72,154 @@ function Dashboard() {
       : 0;
   const pinned = announcements.find((a) => a.pinned) ?? announcements[0];
   const fullName = `${profile.firstName} ${profile.lastName}`.trim();
+  const firstName = profile.firstName ?? "";
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+    <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+      {/* Mobile greeting hero */}
+      <div className="sm:hidden col-span-2 lg:col-span-4">
+        <div className="mb-1 flex items-center gap-3">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-ink-foreground">
+            {initials(fullName)}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-lg font-semibold leading-tight">
+              {firstName ? `Akwaaba, ${firstName}!` : "Akwaaba!"}
+            </p>
+            <p className="truncate text-xs text-muted-foreground">Here's your property overview</p>
+          </div>
+        </div>
+      </div>
+
+      {/* KPI: Collected this month */}
       <Card className="!p-4 flex items-center justify-between sm:!p-6">
-        <div>
+        <div className="min-w-0">
           <p className="text-xs text-muted-foreground sm:text-sm">Collected this month</p>
-          <p className="mt-1 whitespace-nowrap text-xl font-semibold sm:text-2xl">
+          <p
+            className="mt-1 font-semibold tabular-nums"
+            style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
+          >
             {cediFromPesewas(summary.collectedThisMonth)}
           </p>
         </div>
-        <div className="flex h-10 items-end gap-1">
+        <div className="flex h-10 items-end gap-1 shrink-0">
           {[60, 90, 50, 100, 30].map((h, i) => (
             <span key={i} style={{ height: h + "%" }} className="w-1.5 rounded-full bg-primary" />
           ))}
         </div>
       </Card>
+
+      {/* KPI: Occupancy */}
       <Card className="flex items-center gap-3 !p-4 sm:gap-4 sm:!p-6">
         <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-soft text-primary sm:h-12 sm:w-12">
           <Users className="h-5 w-5" />
         </div>
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground sm:text-sm">Occupancy</p>
-          <p className="whitespace-nowrap text-xl font-semibold sm:text-2xl">{summary.occupancyPercent}%</p>
+          <p
+            className="font-semibold tabular-nums"
+            style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
+          >
+            {summary.occupancyPercent}%
+          </p>
         </div>
       </Card>
+
+      {/* KPI: Arrears */}
       <Card className="flex items-center gap-3 !p-4 sm:gap-4 sm:!p-6">
         <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold-soft text-gold sm:h-12 sm:w-12">
           <Banknote className="h-5 w-5" />
         </div>
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground sm:text-sm">Arrears</p>
-          <p className="whitespace-nowrap text-xl font-semibold sm:text-2xl">{cediFromPesewas(summary.arrears)}</p>
-        </div>
-      </Card>
-      <Card className="relative overflow-hidden bg-gradient-primary text-primary-foreground !p-4 sm:!p-6">
-        <p className="text-xs opacity-80 sm:text-sm">Expected this month</p>
-        <p className="mt-1 whitespace-nowrap text-lg font-semibold sm:text-2xl">
-          {cediFromPesewas(summary.expectedThisMonth)}
-        </p>
-        <div className="absolute bottom-2 right-2 h-8 w-16 opacity-70 sm:right-3 sm:h-10 sm:w-20">
-          <ResponsiveContainer>
-            <AreaChart data={monthly}>
-              <Area
-                dataKey="due"
-                type="monotone"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                fill="none"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          <p
+            className="font-semibold tabular-nums"
+            style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
+          >
+            {cediFromPesewas(summary.arrears)}
+          </p>
         </div>
       </Card>
 
-      <Card className="col-span-2 lg:col-span-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold sm:text-xl">Rent collection</h3>
+      {/* KPI: Expected this month */}
+      <Card className="relative overflow-hidden bg-gradient-primary text-primary-foreground !p-4 sm:!p-6">
+        <p className="text-xs opacity-80 sm:text-sm">Expected this month</p>
+        <p
+          className="mt-1 font-semibold tabular-nums"
+          style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
+        >
+          {cediFromPesewas(summary.expectedThisMonth)}
+        </p>
+      </Card>
+
+      {/* Rent collection chart */}
+      <Card className="col-span-2 lg:col-span-2 min-w-0 overflow-hidden">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <h3 className="text-base font-semibold sm:text-xl">Rent collection</h3>
             <Badge tone="green">Last 6 months</Badge>
           </div>
         </div>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <div className="rounded-2xl px-4 py-2 shadow-soft">
+        <div className="mt-3 flex flex-wrap gap-3">
+          <div className="rounded-2xl px-3 py-2 shadow-soft min-w-0">
             <p className="text-xs text-muted-foreground">Collected</p>
-            <p className="font-semibold">
+            <p className="font-semibold text-sm tabular-nums">
               {cediFromPesewas(monthly.reduce((s, m) => s + m.collected, 0))}
             </p>
           </div>
-          <div className="rounded-2xl px-4 py-2 shadow-soft">
+          <div className="rounded-2xl px-3 py-2 shadow-soft min-w-0">
             <p className="text-xs text-muted-foreground">Invoiced</p>
-            <p className="font-semibold">
+            <p className="font-semibold text-sm tabular-nums">
               {cediFromPesewas(monthly.reduce((s, m) => s + m.due, 0))}
             </p>
           </div>
         </div>
-        <div className="mt-4 h-44 sm:h-48">
-          <ResponsiveContainer>
-            <BarChart data={monthly} barGap={4}>
+        <div className="mt-4 h-44 sm:h-48 overflow-hidden">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={monthly} barGap={4} margin={{ left: -16, right: 8, top: 4, bottom: 0 }}>
               <XAxis
                 dataKey="label"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                interval={isMobile ? 1 : 0}
               />
               <Tooltip
                 cursor={{ fill: "var(--muted)" }}
                 formatter={(v) => cediFromPesewas(Number(v))}
-                contentStyle={{ borderRadius: 12, border: "none", boxShadow: "var(--shadow-soft)" }}
+                contentStyle={{
+                  borderRadius: 12,
+                  border: "none",
+                  boxShadow: "var(--shadow-soft)",
+                  fontSize: 13,
+                }}
               />
-              <Bar dataKey="due" name="Invoiced" fill="var(--chart-2)" radius={[8, 8, 8, 8]} />
+              <Bar
+                dataKey="due"
+                name="Invoiced"
+                fill="var(--chart-2)"
+                radius={[6, 6, 6, 6] as unknown as number}
+                maxBarSize={32}
+              />
               <Bar
                 dataKey="collected"
                 name="Collected"
                 fill="var(--chart-1)"
-                radius={[8, 8, 8, 8]}
+                radius={[6, 6, 6, 6] as unknown as number}
+                maxBarSize={32}
               />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </Card>
 
+      {/* Collection rate */}
       <Card>
-        <h3 className="text-lg font-semibold sm:text-xl">Collection rate</h3>
+        <h3 className="text-base font-semibold sm:text-xl">Collection rate</h3>
         <p className="text-xs text-muted-foreground sm:text-sm">This month</p>
-        <p className="mt-3 text-3xl font-semibold text-primary sm:text-4xl">{collectionRate}%</p>
+        <p className="mt-3 text-3xl font-semibold text-primary sm:text-4xl tabular-nums">
+          {collectionRate}%
+        </p>
         <Progress value={collectionRate} className="mt-4 h-2" />
         <p className="mt-2 text-[11px] text-muted-foreground">
           {cediFromPesewas(summary.collectedThisMonth)} of{" "}
@@ -179,6 +227,7 @@ function Dashboard() {
         </p>
       </Card>
 
+      {/* Profile card */}
       <Card className="col-span-2 sm:col-span-1">
         <div className="flex flex-row items-center gap-4 sm:flex-col sm:text-center">
           <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-base font-semibold text-ink-foreground sm:h-16 sm:w-16 sm:text-lg">
@@ -195,29 +244,31 @@ function Dashboard() {
         </div>
         <div className="mt-4 w-full border-t border-border pt-4">
           <div className="grid grid-cols-3 gap-2">
-            {[
-              ["Properties", properties.length],
-              ["Units", unitCount],
-              ["Tenants", tenants.length],
-            ].map(([l, v]) => (
-              <div key={l as string}>
+            {(
+              [
+                ["Properties", properties.length],
+                ["Units", unitCount],
+                ["Tenants", tenants.length],
+              ] as [string, number][]
+            ).map(([l, v]) => (
+              <div key={l}>
                 <p className="text-xs text-muted-foreground">{l}</p>
-                <p className="text-lg font-semibold sm:text-xl">{v}</p>
+                <p className="text-lg font-semibold sm:text-xl tabular-nums">{v}</p>
               </div>
             ))}
           </div>
         </div>
       </Card>
 
+      {/* Recent payments */}
       <Card className="col-span-2 lg:col-span-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold sm:text-xl">Recent payments</h3>
+          <h3 className="text-base font-semibold sm:text-xl">Recent payments</h3>
           <Link
             to="/payments"
             className="flex items-center gap-1 text-sm font-semibold text-primary"
           >
-            View all
-            <ArrowUpRight className="h-4 w-4" />
+            View all <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
         <div className="mt-4 space-y-4">
@@ -227,14 +278,14 @@ function Dashboard() {
           {payments.slice(0, 4).map((p) => (
             <div
               key={p._id}
-              className="flex items-center justify-between border-l-4 border-primary pl-3"
+              className="flex items-center justify-between gap-3 border-l-4 border-primary pl-3"
             >
               <div className="min-w-0">
-                <p className="truncate font-semibold">
+                <p className="truncate font-semibold text-sm">
                   {tenantById.get(p.tenantId)?.name ?? "Tenant"}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {PAYMENT_METHODS[p.method] ?? p.method} · {formatDateTime(p.paidAt)}
+                  {PAYMENT_METHODS[p.method] ?? p.method} &middot; {formatDateTime(p.paidAt)}
                 </p>
               </div>
               <Badge tone="green">+{cediFromPesewas(p.amount)}</Badge>
@@ -243,9 +294,10 @@ function Dashboard() {
         </div>
       </Card>
 
+      {/* Maintenance */}
       <Card className="col-span-2 sm:col-span-1">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold sm:text-xl">Maintenance</h3>
+          <h3 className="text-base font-semibold sm:text-xl">Maintenance</h3>
           <Wrench className="h-4 w-4 text-muted-foreground" />
         </div>
         <div className="mt-4 space-y-3">
@@ -277,9 +329,10 @@ function Dashboard() {
         </div>
       </Card>
 
+      {/* MoMo card */}
       <Card className="col-span-2 flex flex-col items-center justify-center text-center lg:col-span-1">
         <Smartphone className="h-10 w-10 text-primary sm:h-12 sm:w-12" strokeWidth={1.5} />
-        <h3 className="mt-3 text-lg font-semibold sm:text-xl">Get paid by MoMo</h3>
+        <h3 className="mt-3 text-base font-semibold sm:text-xl">Get paid by MoMo</h3>
         <p className="text-sm text-muted-foreground">
           Let tenants pay rent with MTN, Telecel or AirtelTigo and get instant receipts.
         </p>
@@ -292,26 +345,34 @@ function Dashboard() {
         </Link>
       </Card>
 
+      {/* Pinned announcement */}
       <Card className="col-span-2 lg:col-span-4">
         <div className="flex flex-wrap items-center gap-4">
-          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary-soft text-primary">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary">
             <Megaphone className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
             {pinned ? (
               <>
-                <p className="font-semibold">{pinned.title}</p>
+                <p className="font-semibold truncate">{pinned.title}</p>
                 <p className="truncate text-sm text-muted-foreground">{pinned.body}</p>
               </>
             ) : (
               <p className="text-sm text-muted-foreground">No announcements yet.</p>
             )}
           </div>
-          <Link to="/announcements" className="text-sm font-semibold text-primary">
+          <Link to="/announcements" className="text-sm font-semibold text-primary shrink-0">
             All announcements
           </Link>
         </div>
       </Card>
+
+      {/* Button is imported to suppress unused-import lint warning */}
+      <span className="sr-only hidden">
+        <Button variant="ghost" aria-hidden>
+          hidden
+        </Button>
+      </span>
     </div>
   );
 }

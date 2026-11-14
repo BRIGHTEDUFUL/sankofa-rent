@@ -157,14 +157,14 @@ export function Page() {
                   </span>
                   <button
                     onClick={() => setEditing(p)}
-                    className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                    className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
                     title="Edit property"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setRemoving(p)}
-                    className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                    className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
                     title="Delete property"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -199,14 +199,14 @@ export function Page() {
                     key={u._id}
                     onClick={() => setEditingUnit({ property: p, unit: u })}
                     title={`${u.label} · ${u.status}`}
-                    className={`h-7 min-w-7 rounded-md px-1.5 text-xs font-semibold ${u.status === "occupied" ? "bg-primary text-primary-foreground" : u.status === "maintenance" ? "bg-gold-soft text-gold" : "border-2 border-dashed border-border text-muted-foreground"}`}
+                    className={`h-8 min-w-[2rem] rounded-md px-1.5 text-xs font-semibold ${u.status === "occupied" ? "bg-primary text-primary-foreground" : u.status === "maintenance" ? "bg-gold-soft text-gold" : "border-2 border-dashed border-border text-muted-foreground"}`}
                   >
                     {u.label}
                   </button>
                 ))}
                 <button
                   onClick={() => setUnitProperty(p)}
-                  className="grid h-7 w-7 place-items-center rounded-md border-2 border-dashed border-border text-muted-foreground hover:bg-muted"
+                  className="grid h-8 w-8 place-items-center rounded-md border-2 border-dashed border-border text-muted-foreground hover:bg-muted"
                   title="Add unit"
                 >
                   <Plus className="h-3.5 w-3.5" />

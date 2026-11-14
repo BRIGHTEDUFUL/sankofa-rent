@@ -179,7 +179,7 @@ export function Page() {
           placeholder="Select a lease"
           options={leaseOptions}
         />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <TextField label="Period (YYYY-MM)" name="period" required placeholder={currentPeriod} />
           <TextField label="Due date" name="dueDate" type="date" required />
         </div>

@@ -489,6 +489,25 @@ function Page() {
             <ChevronLeft className="h-5 w-5" />
             Settings
           </button>
+          {/* Mobile tab chips */}
+          <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1 -mx-1 px-1 lg:hidden">
+            {visibleTabs.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() =>
+                  navigate({ to: "/settings", search: { tab: t.id as Tab }, replace: true })
+                }
+                className={`shrink-0 h-9 px-4 rounded-full text-sm font-semibold transition pressable ${
+                  detailTab === t.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
           {(message || error) && (
             <p
               role={error ? "alert" : "status"}
@@ -534,7 +553,7 @@ function Page() {
                   className="h-11 sm:h-9"
                 />
               </div>
-              <div className="mt-6 flex justify-end">
+              <div className="sticky-save-bar mt-6 sm:static sm:bg-transparent sm:backdrop-filter-none sm:border-0 sm:pt-0 sm:pb-0 flex justify-end">
                 <Button
                   onClick={() => save()}
                   disabled={saving}
@@ -592,7 +611,7 @@ function Page() {
                   className="h-11 sm:h-9"
                 />
               </div>
-              <div className="mt-6 flex justify-end">
+              <div className="sticky-save-bar mt-6 sm:static sm:bg-transparent sm:backdrop-filter-none sm:border-0 sm:pt-0 sm:pb-0 flex justify-end">
                 <Button
                   onClick={() => save()}
                   disabled={saving}
@@ -805,7 +824,7 @@ function Page() {
                 checked={form.notifyWhatsapp}
                 onCheckedChange={(v) => set("notifyWhatsapp", v)}
               />
-              <div className="mt-6 flex justify-end">
+              <div className="sticky-save-bar mt-6 sm:static sm:bg-transparent sm:backdrop-filter-none sm:border-0 sm:pt-0 sm:pb-0 flex justify-end">
                 <Button
                   onClick={() => save()}
                   disabled={saving}
@@ -859,7 +878,7 @@ function Page() {
                   className="h-11 sm:h-9"
                 />
               </div>
-              <div className="mt-6 flex justify-end">
+              <div className="sticky-save-bar mt-6 sm:static sm:bg-transparent sm:backdrop-filter-none sm:border-0 sm:pt-0 sm:pb-0 flex justify-end">
                 <Button
                   onClick={() => save()}
                   disabled={saving}

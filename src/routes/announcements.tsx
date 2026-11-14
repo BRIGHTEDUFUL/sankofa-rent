@@ -97,7 +97,7 @@ export function Page() {
                   <h3 className="font-semibold">{a.title}</h3>
                   {a.pinned && <Badge tone="gold">Pinned</Badge>}
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">{a.body}</p>
+                <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{a.body}</p>
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                   <span>
                     {a.propertyId
@@ -116,14 +116,14 @@ export function Page() {
               <div className="flex shrink-0 gap-1">
                 <button
                   onClick={() => togglePin({ id: a._id })}
-                  className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                  className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
                   title={a.pinned ? "Unpin" : "Pin"}
                 >
                   <Pin className={`h-4 w-4 ${a.pinned ? "text-primary" : ""}`} />
                 </button>
                 <button
                   onClick={() => setRemoving(a)}
-                  className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                  className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
                   title="Delete"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -152,7 +152,7 @@ export function Page() {
             required
             rows={4}
             placeholder="GWCL works on Saturday 14 Nov, 8am–4pm. Please store water ahead."
-            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm focus:ring-1 focus:ring-ring"
+            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-base focus:ring-1 focus:ring-ring"
           />
         </div>
         <div className="space-y-1.5">

@@ -18,7 +18,7 @@ export function AuthLayout({
 }) {
   const { appName, tagline, logoUrl } = useBranding();
   return (
-    <div className="grid min-h-svh bg-card lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
+    <div className="grid min-h-dvh bg-card lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
       <div className="flex min-w-0 flex-col justify-between px-5 py-6 sm:px-10 sm:py-8 lg:px-16">
         <Link to="/" className="flex items-center gap-2 text-primary">
           {logoUrl ? (
@@ -32,7 +32,7 @@ export function AuthLayout({
           ) : (
             <Sun className="h-8 w-8" strokeWidth={2.5} />
           )}
-          <span className="text-lg font-semibold text-foreground">{appName}</span>
+          <span className="truncate text-lg font-semibold text-foreground">{appName}</span>
         </Link>
         <div className="mx-auto w-full max-w-md animate-rise py-9 sm:py-12">
           <p className="mb-5 text-xs font-semibold uppercase text-primary">{tagline}</p>
@@ -49,7 +49,7 @@ export function AuthLayout({
           <span>© 2026 {appName}</span>
         </div>
       </div>
-      <aside className="relative hidden min-h-svh overflow-hidden bg-ink lg:block">
+      <aside className="relative hidden min-h-dvh overflow-hidden bg-ink lg:block">
         <img
           src={courtyard}
           alt="Sunlit rental courtyard with palms and green shutters"

@@ -194,11 +194,11 @@ export function Page() {
           placeholder="Select a unit"
           options={selectableUnits}
         />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <TextField label="Start date" name="start" type="date" required />
           <TextField label="End date" name="end" type="date" required />
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <TextField
             label="Monthly rent (GH₵)"
             name="rent"

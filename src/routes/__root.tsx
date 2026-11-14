@@ -16,6 +16,7 @@ import { AppShell } from "../components/app/AppShell";
 import { ClientOnly } from "../components/app/ClientOnly";
 import { ConvexProviders } from "../lib/convex";
 import { BrandingEffects, BrandingProvider } from "../lib/branding";
+import { usePlatform } from "@/hooks/use-platform";
 
 function NotFoundComponent() {
   return (
@@ -82,7 +83,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#E8E6E0" },
+      { name: "theme-color", content: "#E8E6E0", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#1a1f1c", media: "(prefers-color-scheme: dark)" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
@@ -138,6 +140,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const isAuth = ["/login", "/signup", "/forgot-password"].includes(path);
+  usePlatform();
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -52,7 +52,7 @@ export function DataPage<T>({
           {stats.map((s) => (
             <Card key={s.label} className="!p-4 sm:!p-5">
               <p className="text-xs text-muted-foreground sm:text-sm">{s.label}</p>
-              <p className="mt-1 text-xl font-semibold sm:text-2xl">{s.value}</p>
+              <p className="mt-1 text-xl font-semibold tabular-nums sm:text-2xl">{s.value}</p>
               {s.hint && <p className="mt-1 text-xs text-muted-foreground">{s.hint}</p>}
             </Card>
           ))}
@@ -66,31 +66,37 @@ export function DataPage<T>({
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <Card className="py-12 text-center text-sm text-muted-foreground">Nothing here yet.</Card>
+        <Card className="py-12 text-center">
+          <p className="text-sm text-muted-foreground">Nothing here yet.</p>
+        </Card>
       ) : (
         <>
+          {/* Mobile card view */}
           <div className="space-y-3 md:hidden">
             {rows.map((r, i) => (
-              <Card key={i} className="!p-4 active:bg-muted/40 transition-colors">
+              <Card key={i} className="!p-4 transition-colors active:bg-muted/40">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 text-sm">{columns[0]?.render(r)}</div>
+                  <div className="min-w-0 flex-1 text-sm">{columns[0]?.render(r)}</div>
                   {columns.length > 1 && (
                     <div className="shrink-0">{columns[columns.length - 1]?.render(r)}</div>
                   )}
                 </div>
-                <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-t pt-3 text-sm">
+                <dl className="mt-3 grid grid-cols-1 gap-y-2 border-t pt-3 text-sm min-[420px]:grid-cols-2">
                   {columns.slice(1, -1).map((c) => (
                     <div key={c.key} className="min-w-0">
                       <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">
                         {c.label}
                       </dt>
-                      <dd className="truncate">{c.render(r)}</dd>
+                      <dd className="min-w-0 overflow-hidden" style={{ overflowWrap: "anywhere" }}>
+                        {c.render(r)}
+                      </dd>
                     </div>
                   ))}
                 </dl>
               </Card>
             ))}
           </div>
+          {/* Desktop table view */}
           <Card className="hidden overflow-x-auto !p-0 md:block">
             <table className="w-full min-w-[720px] text-sm">
               <thead>

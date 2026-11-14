@@ -97,3 +97,147 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-rise, .pressable { animation: none; transition: none; } .pressable:active { transform: none; }
 }
+
+/* ─── Safe-area CSS variables ──────────────────────────────────────────────── */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+}
+
+/* ─── Global mobile reset ───────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { max-width: 100%; overflow-x: hidden; }
+  body { max-width: 100%; overflow-x: hidden; overflow-wrap: anywhere; }
+  img, svg, video, canvas { max-width: 100%; }
+}
+
+/* ─── dvh utility ───────────────────────────────────────────────────────────── */
+@utility min-h-dvh {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@utility h-dvh {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* ─── Hide scrollbar utility ─────────────────────────────────────────────────  */
+@utility hide-scrollbar {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* ─── Nav bottom padding utility ────────────────────────────────────────────── */
+@utility pb-nav {
+  padding-bottom: calc(4.5rem + var(--sab));
+}
+
+/* ─── Sticky save bar utility ───────────────────────────────────────────────── */
+@utility sticky-save-bar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-top: 0.75rem;
+  padding-bottom: calc(0.75rem + var(--sab));
+  background: color-mix(in srgb, var(--card) 95%, transparent);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+/* ─── System font on mobile ──────────────────────────────────────────────────  */
+@media (max-width: 767px) {
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, system-ui, sans-serif;
+  }
+}
+
+/* ─── Platform-specific styles ───────────────────────────────────────────────  */
+
+/* iOS: translucent bottom bar */
+[data-platform="ios"] .mobile-tab-bar {
+  background: color-mix(in srgb, var(--background) 72%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+[data-platform="ios"] .mobile-tab-bar::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 0.5px;
+  background: var(--border);
+}
+
+/* Android: M3 pill indicator handled by Framer Motion layoutId — no extra CSS needed */
+[data-platform="android"] .mobile-tab-bar {
+  background: var(--background);
+  box-shadow: 0 -1px 0 var(--border);
+}
+
+/* iOS large title */
+[data-platform="ios"] .mobile-top-bar.scrolled .large-title { opacity: 0; transform: translateY(-4px); }
+[data-platform="ios"] .mobile-top-bar .large-title { opacity: 1; transform: none; transition: opacity 200ms, transform 200ms; }
+
+/* ─── Material 3 ripple ──────────────────────────────────────────────────────  */
+@keyframes m3-ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+@utility ripple {
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  & .ripple-wave {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: m3-ripple 500ms linear;
+    background: currentColor;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+}
+
+/* ─── Dark mode ──────────────────────────────────────────────────────────────  */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+    --background: oklch(0.14 0.008 150);
+    --foreground: oklch(0.92 0.008 95);
+    --card: oklch(0.18 0.008 150);
+    --card-foreground: oklch(0.92 0.008 95);
+    --popover: oklch(0.18 0.008 150);
+    --popover-foreground: oklch(0.92 0.008 95);
+    --primary: oklch(0.6 0.08 152);
+    --primary-foreground: oklch(0.1 0 0);
+    --primary-soft: oklch(0.22 0.04 152);
+    --secondary: oklch(0.22 0.006 95);
+    --secondary-foreground: oklch(0.9 0.008 95);
+    --muted: oklch(0.22 0.006 95);
+    --muted-foreground: oklch(0.6 0.008 95);
+    --accent: oklch(0.22 0.04 152);
+    --accent-foreground: oklch(0.8 0.04 152);
+    --gold: oklch(0.72 0.1 75);
+    --gold-soft: oklch(0.24 0.04 80);
+    --success: oklch(0.6 0.12 150);
+    --success-soft: oklch(0.2 0.05 150);
+    --destructive: oklch(0.65 0.22 25);
+    --destructive-soft: oklch(0.22 0.05 25);
+    --destructive-foreground: oklch(0.98 0 0);
+    --ink: oklch(0.92 0.005 150);
+    --ink-foreground: oklch(0.12 0 0);
+    --border: oklch(0.28 0.006 95);
+    --input: oklch(0.28 0.006 95);
+    --ring: oklch(0.6 0.08 152);
+    --chart-1: oklch(0.6 0.08 152);
+    --chart-2: oklch(0.38 0.04 152);
+  }
+}
