@@ -1,5 +1,4 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, type ReactNode } from "react";
 import { useQuery } from "convex/react";
 import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
@@ -37,7 +36,6 @@ const nav = [
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { signOut } = useAuthActions();
   const profile = useQuery(api.profiles.me, isAuthenticated ? {} : "skip");
@@ -52,8 +50,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   async function logout() {
     await signOut();
-    queryClient.clear();
-    navigate({ to: "/login", replace: true });
+    // Hard reload recreates the module-level Convex client. A client-side
+    // navigate leaves stale auth/websocket state behind, and repeated
+    // sign-out/sign-in cycles in the same tab then silently never resolve
+    // queries (app stuck on the skeleton shell).
+    window.location.assign("/login");
   }
 
   if (isLoading || !isAuthenticated) {
