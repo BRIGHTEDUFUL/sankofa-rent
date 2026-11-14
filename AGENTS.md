@@ -15,9 +15,12 @@
 - Deployments are driven by gitignored env files, never from the repo for secrets: `.env.local` = dev
   (`dev:adorable-pig-437`), `.env.production.local` = prod (`prod:usable-penguin-827`).
   `npx convex deploy --env-file <file>` for prod; `npx convex dev --once` for dev.
-- **Frontend** (Cloudflare Workers, Nitro `cloudflare-module`): `npm run build` →
-  `npx wrangler deploy` (root `wrangler.jsonc`, Worker `edith-nonnon-project`), live at
-  https://edith-nonnon-project.edimamfaidol.workers.dev. Pushes to `main` trigger Workers Builds.
+- **Frontend** (Cloudflare Workers, Nitro `cloudflare-module`): production is deployed by
+  **Workers Builds** on pushes to `main`, to Worker `final-year-rent-project` — live at
+  https://final-year-rent-project.edimamfaidol.workers.dev. The `edith-nonnon-project` worker
+  was the manual-deploy target and does not reflect the deployed site anymore; the two were
+  never aligned (the Git-connected build always named its script `final-year-rent-project`).
+  `npm run build` → `npx wrangler deploy` (root `wrangler.jsonc`) remains for emergencies only.
   The public prod `VITE_CONVEX_URL` is pinned in the committed `.env.production` (not a secret).
 - **Branding** is a global singleton (`convex/branding.ts` + `src/lib/branding.tsx`), publicly
   readable, admin-writable only. Route `head()` titles are build-time static; `BrandingEffects`

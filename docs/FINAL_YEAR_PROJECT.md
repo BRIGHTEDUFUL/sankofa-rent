@@ -5,7 +5,7 @@
 **Author:** Edith Nonnon
 **Programme:** Final-Year Project · 2026
 **Supervisor:** __________________________ *(complete before submission)*
-**Live system:** https://edith-nonnon-project.edimamfaidol.workers.dev
+**Live system:** https://final-year-rent-project.edimamfaidol.workers.dev
 **Source code:** https://github.com/BRIGHTEDUFUL/sankofa-rent
 
 > This report documents the finished, deployed system — every claim in it can be
@@ -327,7 +327,7 @@ Features were taken from real rental life, anchored in a single seeded demo case
                        │ wss + https
 ┌──────────────────────▼────────────────────────────────────┐
 │  Cloudflare Workers (SSR, nitro) — hosts both environments │
-│     production: edith-nonnon-project.edimamfaidol.workers.dev
+│     production: final-year-rent-project.edimamfaidol.workers.dev
 └──────────────────────┬────────────────────────────────────┘
                        │
 ┌──────────────────────▼────────────────────────────────────┐
@@ -550,7 +550,7 @@ These are listed because a final-year examiner deserves to see the process, not 
 | Env | Frontend | Backend (Convex) | Seeded data |
 |---|---|---|---|
 | local dev | localhost:8081 (`npm run dev`) | `dev:adorable-pig-437` | 1 admin + 1 member, partial dataset |
-| production | https://edith-nonnon-project.edimamfaidol.workers.dev | `prod:usable-penguin-827` | 1 admin + minimal demo set |
+| production | https://final-year-rent-project.edimamfaidol.workers.dev | `prod:usable-penguin-827` | 1 admin + minimal demo set |
 | renamed from | ~~rentwise-ghana.edimamfaidol.workers.dev~~ | — | deleted 2026-11-14 |
 
 ### 9.2 Release process
@@ -579,7 +579,7 @@ npx convex run branding:get --env-file .env.production.local
 
 ### 9.4 Live URLs (2026-11-14)
 
-- **App:** https://edith-nonnon-project.edimamfaidol.workers.dev
+- **App:** https://final-year-rent-project.edimamfaidol.workers.dev
 - **Repo:** https://github.com/BRIGHTEDUFUL/sankofa-rent
 - **Convex prod:** `usable-penguin-827.convex.cloud`
 - **Convex dev:** `adorable-pig-437.convex.cloud`
@@ -682,7 +682,7 @@ and sign-up/sign-in password rules.
 ## 18. Appendix F — Deployed environment
 
 ```
-production   edith-nonnon-project.edimamfaidol.workers.dev
+production   final-year-rent-project.edimamfaidol.workers.dev
 backend      usable-penguin-827.convex.cloud
 dev          adorable-pig-437.convex.cloud   (localhost:8081 via `npm run dev`)
 repo         github.com/BRIGHTEDUFUL/sankofa-rent

@@ -8,7 +8,7 @@
 Property management, rent invoicing, payments and receipts — one calm dashboard.<br/>
 Built as a university final-year project, engineered like a product launch.
 
-<a href="https://edith-nonnon-project.edimamfaidol.workers.dev"><img src="https://img.shields.io/badge/Live%20App-Open%20%E2%86%92-4E735A?style=for-the-badge" alt="Live App"/></a>
+<a href="https://final-year-rent-project.edimamfaidol.workers.dev"><img src="https://img.shields.io/badge/Live%20App-Open%20%E2%86%92-4E735A?style=for-the-badge" alt="Live App"/></a>
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=111111)](https://react.dev/)
@@ -104,7 +104,7 @@ Create your first account — the first sign-up on a fresh deployment becomes th
 
 | Environment | URL | Convex deployment |
 |---|---|---|
-| **Production** | **https://edith-nonnon-project.edimamfaidol.workers.dev** | `prod:usable-penguin-827` |
+| **Production** | **https://final-year-rent-project.edimamfaidol.workers.dev** | `prod:usable-penguin-827` |
 | Development | localhost:8081 | `dev:adorable-pig-437` |
 
 Backend and frontend deploy separately — the frontend is auto-deployed to Cloudflare Workers on every push to `main` (Workers Builds), while the backend goes live on demand with `npx convex deploy --env-file .env.production.local`.
@@ -142,7 +142,7 @@ docs/              # Assets (screenshots), CONVEX_MIGRATION.md (full runbook)
 
 ## Roadmap
 
-- [x] Live on Cloudflare Workers (`edith-nonnon-project`)
+- [x] Live on Cloudflare Workers (`final-year-rent-project`)
 - [x] Custom branding (name · tagline · logo · accent) with admin audit
 - [x] Roles (admin / member), first-account-becomes-admin
 - [ ] Password-reset emails (Resend)

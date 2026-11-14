@@ -12,7 +12,7 @@ frontend is deployed on Cloudflare Workers:**
 |---|---|---|---|
 | `dev:adorable-pig-437` (`.env.local`) | development | SITE_URL/JWT/JWKS ✅ | Kojo + Ama test accounts |
 | `prod:usable-penguin-827` (`.env.production.local`, gitignored) | production backend | SITE_URL/JWT/JWKS ✅ | One seeded admin account + minimal data |
-| `edith-nonnon-project` (Cloudflare Worker) | production frontend | n/a | https://edith-nonnon-project.edimamfaidol.workers.dev — renamed from `rentwise-ghana` 2026-11-14 |
+| `final-year-rent-project` (Cloudflare Worker) | production frontend | n/a | https://final-year-rent-project.edimamfaidol.workers.dev — Git-connected Workers Builds; the earlier `edith-nonnon-project` worker (itself renamed from `rentwise-ghana`) was only updated manually and is stale |
 
 The full user journey was browser-verified against **dev** (sign-up, login, CRUD, invoice,
 payment, branding, non-admin gating) and against **prod** (sign-up → first account becomes
@@ -512,10 +512,13 @@ the gitignored env files; never commit them.
 5. Prod frontend env: `.env.production` is committed (public only — not a secret) and pins
    `VITE_CONVEX_URL=https://usable-penguin-827.convex.cloud`; a host-set build variable
    overrides it.
-6. Prod frontend (Cloudflare Workers, 2026-11-14): `npm run build` → `npx wrangler deploy`
-   (root `wrangler.jsonc`; Worker `edith-nonnon-project` (renamed from `rentwise-ghana`); assets served via the `ASSETS` binding).
-   Live at https://edith-nonnon-project.edimamfaidol.workers.dev. The old `rentwise-ghana`
-   Worker remains live until deleted in the Cloudflare dashboard. Pushes to `main` also trigger the Workers Builds build.
+6. Prod frontend (Cloudflare Workers, 2026-11-14): production is deployed by the Git-connected
+   Workers Builds pipeline on pushes to `main` (Worker `final-year-rent-project`; assets served
+   via the `ASSETS` binding). Live at https://final-year-rent-project.edimamfaidol.workers.dev —
+   verified end to end on 2026-11-14. `npm run build` → `npx wrangler deploy` (root
+   `wrangler.jsonc`, which still names Worker `edith-nonnon-project`) remains the manual path
+   and targets the stale worker. The old `rentwise-ghana`
+   Worker remains live until deleted in the Cloudflare dashboard.
    CI is npm-only — `bun.lock`/`bunfig.toml` were removed because a stale bun lockfile was
    failing `bun install --frozen-lockfile` on every push.
 7. Prod smoke test: `npx convex run branding:get --env-file .env.production.local` →
