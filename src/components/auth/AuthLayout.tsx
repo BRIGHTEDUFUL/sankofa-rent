@@ -30,7 +30,7 @@ export function AuthLayout({ title, subtitle, children, footer }: { title: strin
   );
 }
 
-type FieldProps = InputHTMLAttributes<HTMLInputElement> & { label: string; name: string; right?: ReactNode; hint?: string; error?: string };
+type FieldProps = InputHTMLAttributes<HTMLInputElement> & { label: string; name: string; right?: ReactNode; hint?: string | undefined; error?: string | undefined };
 
 export function Field({ label, name, type = "text", right, hint, error, ...props }: FieldProps) {
   const [visible, setVisible] = useState(false);
