@@ -113,6 +113,20 @@ function fromProfile(p: Doc<"profiles">): FormState {
   };
 }
 
+// Sticky at the bottom on mobile, plain flex row on sm+
+function SaveBar({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      {/* Mobile: sticky bar above safe area */}
+      <div className="sm:hidden sticky bottom-0 mt-6 flex justify-end px-0 pt-3 pb-[calc(0.75rem+var(--sab))] bg-card/95 backdrop-blur border-t border-border">
+        {children}
+      </div>
+      {/* Desktop: plain right-aligned row */}
+      <div className="hidden sm:flex justify-end mt-6">{children}</div>
+    </>
+  );
+}
+
 function Section({
   title,
   desc,
@@ -553,7 +567,7 @@ function Page() {
                   className="h-11 sm:h-9"
                 />
               </div>
-              <div className="sticky-save-bar mt-6 sm:static sm:bg-transparent sm:backdrop-filter-none sm:border-0 sm:pt-0 sm:pb-0 flex justify-end">
+              <SaveBar>
                 <Button
                   onClick={() => save()}
                   disabled={saving}
@@ -561,7 +575,7 @@ function Page() {
                 >
                   {saving ? "Saving…" : "Save changes"}
                 </Button>
-              </div>
+              </SaveBar>
             </Section>
           )}
 
@@ -611,7 +625,7 @@ function Page() {
                   className="h-11 sm:h-9"
                 />
               </div>
-              <div className="sticky-save-bar mt-6 sm:static sm:bg-transparent sm:backdrop-filter-none sm:border-0 sm:pt-0 sm:pb-0 flex justify-end">
+              <SaveBar>
                 <Button
                   onClick={() => save()}
                   disabled={saving}
@@ -619,7 +633,7 @@ function Page() {
                 >
                   {saving ? "Saving…" : "Save changes"}
                 </Button>
-              </div>
+              </SaveBar>
             </Section>
           )}
 
@@ -824,7 +838,7 @@ function Page() {
                 checked={form.notifyWhatsapp}
                 onCheckedChange={(v) => set("notifyWhatsapp", v)}
               />
-              <div className="sticky-save-bar mt-6 sm:static sm:bg-transparent sm:backdrop-filter-none sm:border-0 sm:pt-0 sm:pb-0 flex justify-end">
+              <SaveBar>
                 <Button
                   onClick={() => save()}
                   disabled={saving}
@@ -832,7 +846,7 @@ function Page() {
                 >
                   {saving ? "Saving…" : "Save changes"}
                 </Button>
-              </div>
+              </SaveBar>
             </Section>
           )}
 
@@ -878,7 +892,7 @@ function Page() {
                   className="h-11 sm:h-9"
                 />
               </div>
-              <div className="sticky-save-bar mt-6 sm:static sm:bg-transparent sm:backdrop-filter-none sm:border-0 sm:pt-0 sm:pb-0 flex justify-end">
+              <SaveBar>
                 <Button
                   onClick={() => save()}
                   disabled={saving}
@@ -886,7 +900,7 @@ function Page() {
                 >
                   {saving ? "Saving…" : "Save changes"}
                 </Button>
-              </div>
+              </SaveBar>
             </Section>
           )}
 

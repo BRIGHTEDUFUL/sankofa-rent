@@ -122,14 +122,17 @@ export function Page() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Properties & units</h2>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Properties & units</h2>
           <p className="text-sm text-muted-foreground">
             {properties.length} properties · {unitCount} units
           </p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
+        <Button
+          className="h-12 w-full justify-center sm:h-auto sm:w-auto sm:justify-start"
+          onClick={() => setCreateOpen(true)}
+        >
           <Plus className="h-4 w-4" />
           Add property
         </Button>
