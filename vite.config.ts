@@ -1,23 +1,34 @@
-// @lovable.dev/vite-tanstack-config already includes the following — do NOT add them manually
-// or the app will break with duplicate plugins:
-//   - TanStack devtools (dev-only, first), tanstackStart, viteReact, tailwindcss, tsConfigPaths,
-//     nitro (build-only using cloudflare as a default target), VITE_* env injection, @ path alias,
-//     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
-// Never set ssr.external or resolve.external: the Worker has no runtime module resolution, so
-// the build fails. Never add compression (compressPublicAssets, vite-plugin-compression):
-// hosting already compresses at the edge.
-// You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+// Direct, dependency-explicit Vite + TanStack Start + Nitro config.
+// Standalone configuration: no vendor wrapper, no sandbox-only plugins.
+import { defineConfig } from "vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { nitro } from "nitro/vite";
+import tailwindcss from "@tailwindcss/vite";
+import tsConfigPaths from "vite-tsconfig-paths";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
-    server: { entry: "server" },
+  resolve: {
+    alias: { "@": `${process.cwd()}/src` },
+    dedupe: [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "react/jsx-dev-runtime",
+      "@tanstack/react-query",
+      "@tanstack/query-core",
+    ],
   },
-  nitro: {
+  css: { transformer: "lightningcss" },
+  plugins: [
+    tailwindcss(),
+    tsConfigPaths({ projects: ["./tsconfig.json"] }),
+    // Redirect TanStack Start's bundled server entry to src/server.ts (our
+    // SSR error wrapper) — nitro builds from this entry.
+    tanstackStart({ server: { entry: "server" } }),
     // Hard-pin the deploy target so every build (local and CI) emits the
-    // Workers layout that wrangler.jsonc expects: .output/server + .output/public.
-    preset: "cloudflare-module",
-  },
+    // Workers layout wrangler.jsonc expects: .output/server + .output/public.
+    nitro({ preset: "cloudflare-module" }),
+    react(),
+  ],
 });

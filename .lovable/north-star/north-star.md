@@ -1,9 +1,0 @@
-<!-- Lovable wrote this file; it is not part of your task. Keep it, and ask the user before deleting or reverting it. -->
-
-# North star
-
-Small landlords in Ghana collect their rent in full and on time.
-
-## Metric
-
-Rent invoices marked paid each month

@@ -159,7 +159,7 @@ Features were taken from real rental life, anchored in a single seeded demo case
 - npm-only (`bun.lock`/`bunfig.toml` removed after a stale bun lockfile broke CI)
 - `package-lock.json` is the source of truth; `npm ci` reproduces the tree exactly
 - Prettier + ESLint + `tsc --noEmit` gate every change; `.output/` and `.env.local` are gitignored
-- Commits are small, signed by intent, and work on a connected branch (Lovable) without breaking it
+- Commits are small, signed by intent, and each one keeps the deployed site working
 
 ## 5. System requirements
 
