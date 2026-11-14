@@ -10,10 +10,12 @@
 - [x] Custom branding: app name, tagline, logo, accent color — admin-only, live everywhere (auth pages, header, tab title, favicon, theme)
 - [x] Roles: admin / member
 - [x] Duplicate-invoice guard, parser tolerance for UI cedi formats, error surfacing (`friendlyError`)
+- [x] Frontend live on Cloudflare Workers — `rentwise-ghana` (Nitro `cloudflare-module`), https://rentwise-ghana.edimamfaidol.workers.dev (verified 2026-11-14, HTTP 200; `.env.production` pins the public prod `VITE_CONVEX_URL`; pushes to `main` trigger Workers Builds)
+- [x] CI fix: `bun.lock`/`bunfig.toml` dropped — the repo pins npm; a stale bun lockfile was failing `bun install --frozen-lockfile` on every build
 
 ## Next
 
-- [ ] Deploy the frontend (Cloudflare Workers via nitro) and set `VITE_CONVEX_URL` to the prod deployment
+- [ ] Verify the Workers Builds pipeline end to end (builds trigger on push to `main`; deploy was verified manually with `npx wrangler deploy` on 2026-11-14)
 - [ ] Rotate the seeded admin password after the first production login
 - [ ] Verify Google sign-in (if wanted for the demo) — currently email + password only
 - [ ] Wire the code-split warning cleanup (`Page` exports in route files)

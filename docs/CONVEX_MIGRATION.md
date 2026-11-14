@@ -5,12 +5,14 @@ This guide describes the migration of this app to Convex (database, auth, functi
 **Implementation status (14 November 2026): complete, including deployments.**
 `convex/` holds the schema and one function file per screen; the frontend reads live data
 through `useQuery`; `src/lib/mock.ts` is deleted. Auth is email + password only
-(`@convex-dev/auth` 0.0.98). **Both deployments are live and verified:**
+(`@convex-dev/auth` 0.0.98). **Both deployments are live and verified, and the production
+frontend is deployed on Cloudflare Workers:**
 
 | Deployment | Role | Auth keys | Live test |
 |---|---|---|---|
 | `dev:adorable-pig-437` (`.env.local`) | development | SITE_URL/JWT/JWKS ✅ | Kojo + Ama test accounts |
-| `prod:usable-penguin-827` (`.env.production.local`, gitignored) | production | SITE_URL/JWT/JWKS ✅ | One seeded admin account + minimal data |
+| `prod:usable-penguin-827` (`.env.production.local`, gitignored) | production backend | SITE_URL/JWT/JWKS ✅ | One seeded admin account + minimal data |
+| `rentwise-ghana` (Cloudflare Worker) | production frontend | n/a | https://rentwise-ghana.edimamfaidol.workers.dev — HTTP 200 (2026-11-14) |
 
 The full user journey was browser-verified against **dev** (sign-up, login, CRUD, invoice,
 payment, branding, non-admin gating) and against **prod** (sign-up → first account becomes
@@ -507,8 +509,16 @@ the gitignored env files; never commit them.
 3. Auth keys (once per deployment): `npx @convex-dev/auth` — sets `SITE_URL`, `JWT_PRIVATE_KEY`, `JWKS`.
 4. Prod backend: `npx convex deploy --env-file .env.production.local` (already done — schema,
    indexes, functions and auth keys pushed on 2026-11-14).
-5. Prod frontend env: hosting must define `VITE_CONVEX_URL=https://usable-penguin-827.convex.cloud`.
-6. Prod smoke test: `npx convex run branding:get --env-file .env.production.local` →
+5. Prod frontend env: `.env.production` is committed (public only — not a secret) and pins
+   `VITE_CONVEX_URL=https://usable-penguin-827.convex.cloud`; a host-set build variable
+   overrides it.
+6. Prod frontend (Cloudflare Workers, 2026-11-14): `npm run build` → `npx wrangler deploy`
+   (root `wrangler.jsonc`; Worker `rentwise-ghana`; assets served via the `ASSETS` binding).
+   Live at https://rentwise-ghana.edimamfaidol.workers.dev — HTTP 200, title
+   *Dashboard - Sankofa Rent*. Pushes to `main` also trigger the Workers Builds build.
+   CI is npm-only — `bun.lock`/`bunfig.toml` were removed because a stale bun lockfile was
+   failing `bun install --frozen-lockfile` on every push.
+7. Prod smoke test: `npx convex run branding:get --env-file .env.production.local` →
    returns `{ appName: "Sankofa Rent", tagline: "…", accentColor: "#4E735A", logoUrl: null }`.
 
 ### Test evidence (2026-11-14)

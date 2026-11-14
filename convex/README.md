@@ -19,9 +19,10 @@ CONVEX_DEPLOYMENT=dev:<project>|<token>
 VITE_CONVEX_URL=https://<project>.convex.cloud
 ```
 
-The frontend reads only `VITE_CONVEX_URL`. Production sets that variable in the hosting
-environment (never in the repo), and Convex secrets live in the deployment's environment
-settings.
+The frontend reads only `VITE_CONVEX_URL`. Production pins that variable in the committed
+`.env.production` (public, no secrets — overridden by any host-set variable) so CI builds work;
+Convex secrets live in the deployment's environment settings, never in the repo. The
+production frontend runs on Cloudflare Workers (`rentwise-ghana`) — see `README.md → Deploying`.
 
 ## Files
 

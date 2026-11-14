@@ -60,23 +60,37 @@ may edit branding. Every later account is a member.
 | `npm test` | Unit tests (vitest) |
 | `npm run lint` | ESLint (0 errors; a few acceptable `react-refresh` warnings) |
 | `npm run build` | Production build → `.output/` (Nitro `cloudflare-module`) |
+| `npx wrangler deploy` | Deploy the built frontend to Cloudflare Workers (uses `wrangler.jsonc`) |
 | `npx tsc --noEmit` | Typecheck |
 
 ## Deploying
 
-Backend and frontend sync through environment files, never through the repo:
+Backend deploys to Convex; frontend deploys to Cloudflare Workers (Nitro `cloudflare-module`).
 
 | File | Purpose | Committed? |
 |---|---|---|
 | `.env.local` | **dev** deployment (`dev:…`) | ❌ gitignored |
-| `.env.production.local` | **prod** deployment + keys (`prod:…`) | ❌ gitignored |
+| `.env.production.local` | **prod** deployment + deploy key (`prod:…`) | ❌ gitignored |
+| `.env.production` | **Public** prod `VITE_CONVEX_URL`, so CI builds work | ✅ committed — not a secret (it is embedded in every browser bundle) |
+
+### Backend → prod
 
 ```sh
 npx convex deploy --env-file .env.production.local   # schema + functions to prod
 ```
 
-Then build and host the frontend (Cloudflare Workers preset). The hosting environment
-must define `VITE_CONVEX_URL=https://<prod>.convex.cloud`. See `wrangler.jsonc`.
+### Frontend → prod (Cloudflare Workers)
+
+```sh
+npm run build          # → .output/  (Nitro cloudflare-module)
+npx wrangler deploy    # honors wrangler.jsonc (Worker `rentwise-ghana`)
+```
+
+Live: **https://rentwise-ghana.edimamfaidol.workers.dev** (verified 2026-11-14 — HTTP 200).
+`wrangler.jsonc` points the Worker at `.output/server/index.mjs` (SSR shell) and serves
+`.output/public/` as static assets (`ASSETS` binding). Pushes to `main` also trigger the
+Workers Builds build for this repo. A host-set `VITE_CONVEX_URL` build variable overrides
+the committed `.env.production`.
 
 `docs/CONVEX_MIGRATION.md` has the full deployment table, acceptance checklist and
 operator notes (migrations, backfills, deploy keys).
