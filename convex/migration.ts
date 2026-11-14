@@ -82,3 +82,77 @@ export const setAdmin = internalMutation({
     return { admin: target };
   },
 });
+
+// Migrate all app data from one account to another — used to hand a seeded
+// dataset over to a new owner. Re-points every landlord-scoped table and
+// copies the business-facing profile fields (name, business identity, MoMo
+// and bank details, notification preferences, rent-due settings) so receipts
+// and invoices keep their look. The target account must already exist and
+// have a profile (sign up in the app first). Roles are NOT changed — use
+// setAdmin afterwards to promote exactly one admin.
+//   npx convex run migration:adoptLandlordData '{"fromEmail":"old@example.com","toEmail":"new@example.com"}'
+export const adoptLandlordData = internalMutation({
+  args: { fromEmail: v.string(), toEmail: v.string() },
+  handler: async (ctx, { fromEmail, toEmail }) => {
+    const norm = (e: string) => e.trim().toLowerCase();
+    const users = await ctx.db.query("users").collect();
+    const fromUser = users.find((u) => u.email?.toLowerCase() === norm(fromEmail));
+    const toUser = users.find((u) => u.email?.toLowerCase() === norm(toEmail));
+    if (!fromUser) throw new Error(`No user with email ${fromEmail}`);
+    if (!toUser) throw new Error(`No user with email ${toEmail}`);
+
+    const profiles = await ctx.db.query("profiles").collect();
+    const fromProfile = profiles.find((p) => p.userId === fromUser._id);
+    const toProfile = profiles.find((p) => p.userId === toUser._id);
+    if (!fromProfile) throw new Error("Source profile not found");
+    if (!toProfile) throw new Error("Target profile not found");
+
+    const moved: Record<string, number> = {};
+    const tables = [
+      "properties",
+      "units",
+      "tenants",
+      "leases",
+      "invoices",
+      "payments",
+      "maintenance",
+      "announcements",
+    ] as const;
+    for (const table of tables) {
+      const rows = await ctx.db
+        .query(table)
+        .withIndex("by_landlord", (q) => q.eq("landlordId", fromUser._id))
+        .collect();
+      for (const row of rows) {
+        await ctx.db.patch(row._id, { landlordId: toUser._id });
+      }
+      moved[table] = rows.length;
+    }
+    const counters = await ctx.db
+      .query("counters")
+      .filter((q) => q.eq(q.field("landlordId"), fromUser._id))
+      .collect();
+    for (const row of counters) {
+      await ctx.db.patch(row._id, { landlordId: toUser._id });
+    }
+    moved.counters = counters.length;
+
+    await ctx.db.patch(toProfile._id, {
+      // Personal names stay with each account — only business identity copies.
+      phone: fromProfile.phone,
+      businessName: fromProfile.businessName,
+      region: fromProfile.region,
+      momoNumber: fromProfile.momoNumber,
+      momoNetwork: fromProfile.momoNetwork,
+      bankName: fromProfile.bankName,
+      bankAccount: fromProfile.bankAccount,
+      rentDueDay: fromProfile.rentDueDay,
+      lateFeePercent: fromProfile.lateFeePercent,
+      notifySms: fromProfile.notifySms,
+      notifyEmail: fromProfile.notifyEmail,
+      notifyWhatsapp: fromProfile.notifyWhatsapp,
+    });
+
+    return { moved };
+  },
+});
