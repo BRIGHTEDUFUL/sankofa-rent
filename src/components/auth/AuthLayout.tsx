@@ -40,7 +40,7 @@ export function Field({ label, name, type = "text", right, hint, error, ...props
     <div className="min-w-0">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-sm font-medium"><label htmlFor={name}>{label}</label>{right}</div>
       <div className="relative">
-        <input {...props} id={name} name={name} type={password && visible ? "text" : type} aria-invalid={Boolean(error)} aria-describedby={description} className={`h-12 w-full min-w-0 rounded-lg border bg-card px-3 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm ${password ? "pr-12" : ""} ${error ? "border-destructive" : "border-input"}`} />
+        <input {...props} id={name} name={name} type={password && visible ? "text" : type} aria-invalid={Boolean(error)} aria-describedby={description} className={`h-12 w-full min-w-0 rounded-lg border bg-card px-3 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm ${password ? "pr-12" : ""} ${error ? "border-destructive" : "border-foreground/15 hover:border-foreground/30"}`} />
         {password && <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1 h-10 w-10 text-muted-foreground" aria-label={visible ? "Hide password" : "Show password"} title={visible ? "Hide password" : "Show password"} onClick={() => setVisible(!visible)}>{visible ? <EyeOff /> : <Eye />}</Button>}
       </div>
       {description && <p id={description} className={`mt-2 text-xs leading-relaxed ${error ? "text-destructive" : "text-muted-foreground"}`}>{error || hint}</p>}
@@ -57,5 +57,5 @@ export function AuthNotice({ children, error = false }: { children: ReactNode; e
 }
 
 export function GoogleButton({ onClick }: { onClick: () => void }) {
-  return <Button type="button" variant="outline" className="h-12 w-full rounded-lg" onClick={onClick}><span className="text-lg font-bold text-foreground" aria-hidden="true">G</span>Continue with Google</Button>;
+  return <Button type="button" variant="outline" className="h-12 w-full rounded-lg border-foreground/15 bg-card shadow-none hover:bg-muted" onClick={onClick}><span className="text-lg font-bold text-foreground" aria-hidden="true">G</span>Continue with Google</Button>;
 }
