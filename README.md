@@ -1,134 +1,148 @@
-# Sankofa Rent
+<div align="center">
 
-Rent management for small landlords in Ghana — properties, units, tenants, leases, rent
-invoicing, payments, receipts, maintenance and announcements, in one place.
+# ☀ Sankofa Rent
 
-Built for a university final-year project at [example — Ghana]. Designed to be demoed:
-one seeded admin account, a focused dataset, and a live deployment per environment.
+### Rent, handled beautifully.
+### Made for Ghanaian landlords.
 
-## What's inside
+Property management, rent invoicing, payments and receipts — one calm dashboard.<br/>
+Built as a university final-year project, engineered like a product launch.
 
-| Area | Status |
+<a href="https://edith-nonnon-project.edimamfaidol.workers.dev"><img src="https://img.shields.io/badge/Live%20App-Open%20%E2%86%92-4E735A?style=for-the-badge" alt="Live App"/></a>
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=111111)](https://react.dev/)
+[![TanStack](https://img.shields.io/badge/TanStack_Start-1.168-EF552E?style=flat&logo=react&logoColor=white)](https://tanstack.com/start)
+[![Convex](https://img.shields.io/badge/Convex-Backend-E5511C?style=flat&logo=convex&logoColor=white)](https://convex.dev/)
+[![Tailwind](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Deploy](https://img.shields.io/badge/Deploy-Cloudflare_Workers-F38020?style=flat&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
+
+</div>
+
+<br/>
+
+<div align="center">
+
+<img src="docs/assets/dashboard.jpeg" alt="Sankofa Rent — live dashboard" width="100%" />
+
+</div>
+
+---
+
+## Why Sankofa Rent
+
+Rent collection in Ghana still runs through WhatsApp groups, exercise books and scattered MoMo receipts. Property managers can't see their occupancy, lagging tenants or monthly collection at a glance — and owners need proof of payment, not screenshots.
+
+Sankofa Rent gives a single landlord everything: **properties and units, tenants and leases, rent invoices with due dates, in-app payments (MoMo + bank + cash), digital receipts, maintenance requests, announcements and a monthly dashboard** — in English, with pesewas-exact money handling, styled for the Ghanaian market.
+
+And because it's a final-year defense piece, the whole product is **rebrandable live** — name, tagline, logo and accent colour — all changeable from Settings by the admin in front of the panel.
+
+## Features
+
+| | |
 |---|---|
-| Email + password auth (Convex Auth) | ✅ Working, verified |
-| Dashboard (collection rate, occupancy, arrears, 6-month trend) | ✅ Working |
-| Properties & units (CRUD, KPIs) | ✅ Working |
-| Tenants (assign units, balances) | ✅ Working |
-| Leases (create / renew / end; duplicate-safe unit assignment) | ✅ Working |
-| Rent invoices (draft → send → paid, duplicate guard) | ✅ Working |
-| Payments & receipts (MoMo / Telecel Cash / AirtelTigo / bank / cash) | ✅ Working |
-| Maintenance requests (priority, status tracking) | ✅ Working |
-| Announcements (SMS / email / WhatsApp channels) | ✅ Working |
-| **Custom branding** — app name, tagline, logo, accent color, live everywhere (header, auth pages, tab title, favicon, theme) | ✅ Working, admin-only |
-| Roles (`admin` / `member`) — first account becomes admin | ✅ Working |
+| **Dashboard** | Collected vs invoiced, collection rate, occupancy, arrears — last 6 months |
+| **Properties & units** | One-tap property + unit management, rent roll, occupancy KPIs |
+| **Tenants** | Profiles, unit assignment, balances derived from unpaid invoices |
+| **Leases** | Create / renew / end; duplicate-safe unit assignment |
+| **Invoices** | Draft → send → paid; monthly generation cron; duplicate guard |
+| **Payments & receipts** | MoMo (MTN, Telecel, AirtelTigo), bank, cash — numbered receipts |
+| **Maintenance** | Priority + status tracking per unit |
+| **Announcements** | SMS / email / WhatsApp channel selection |
+| **Branding** | Admin-only: live app name, tagline, 8 curated accent palettes + custom colour, logo upload to Convex storage |
+| **Roles** | First account on a deployment becomes admin, the rest members |
+
+## Screenshots
+
+<div align="center">
+
+**Sign in** — custom courtyard imagery, split-screen
+<img src="docs/assets/login.jpeg" alt="Sankofa Rent — sign in" width="100%" />
+
+**Live rebranding** — Settings → Branding (admin-only)
+<img src="docs/assets/branding.jpeg" alt="Sankofa Rent — Settings → Branding" width="100%" />
+
+</div>
 
 ## Tech stack
 
-- **Frontend** — React 19, TanStack Start (SSR) + Router + React Query, Tailwind CSS v4
-- **Backend** — Convex (schema, indexes, queries, mutations, cron jobs, file storage)
-- **Auth** — `@convex-dev/auth` 0.0.98, email + password only
-- **Language** — TypeScript strict
-- **Tests** — Vitest + Testing Library (unit), manual browser E2E (see `docs/CONVEX_MIGRATION.md`)
+| Layer | Choice |
+|---|---|
+| Framework | **TanStack Start** (SSR React 19, file-based routes) + TanStack Query |
+| Backend | **Convex** — schema, queries, mutations, crons (overdue invoices, monthly billing, lease expiry), file storage |
+| Auth | **@convex-dev/auth 0.0.98** — email + password |
+| Styling | Tailwind CSS v4, Plus Jakarta Sans, Sun brand mark |
+| Money | Integer pesewas (GH₵ 1 = 100) — never floats |
+| Deploy | Cloudflare **Workers** (Nitro `cloudflare-module`), CI as npm-only |
+| Tests | Vitest + Testing Library — 14 unit tests |
 
 ## Quick start
 
-Prerequisites: **Node.js ≥ 22 and npm** (no bun, no pnpm, no yarn — the repo pins npm).
+Prerequisites: **Node.js ≥ 22** and **npm** (no bun/pnpm/yarn).
 
 ```sh
 npm install
-npx convex dev          # pushes schema/functions to your dev deployment, regenerates types
-npm run dev             # http://localhost:8081
+npx convex dev     # syncs backend to your dev deployment
+npm run dev        # → http://localhost:8081
 ```
 
-`.env.local` (gitignored) must define:
-
-```
-CONVEX_DEPLOYMENT=dev:<name>|<deploy-key>
-VITE_CONVEX_URL=https://<name>.convex.cloud
-```
-
-Sign up in the app — the **first account created on a deployment becomes its admin** and
-may edit branding. Every later account is a member.
+Create your first account — the first sign-up on a fresh deployment becomes the admin.
 
 ## Scripts
 
 | Command | What it does |
 |---|---|
 | `npm run dev` | Vite dev server (SSR) |
-| `npx convex dev` | Sync backend to the dev deployment + regenerate `convex/_generated/` |
-| `npx convex deploy --env-file .env.production.local` | Deploy backend to production |
-| `npm test` | Unit tests (vitest) |
-| `npm run lint` | ESLint (0 errors; a few acceptable `react-refresh` warnings) |
-| `npm run build` | Production build → `.output/` (Nitro `cloudflare-module`) |
-| `npx wrangler deploy` | Deploy the built frontend to Cloudflare Workers (uses `wrangler.jsonc`) |
+| `npx convex dev` | Push schema/functions to dev, regenerate types |
+| `npx convex deploy --env-file .env.production.local` | Push backend to prod |
+| `npm test` | Vitest (14 tests) |
+| `npm run lint` | ESLint — 0 errors |
+| `npm run build` | Production build → `.output/` (Nitro) |
 | `npx tsc --noEmit` | Typecheck |
 
-## Deploying
+## Deployments
 
-Backend deploys to Convex; frontend deploys to Cloudflare Workers (Nitro `cloudflare-module`).
-
-| File | Purpose | Committed? |
+| Environment | URL | Convex deployment |
 |---|---|---|
-| `.env.local` | **dev** deployment (`dev:…`) | ❌ gitignored |
-| `.env.production.local` | **prod** deployment + deploy key (`prod:…`) | ❌ gitignored |
-| `.env.production` | **Public** prod `VITE_CONVEX_URL`, so CI builds work | ✅ committed — not a secret (it is embedded in every browser bundle) |
+| **Production** | **https://edith-nonnon-project.edimamfaidol.workers.dev** | `prod:usable-penguin-827` |
+| Development | localhost:8081 | `dev:adorable-pig-437` |
 
-### Backend → prod
+Backend and frontend deploy separately — the frontend is auto-deployed to Cloudflare Workers on every push to `main` (Workers Builds), while the backend goes live on demand with `npx convex deploy --env-file .env.production.local`.
 
-```sh
-npx convex deploy --env-file .env.production.local   # schema + functions to prod
-```
-
-### Frontend → prod (Cloudflare Workers)
-
-```sh
-npm run build          # → .output/  (Nitro cloudflare-module)
-npx wrangler deploy    # honors wrangler.jsonc (Worker `edith-nonnon-project`)
-```
-
-Live: **https://edith-nonnon-project.edimamfaidol.workers.dev** (verified 2026-11-14 — HTTP 200).
-`wrangler.jsonc` points the Worker at `.output/server/index.mjs` (SSR shell) and serves
-`.output/public/` as static assets (`ASSETS` binding). Pushes to `main` also trigger the
-Workers Builds build for this repo. A host-set `VITE_CONVEX_URL` build variable overrides
-the committed `.env.production`.
-
-`docs/CONVEX_MIGRATION.md` has the full deployment table, acceptance checklist and
-operator notes (migrations, backfills, deploy keys).
-
-## Roles & security model
-
-- All app data is scoped per landlord; `landlordId` is always derived from the signed-in
-  user, never from client input.
-- `branding` (name/logo/colors) is a single global row, **publicly readable** (the login
-  page needs it) and **writable by admins only** — enforced server-side in `convex/branding.ts`
-  (`requireAdmin`), and hidden in the UI for members.
-- Money is integer pesewas; dates are epoch ms.
-- No secrets in the repo. Deploy keys live only in the gitignored env files above.
-
-## Operator commands
-
-Run with `npx convex run <file:function>` (add `--env-file .env.production.local` for prod):
-
-| Command | Purpose |
-|---|---|
-| `migration:backfillAdmin` | Promote earliest profile to admin if none exists (safe to re-run) |
-| `migration:setAdmin` | Force-set one admin by email (demotes other admins) |
-| `migration:renameDefaultBrand` | One-time rename of the default brand (only untouched rows) |
-| `migration:deleteDraftInvoiceByNumber` | Delete a DRAFT invoice (e.g. accidental duplicate) |
+The production backend is pre-seeded with a small, real dataset (1 property · 2 units · 1 tenant · 1 paid invoice · 1 receipt · 1 maintenance request · 1 announcement) — exactly what you see in the screenshots.
 
 ## Project structure
 
 ```
-convex/            schema + functions (one file per domain), _generated/
-src/components/    app shell (Card/Button/Badge), auth layout, dialogs, design system
-src/lib/           branding provider, convex client, formatting utils, tests
-src/routes/        TanStack file-routes (/, /properties, /tenants, /leases,
-                   /invoices, /payments, /maintenance, /announcements, /settings, /login, …)
-docs/              design notes, migration/deployment runbook
+convex/            # Backend: schema, auth, functions, crons, operator migrations
+  schema.ts        # 11 tables; money as pesewas; auth+roles
+  branding.ts      # Global brand singleton (public read, admin write)
+  migration.ts     # backfillAdmin · setAdmin · renameDefaultBrand · deleteDraftInvoiceByNumber · adoptLandlordData
+src/
+  components/      # AppShell (Card/Button/Badge), AuthLayout, data pages, design system
+  lib/             # BrandingProvider + BrandingEffects, convex client, format utilities
+  routes/          # TanStack file-routes: /, /properties, /tenants, /leases, /invoices,
+                   # /payments, /maintenance, /announcements, /settings, /login, /signup
+docs/              # Assets (screenshots), CONVEX_MIGRATION.md (full runbook)
 ```
 
-## License & acknowledgments
+## Engineering highlights
 
-University final-year project. Not licensed for redistribution; brand assets are the
-owner's. Supersedes the initial Lovable-generated template (retained historical history per
-`AGENTS.md`).
+- **Full-stack branding, done properly** — a public singleton table drives a `BrandingProvider`; the React tree, `document.title`, the favicon `link` and the `--primary` CSS variable all re-skin live, with a MutationObserver that guarantees no title-rewrite loop.
+- **Server-enforced roles** — UI hides `Settings → Branding` for members, but the write path throws `Admin access required` server-side. UI gates are never authorization.
+- **Pesewas-safe money, friendly errors** — `GH₵ 1,850.00` renders correctly; a Convex `Uncaught Error` becomes "Invoice INV-1001 already covers this lease and period".
+- **Sign-out is bulletproof** — a hard reload recreates the module-level Convex client instead of leaving stale websocket state behind.
+- **14/14 unit tests** on branding validation, the cedi parser and auth rules; zero console errors in production.
+
+## Roadmap
+
+- [x] Live on Cloudflare Workers (`edith-nonnon-project`)
+- [x] Custom branding (name · tagline · logo · accent) with admin audit
+- [x] Roles (admin / member), first-account-becomes-admin
+- [ ] Password-reset emails (Resend)
+- [ ] SMS / WhatsApp rent reminders (Arkesel/mNotify)
+- [ ] MoMo collection webhooks (MTN/Telecel/AirtelTigo)
+
+## License
+
+University final-year project · Sankofa Rent · 2026. Brand assets belong to the author.
