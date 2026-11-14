@@ -90,81 +90,83 @@ export function Page() {
 
   return (
     <>
-      {actionError && (
-        <p
-          role="alert"
-          className="mb-4 border-l-2 border-destructive py-2 pl-3 text-sm text-destructive"
-        >
-          {actionError}
-        </p>
-      )}
-      <DataPage
-        title="Rent invoices"
-        subtitle={`${formatMonth(currentPeriod)} billing cycle`}
-        action="New invoice"
-        onAction={() => setCreateOpen(true)}
-        loading={false}
-        stats={[
-          { label: "Invoiced", value: cediFromPesewas(invoiced) },
-          { label: "Collected", value: cediFromPesewas(collected) },
-          {
-            label: "Overdue",
-            value: cediFromPesewas(overdue),
-            hint: `${cycle.filter((i) => i.status === "overdue").length} overdue`,
-          },
-          { label: "Collection rate", value: `${rate}%` },
-        ]}
-        columns={[
-          {
-            key: "n",
-            label: "Invoice",
-            render: (r) => <span className="font-mono text-xs font-semibold">{r.number}</span>,
-          },
-          {
-            key: "t",
-            label: "Tenant",
-            render: (r) => (
-              <span className="font-semibold">{tenantName.get(r.tenantId) ?? "—"}</span>
-            ),
-          },
-          { key: "p", label: "Period", render: (r) => formatMonth(r.period) },
-          { key: "d", label: "Due", render: (r) => formatDate(r.dueDate) },
-          {
-            key: "a",
-            label: "Amount",
-            render: (r) => <span className="font-semibold">{cediFromPesewas(r.amount)}</span>,
-          },
-          {
-            key: "s",
-            label: "Status",
-            render: (r) => <Badge tone={tone[r.status]}>{r.status}</Badge>,
-          },
-          {
-            key: "act",
-            label: "Actions",
-            className: "text-right",
-            render: (r) =>
-              r.status === "draft" ? (
-                <button
-                  onClick={() => {
-                    setActionError("");
-                    sendInvoice({ id: r._id }).catch((err: unknown) =>
-                      setActionError(friendlyError(err, "Could not send the invoice.")),
-                    );
-                  }}
-                  className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
-                >
-                  Send
-                </button>
-              ) : (
-                <span className="text-xs text-muted-foreground">
-                  {cediFromPesewas(r.paid)} paid
-                </span>
+      <div className="space-y-5">
+        {actionError && (
+          <p
+            role="alert"
+            className="border-l-2 border-destructive py-2 pl-3 text-sm text-destructive"
+          >
+            {actionError}
+          </p>
+        )}
+        <DataPage
+          title="Rent invoices"
+          subtitle={`${formatMonth(currentPeriod)} billing cycle`}
+          action="New invoice"
+          onAction={() => setCreateOpen(true)}
+          loading={false}
+          stats={[
+            { label: "Invoiced", value: cediFromPesewas(invoiced) },
+            { label: "Collected", value: cediFromPesewas(collected) },
+            {
+              label: "Overdue",
+              value: cediFromPesewas(overdue),
+              hint: `${cycle.filter((i) => i.status === "overdue").length} overdue`,
+            },
+            { label: "Collection rate", value: `${rate}%` },
+          ]}
+          columns={[
+            {
+              key: "n",
+              label: "Invoice",
+              render: (r) => <span className="font-mono text-xs font-semibold">{r.number}</span>,
+            },
+            {
+              key: "t",
+              label: "Tenant",
+              render: (r) => (
+                <span className="font-semibold">{tenantName.get(r.tenantId) ?? "—"}</span>
               ),
-          },
-        ]}
-        rows={invoices}
-      />
+            },
+            { key: "p", label: "Period", render: (r) => formatMonth(r.period) },
+            { key: "d", label: "Due", render: (r) => formatDate(r.dueDate) },
+            {
+              key: "a",
+              label: "Amount",
+              render: (r) => <span className="font-semibold">{cediFromPesewas(r.amount)}</span>,
+            },
+            {
+              key: "s",
+              label: "Status",
+              render: (r) => <Badge tone={tone[r.status]}>{r.status}</Badge>,
+            },
+            {
+              key: "act",
+              label: "Actions",
+              className: "text-right",
+              render: (r) =>
+                r.status === "draft" ? (
+                  <button
+                    onClick={() => {
+                      setActionError("");
+                      sendInvoice({ id: r._id }).catch((err: unknown) =>
+                        setActionError(friendlyError(err, "Could not send the invoice.")),
+                      );
+                    }}
+                    className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
+                  >
+                    Send
+                  </button>
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    {cediFromPesewas(r.paid)} paid
+                  </span>
+                ),
+            },
+          ]}
+          rows={invoices}
+        />
+      </div>
 
       <FormDialog
         open={createOpen}

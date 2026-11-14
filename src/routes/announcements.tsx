@@ -165,7 +165,7 @@ export function Page() {
           <select
             name="propertyId"
             defaultValue="none"
-            className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm focus:ring-1 focus:ring-ring"
+            className="h-11 w-full rounded-md border border-input bg-transparent px-3 text-base focus:ring-1 focus:ring-ring sm:h-9 sm:text-sm"
           >
             <option value="none">All properties</option>
             {properties.map((p) => (

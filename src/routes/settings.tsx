@@ -793,28 +793,30 @@ function Page() {
                 </p>
               )}
 
-              <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
-                <Button
-                  variant="ghost"
-                  onClick={resetBrandingForm}
-                  disabled={brandSaving}
-                  className="h-12 w-full justify-center sm:h-auto sm:w-auto"
-                >
-                  Reset to defaults
-                </Button>
-                <Button
-                  onClick={() => saveBrandingChanges()}
-                  disabled={
-                    brandSaving ||
-                    !brand.appName.trim() ||
-                    !brand.tagline.trim() ||
-                    !isUsableAccent(brand.accentColor)
-                  }
-                  className="h-12 w-full justify-center sm:h-auto sm:w-auto"
-                >
-                  {brandSaving ? "Saving…" : "Save branding"}
-                </Button>
-              </div>
+              <SaveBar>
+                <div className="flex w-full gap-2 sm:w-auto">
+                  <Button
+                    variant="ghost"
+                    onClick={resetBrandingForm}
+                    disabled={brandSaving}
+                    className="flex-1 h-12 justify-center sm:flex-none sm:h-auto"
+                  >
+                    Reset to defaults
+                  </Button>
+                  <Button
+                    onClick={() => saveBrandingChanges()}
+                    disabled={
+                      brandSaving ||
+                      !brand.appName.trim() ||
+                      !brand.tagline.trim() ||
+                      !isUsableAccent(brand.accentColor)
+                    }
+                    className="flex-1 h-12 justify-center sm:flex-none sm:h-auto"
+                  >
+                    {brandSaving ? "Saving…" : "Save branding"}
+                  </Button>
+                </div>
+              </SaveBar>
             </Section>
           )}
 

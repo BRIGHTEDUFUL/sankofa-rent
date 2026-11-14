@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Doc, Id } from "../../convex/_generated/dataModel";
@@ -276,10 +276,12 @@ function MaintenanceDialog({
         </div>
         <div className="space-y-1.5">
           <Label>Description</Label>
-          <Input
+          <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="What happened?"
+            rows={3}
+            placeholder="What happened? Any relevant details."
+            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-base focus:ring-1 focus:ring-ring"
           />
         </div>
         <div className="space-y-1.5">
@@ -373,6 +375,13 @@ function StatusDialog({
   const [cost, setCost] = useState(item?.cost ? String(item.cost / 100) : "");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (item) {
+      setStatus(item.status);
+      setCost(item.cost ? String(item.cost / 100) : "");
+    }
+  }, [item]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

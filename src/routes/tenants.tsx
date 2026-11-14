@@ -163,14 +163,14 @@ export function Page() {
               <div className="flex justify-end gap-1">
                 <button
                   onClick={() => setEditing(r)}
-                  className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                  className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
                   title="Edit tenant"
                 >
                   <Pencil className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setArchiving(r)}
-                  className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                  className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
                   title="Archive tenant"
                 >
                   <Archive className="h-4 w-4" />

@@ -75,12 +75,9 @@ export function DataPage<T>({
           <div className="space-y-3 md:hidden">
             {rows.map((r, i) => (
               <Card key={i} className="!p-4 transition-colors active:bg-muted/40">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1 text-sm">{columns[0]?.render(r)}</div>
-                  {columns.length > 1 && (
-                    <div className="shrink-0">{columns[columns.length - 1]?.render(r)}</div>
-                  )}
-                </div>
+                {/* Title row */}
+                <div className="min-w-0 text-sm">{columns[0]?.render(r)}</div>
+                {/* Middle fields */}
                 <dl className="mt-3 grid grid-cols-1 gap-y-2 border-t pt-3 text-sm min-[420px]:grid-cols-2">
                   {columns.slice(1, -1).map((c) => (
                     <div key={c.key} className="min-w-0">
@@ -93,6 +90,10 @@ export function DataPage<T>({
                     </div>
                   ))}
                 </dl>
+                {/* Actions / trailing value row */}
+                <div className="mt-3 flex items-center justify-end gap-2 border-t pt-3">
+                  {columns[columns.length - 1]?.render(r)}
+                </div>
               </Card>
             ))}
           </div>
