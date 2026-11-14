@@ -17,6 +17,7 @@ import {
   MoreHorizontal,
   ChevronLeft,
   Sun,
+  Moon,
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -26,6 +27,7 @@ import { initials } from "@/lib/format";
 import { usePlatform } from "@/hooks/use-platform";
 import { hapticTap } from "@/lib/haptics";
 import { useRipple } from "@/hooks/use-ripple";
+import { useTheme } from "@/hooks/use-theme";
 
 // ─── Navigation config ───────────────────────────────────────────────────────
 
@@ -71,7 +73,17 @@ const TOP_LEVEL = new Set(["/", "/properties", "/tenants", "/payments"]);
 
 // ─── Mobile top bar ──────────────────────────────────────────────────────────
 
-function MobileTopBar({ path, avatar }: { path: string; avatar: string }) {
+function MobileTopBar({
+  path,
+  avatar,
+  onToggleTheme,
+  isDark,
+}: {
+  path: string;
+  avatar: string;
+  onToggleTheme: () => void;
+  isDark: boolean;
+}) {
   const router = useRouter();
   const platform = usePlatform();
   const [scrolled, setScrolled] = useState(false);
@@ -129,6 +141,13 @@ function MobileTopBar({ path, avatar }: { path: string; avatar: string }) {
 
         {/* Right slot */}
         <div className="flex w-auto items-center gap-1">
+          <button
+            onClick={onToggleTheme}
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            className="grid h-10 w-10 place-items-center rounded-full text-foreground pressable hover:bg-muted"
+          >
+            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </button>
           <Link
             to="/announcements"
             aria-label="Announcements"
@@ -358,6 +377,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const profile = useQuery(api.profiles.me, isAuthenticated ? {} : "skip");
   const { logoUrl } = useBranding();
   const platform = usePlatform();
+  const { toggle: toggleTheme, effective: effectiveTheme } = useTheme();
 
   // Keyboard offset for mobile: shrink main when soft keyboard opens
   useEffect(() => {
@@ -404,7 +424,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh sm:p-6">
       {/* Mobile top bar */}
-      <MobileTopBar path={path} avatar={avatar} />
+      <MobileTopBar
+        path={path}
+        avatar={avatar}
+        onToggleTheme={toggleTheme}
+        isDark={effectiveTheme === "dark"}
+      />
 
       {/* Desktop header */}
       <header className="hidden sm:block sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl pt-safe">
@@ -488,6 +513,20 @@ export function AppShell({ children }: { children: ReactNode }) {
               >
                 <Settings className="h-5 w-5" />
               </Link>
+              <button
+                onClick={toggleTheme}
+                title={effectiveTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                aria-label={
+                  effectiveTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+                }
+                className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+              >
+                {effectiveTheme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </button>
               <button
                 onClick={logout}
                 title="Log out"
