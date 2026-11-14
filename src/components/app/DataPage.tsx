@@ -66,17 +66,23 @@ export function DataPage<T>({
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <Card className="py-12 text-center">
-          <p className="text-sm text-muted-foreground">Nothing here yet.</p>
+        <Card className="py-16 text-center">
+          <p className="text-sm font-medium">Nothing here yet.</p>
+          <p className="mt-1 text-xs text-muted-foreground">Records you create will appear here.</p>
         </Card>
       ) : (
         <>
           {/* Mobile card view */}
-          <div className="space-y-3 md:hidden">
+          <div className="stagger-children space-y-3 md:hidden">
             {rows.map((r, i) => (
               <Card key={i} className="!p-4 transition-colors active:bg-muted/40">
-                {/* Title row */}
-                <div className="min-w-0 text-sm">{columns[0]?.render(r)}</div>
+                {/* Title + actions in one row */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1 text-sm">{columns[0]?.render(r)}</div>
+                  {columns.length > 1 && (
+                    <div className="shrink-0">{columns[columns.length - 1]?.render(r)}</div>
+                  )}
+                </div>
                 {/* Middle fields */}
                 <dl className="mt-3 grid grid-cols-1 gap-y-2 border-t pt-3 text-sm min-[420px]:grid-cols-2">
                   {columns.slice(1, -1).map((c) => (
@@ -90,10 +96,6 @@ export function DataPage<T>({
                     </div>
                   ))}
                 </dl>
-                {/* Actions / trailing value row */}
-                <div className="mt-3 flex items-center justify-end gap-2 border-t pt-3">
-                  {columns[columns.length - 1]?.render(r)}
-                </div>
               </Card>
             ))}
           </div>

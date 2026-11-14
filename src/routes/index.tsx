@@ -75,7 +75,7 @@ function Dashboard() {
   const firstName = profile.firstName ?? "";
 
   return (
-    <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
       {/* Mobile greeting hero */}
       <div className="sm:hidden col-span-2 lg:col-span-4">
         <div className="mb-1 flex items-center gap-3">
@@ -102,10 +102,8 @@ function Dashboard() {
             {cediFromPesewas(summary.collectedThisMonth)}
           </p>
         </div>
-        <div className="flex h-10 items-end gap-1 shrink-0">
-          {[60, 90, 50, 100, 30].map((h, i) => (
-            <span key={i} style={{ height: h + "%" }} className="w-1.5 rounded-full bg-primary" />
-          ))}
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-success-soft text-success">
+          <Banknote className="h-5 w-5" />
         </div>
       </Card>
 
@@ -276,11 +274,8 @@ function Dashboard() {
             <p className="text-sm text-muted-foreground">No payments recorded yet.</p>
           )}
           {payments.slice(0, 4).map((p) => (
-            <div
-              key={p._id}
-              className="flex items-center justify-between gap-3 border-l-4 border-primary pl-3"
-            >
-              <div className="min-w-0">
+            <div key={p._id} className="flex items-center justify-between gap-3 py-0.5">
+              <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold text-sm">
                   {tenantById.get(p.tenantId)?.name ?? "Tenant"}
                 </p>

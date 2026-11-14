@@ -94,7 +94,7 @@ export function Page() {
         {actionError && (
           <p
             role="alert"
-            className="border-l-2 border-destructive py-2 pl-3 text-sm text-destructive"
+            className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive"
           >
             {actionError}
           </p>

@@ -434,39 +434,39 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Desktop header */}
       <header className="hidden sm:block sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl pt-safe">
         <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between gap-3 px-6">
-          <div className="flex min-w-0 items-center gap-4">
-            <div className="grid h-12 w-12 shrink-0 place-items-center text-primary">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="grid h-11 w-11 shrink-0 place-items-center text-primary">
               {logoUrl ? (
                 <img
                   src={logoUrl}
                   alt=""
-                  className="h-10 w-10 rounded-lg object-contain"
-                  width={40}
-                  height={40}
+                  className="h-9 w-9 rounded-lg object-contain"
+                  width={36}
+                  height={36}
                 />
               ) : (
-                <Sun className="h-10 w-10" strokeWidth={2.5} />
+                <Sun className="h-9 w-9" strokeWidth={2.5} />
               )}
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-2xl font-semibold">
+              <h1 className="truncate text-lg font-semibold leading-tight">
                 {firstName ? `Akwaaba, ${firstName}!` : "Akwaaba!"}
               </h1>
-              <p className="truncate text-sm text-muted-foreground">
+              <p className="truncate text-xs text-muted-foreground">
                 Here's what's happening across your properties
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Link
               to="/announcements"
               aria-label="Announcements"
-              className="grid h-11 w-11 place-items-center rounded-full text-foreground pressable hover:bg-muted"
+              className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground pressable hover:bg-muted hover:text-foreground"
             >
-              <Bell className="h-5 w-5" />
+              <Bell className="h-[18px] w-[18px]" />
             </Link>
             <Link to="/settings" aria-label="Settings">
-              <div className="grid h-11 w-11 place-items-center rounded-full bg-ink text-xs font-semibold text-ink-foreground pressable">
+              <div className="grid h-9 w-9 place-items-center rounded-full bg-ink text-[11px] font-semibold text-ink-foreground pressable ring-2 ring-transparent hover:ring-border">
                 {avatar}
               </div>
             </Link>
@@ -478,7 +478,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="flex gap-6 sm:pt-6">
           {/* Desktop sidebar */}
           <aside className="sticky top-6 hidden h-[calc(100vh-8rem)] w-16 shrink-0 flex-col items-center justify-between rounded-full bg-card py-4 shadow-soft sm:flex">
-            <nav className="flex flex-col items-center gap-2" aria-label="Primary">
+            <nav className="flex flex-col items-center gap-1.5" aria-label="Primary">
               {DESKTOP_NAV.map((n) => {
                 const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
                 return (
@@ -494,24 +494,24 @@ export function AppShell({ children }: { children: ReactNode }) {
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`}
                   >
-                    <n.icon className="h-5 w-5" />
+                    <n.icon className="h-[18px] w-[18px]" />
                   </Link>
                 );
               })}
             </nav>
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-1.5">
               <Link
                 to="/settings"
                 title="Settings"
                 aria-label="Settings"
                 aria-current={path.startsWith("/settings") ? "page" : undefined}
-                className={`grid h-11 w-11 place-items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                className={`grid h-11 w-11 place-items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors ${
                   path.startsWith("/settings")
                     ? "bg-ink text-ink-foreground"
-                    : "text-muted-foreground hover:bg-muted"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
-                <Settings className="h-5 w-5" />
+                <Settings className="h-[18px] w-[18px]" />
               </Link>
               <button
                 onClick={toggleTheme}
@@ -519,26 +519,26 @@ export function AppShell({ children }: { children: ReactNode }) {
                 aria-label={
                   effectiveTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"
                 }
-                className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+                className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
               >
                 {effectiveTheme === "dark" ? (
-                  <Sun className="h-5 w-5" />
+                  <Sun className="h-[18px] w-[18px]" />
                 ) : (
-                  <Moon className="h-5 w-5" />
+                  <Moon className="h-[18px] w-[18px]" />
                 )}
               </button>
               <button
                 onClick={logout}
                 title="Log out"
                 aria-label="Log out"
-                className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
               >
-                <LogOut className="h-5 w-5" />
+                <LogOut className="h-[18px] w-[18px]" />
               </button>
               <div
                 role="img"
                 aria-label={fullName ? `Account avatar for ${fullName}` : "Your account"}
-                className="mt-2 grid h-10 w-10 place-items-center rounded-full bg-ink text-xs font-semibold text-ink-foreground"
+                className="mt-2 grid h-9 w-9 place-items-center rounded-full bg-ink text-[11px] font-semibold text-ink-foreground"
               >
                 {avatar}
               </div>

@@ -291,7 +291,9 @@ function RecordPaymentDialog({
           />
         </div>
         {error && (
-          <p className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>
+          <p className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive">
+            {error}
+          </p>
         )}
         <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button

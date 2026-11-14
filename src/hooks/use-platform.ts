@@ -28,7 +28,7 @@ export function usePlatform(): Platform {
     const p = detectPlatform();
     cachedPlatform = p;
     setPlatform(p);
-    document.documentElement.dataset.platform = p;
+    document.documentElement.dataset["platform"] = p;
   }, []);
 
   return platform;

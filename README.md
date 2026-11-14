@@ -6,7 +6,7 @@
 ### Made for Ghanaian landlords.
 
 Property management, rent invoicing, payments and receipts — one calm dashboard.<br/>
-Built as a university final-year project, engineered like a product launch.
+Built as a university final-year project by **Edith Nonnon**, engineered like a product launch.
 
 <a href="https://final-year-rent-project.edimamfaidol.workers.dev"><img src="https://img.shields.io/badge/Live%20App-Open%20%E2%86%92-4E735A?style=for-the-badge" alt="Live App"/></a>
 
@@ -15,6 +15,7 @@ Built as a university final-year project, engineered like a product launch.
 [![TanStack](https://img.shields.io/badge/TanStack_Start-1.168-EF552E?style=flat&logo=react&logoColor=white)](https://tanstack.com/start)
 [![Convex](https://img.shields.io/badge/Convex-Backend-E5511C?style=flat&logo=convex&logoColor=white)](https://convex.dev/)
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-14-black?style=flat&logo=framer&logoColor=white)](https://www.framer.com/motion/)
 [![Deploy](https://img.shields.io/badge/Deploy-Cloudflare_Workers-F38020?style=flat&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 
 </div>
@@ -35,7 +36,9 @@ Rent collection in Ghana still runs through WhatsApp groups, exercise books and 
 
 Sankofa Rent gives a single landlord everything: **properties and units, tenants and leases, rent invoices with due dates, in-app payments (MoMo + bank + cash), digital receipts, maintenance requests, announcements and a monthly dashboard** — in English, with pesewas-exact money handling, styled for the Ghanaian market.
 
-And because it's a final-year defense piece, the whole product is **rebrandable live** — name, tagline, logo and accent colour — all changeable from Settings by the admin in front of the panel.
+It works equally well on the phone in a landlord's pocket and the laptop on their desk. And because it's a final-year defence piece, the whole product is **rebrandable live** — name, tagline, logo and accent colour — all changeable from Settings by the admin in front of the panel.
+
+---
 
 ## Features
 
@@ -49,14 +52,18 @@ And because it's a final-year defense piece, the whole product is **rebrandable 
 | **Payments & receipts** | MoMo (MTN, Telecel, AirtelTigo), bank, cash — numbered receipts |
 | **Maintenance** | Priority + status tracking per unit |
 | **Announcements** | SMS / email / WhatsApp channel selection |
-| **Branding** | Admin-only: live app name, tagline, 8 curated accent palettes + custom colour, logo upload to Convex storage |
+| **Branding** | Admin-only: live app name, tagline, 8 curated accents + custom colour, logo upload |
 | **Roles** | First account on a deployment becomes admin, the rest members |
+| **Mobile-native** | iOS translucency, Android M3 ripple + pill, page transitions, platform detection |
+| **Dark mode** | Full OKLCH token set; OS preference + manual toggle |
+
+---
 
 ## Screenshots
 
 <div align="center">
 
-**Sign in** — custom courtyard imagery, split-screen
+**Sign in** — split-screen with courtyard photography
 <img src="docs/assets/login.jpeg" alt="Sankofa Rent — sign in" width="100%" />
 
 **Live rebranding** — Settings → Branding (admin-only)
@@ -64,17 +71,48 @@ And because it's a final-year defense piece, the whole product is **rebrandable 
 
 </div>
 
+---
+
 ## Tech stack
 
 | Layer | Choice |
 |---|---|
 | Framework | **TanStack Start** (SSR React 19, file-based routes) + TanStack Query |
-| Backend | **Convex** — schema, queries, mutations, crons (overdue invoices, monthly billing, lease expiry), file storage |
+| Backend | **Convex** — schema, queries, mutations, crons, file storage |
 | Auth | **@convex-dev/auth 0.0.98** — email + password |
-| Styling | Tailwind CSS v4, Plus Jakarta Sans, Sun brand mark |
-| Money | Integer pesewas (GH₵ 1 = 100) — never floats |
-| Deploy | Cloudflare **Workers** (Nitro `cloudflare-module`), CI as npm-only |
-| Tests | Vitest + Testing Library — 14 unit tests |
+| Styling | **Tailwind CSS v4** — OKLCH tokens, `@utility` custom utilities, dark mode |
+| Animation | **Framer Motion 14** — page transitions, Android M3 pill, More drawer |
+| Charts | **Recharts 2** — 6-month bar chart, collection gauge |
+| Money | Integer pesewas (GH₵ 1 = 100 p) — never floats |
+| Deploy | **Cloudflare Workers** (Nitro `cloudflare-module`), CI as npm-only |
+| Tests | **Vitest 4** + Testing Library — 14 unit tests |
+
+---
+
+## Mobile experience
+
+The app is fully native-feel on phones. Key implementation:
+
+- **Platform detection** (`use-platform.ts`) — stamps `data-platform="ios|android|other"` on `<html>` at mount; drives platform-specific CSS and rendering decisions.
+- **iOS** — translucent tab bar (`backdrop-filter: saturate(180%) blur(20px)`); centred navigation title; filled tab icons on active.
+- **Android** — Material 3 animated pill indicator (Framer Motion `layoutId` spring); ripple on tap (`use-ripple.ts`); haptic feedback via `navigator.vibrate`.
+- **Page transitions** — `AnimatePresence` wraps the main content area; 150 ms ease-out fade + 6 px Y slide.
+- **Safe areas** — CSS variables `--sat`/`--sab`/etc. from `env(safe-area-inset-*)`, applied to top bar, bottom nav, and save bars.
+- **Keyboard** — `visualViewport` listener adjusts main content margin when the soft keyboard appears.
+- **iOS input zoom prevention** — `text-base` throughout; `md:text-sm` removed from the Input component.
+
+---
+
+## Design system
+
+- **OKLCH tokens** in `styles.css` for all colours — light and dark mode, no hard-coded hex in component code.
+- **Typography** — Plus Jakarta Sans (web); system fonts on mobile; `clamp()` sizes on KPI numbers.
+- **Staggered entrance** — `stagger-children` Tailwind utility for list entrance animation; respects `prefers-reduced-motion`.
+- **Browser surfaces** — `caret-color`, `::selection`, and scrollbars are all themed from the token set.
+- **Error states** — pill banners using `bg-destructive-soft`/`bg-primary-soft`; no `border-left` accent stripes.
+- **Automated audit** — impeccable design detector run against all UI files: **0 findings**.
+
+---
 
 ## Quick start
 
@@ -88,6 +126,8 @@ npm run dev        # → http://localhost:8081
 
 Create your first account — the first sign-up on a fresh deployment becomes the admin.
 
+---
+
 ## Scripts
 
 | Command | What it does |
@@ -95,10 +135,12 @@ Create your first account — the first sign-up on a fresh deployment becomes th
 | `npm run dev` | Vite dev server (SSR) |
 | `npx convex dev` | Push schema/functions to dev, regenerate types |
 | `npx convex deploy --env-file .env.production.local` | Push backend to prod |
-| `npm test` | Vitest (14 tests) |
+| `npm test` | Vitest (14 tests, 4 files) |
 | `npm run lint` | ESLint — 0 errors |
 | `npm run build` | Production build → `.output/` (Nitro) |
-| `npx tsc --noEmit` | Typecheck |
+| `npx tsc --noEmit` | Typecheck — 0 errors |
+
+---
 
 ## Deployments
 
@@ -107,47 +149,70 @@ Create your first account — the first sign-up on a fresh deployment becomes th
 | **Production** | **https://final-year-rent-project.edimamfaidol.workers.dev** | `prod:usable-penguin-827` |
 | Development | localhost:8081 | `dev:adorable-pig-437` |
 
-Backend and frontend deploy separately — the frontend is auto-deployed to Cloudflare Workers on every push to `main` (Workers Builds), while the backend goes live on demand with `npx convex deploy --env-file .env.production.local`.
+Backend and frontend deploy separately. The frontend auto-deploys to Cloudflare Workers on every push to `main` (Workers Builds). The backend deploys on demand with `npx convex deploy --env-file .env.production.local`.
 
-The production backend is pre-seeded with a small, real dataset (1 property · 2 units · 1 tenant · 1 paid invoice · 1 receipt · 1 maintenance request · 1 announcement) — exactly what you see in the screenshots.
+The production backend is pre-seeded with a small, real dataset (1 property · 2 units · 1 tenant · 1 paid invoice · 1 receipt · 1 maintenance request · 1 announcement).
+
+---
 
 ## Project structure
 
 ```
-convex/            # Backend: schema, auth, functions, crons, operator migrations
-  schema.ts        # 11 tables; money as pesewas; auth+roles
-  branding.ts      # Global brand singleton (public read, admin write)
-  migration.ts     # backfillAdmin · setAdmin · renameDefaultBrand · deleteDraftInvoiceByNumber · adoptLandlordData
+convex/            Backend: schema, auth, functions, crons, operator migrations
 src/
-  components/      # AppShell (Card/Button/Badge), AuthLayout, data pages, design system
-  lib/             # BrandingProvider + BrandingEffects, convex client, format utilities
-  routes/          # TanStack file-routes: /, /properties, /tenants, /leases, /invoices,
-                   # /payments, /maintenance, /announcements, /settings, /login, /signup
-docs/              # Assets (screenshots), CONVEX_MIGRATION.md (full runbook)
+  components/      AppShell (Card/Button/Badge), AuthLayout, DataPage, FormDialog, Radix UI
+  hooks/           use-platform.ts, use-ripple.ts, use-mobile.ts
+  lib/             BrandingProvider, convex client, format utilities, haptics
+  routes/          TanStack file-routes: /, /properties, /tenants, /leases,
+                   /invoices, /payments, /maintenance, /announcements, /settings,
+                   /login, /signup, /forgot-password
+  styles.css       Tailwind v4 source: OKLCH tokens, utilities, platform CSS, dark mode
+docs/              Project report + CONVEX_MIGRATION.md + screenshots
+public/            favicon.svg, manifest.webmanifest, icons, robots.txt
 ```
+
+---
 
 ## Engineering highlights
 
-- **Full-stack branding, done properly** — a public singleton table drives a `BrandingProvider`; the React tree, `document.title`, the favicon `link` and the `--primary` CSS variable all re-skin live, with a MutationObserver that guarantees no title-rewrite loop.
+- **Full-stack branding, done properly** — a public singleton table drives a `BrandingProvider`; the React tree, `document.title`, the favicon `link` and the `--primary` CSS variable all re-skin live, with a `MutationObserver` guard that prevents infinite title-rewrite loops.
 - **Server-enforced roles** — UI hides `Settings → Branding` for members, but the write path throws `Admin access required` server-side. UI gates are never authorization.
+- **Native-feel mobile** — platform detection, iOS translucency, Android M3 ripple and animated pill, page transitions, keyboard offset — all without a native build.
 - **Pesewas-safe money, friendly errors** — `GH₵ 1,850.00` renders correctly; a Convex `Uncaught Error` becomes "Invoice INV-1001 already covers this lease and period".
 - **Sign-out is bulletproof** — a hard reload recreates the module-level Convex client instead of leaving stale websocket state behind.
+- **Zero anti-patterns** — an automated design detector found 0 issues after the final design sweep (banned side-tab borders, decorative sparklines, and eyebrow kickers were all removed).
 - **14/14 unit tests** on branding validation, the cedi parser and auth rules; zero console errors in production.
 
-## Docs & report
+---
 
-- **[Final-Year Project Report](docs/FINAL_YEAR_PROJECT.md)** — full write-up: objectives, scope, functional/non-functional requirements, architecture, data model, implementation, test evidence, deployment, limitations.
+## Docs and report
+
+- **[Final-Year Project Report](docs/FINAL_YEAR_PROJECT.md)** — full write-up: objectives, scope, functional/non-functional requirements, architecture, data model, mobile architecture, design system, implementation, test evidence, deployment, limitations.
 - **[Convex migration runbook](docs/CONVEX_MIGRATION.md)** — schema walk-through, auth wiring, deployment pipelines, operator commands.
 - **[Backend map](convex/README.md)** — one function file per domain.
+
+---
 
 ## Roadmap
 
 - [x] Live on Cloudflare Workers (`final-year-rent-project`)
-- [x] Custom branding (name · tagline · logo · accent) with admin audit
+- [x] Custom branding (name · tagline · logo · accent) with admin enforcement
 - [x] Roles (admin / member), first-account-becomes-admin
+- [x] Full mobile-native experience: iOS translucency, Android M3, platform detection, page transitions, keyboard offset, safe areas
+- [x] Design system sweep: OKLCH tokens, browser surfaces themed, zero anti-patterns
+- [x] Dark mode (OS preference + manual toggle)
 - [ ] Password-reset emails (Resend)
 - [ ] SMS / WhatsApp rent reminders (Arkesel/mNotify)
 - [ ] MoMo collection webhooks (MTN/Telecel/AirtelTigo)
+- [ ] Rotate demo admin password after submission
+
+---
+
+## Author
+
+**Edith Nonnon** — Final-Year Project, 2026.
+
+---
 
 ## License
 

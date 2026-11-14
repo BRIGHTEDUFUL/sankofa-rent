@@ -59,7 +59,10 @@ export function FormDialog({
       >
         {children}
         {error && (
-          <p role="alert" className="border-l-2 border-destructive pl-3 text-sm text-destructive">
+          <p
+            role="alert"
+            className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive"
+          >
             {error}
           </p>
         )}
@@ -155,7 +158,9 @@ export function ConfirmDialog({
     >
       <p className="text-sm text-muted-foreground">{message}</p>
       {error && (
-        <p className="border-l-2 border-destructive pl-3 text-sm text-destructive">{error}</p>
+        <p className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive">
+          {error}
+        </p>
       )}
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button

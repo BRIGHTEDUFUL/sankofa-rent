@@ -525,7 +525,7 @@ function Page() {
           {(message || error) && (
             <p
               role={error ? "alert" : "status"}
-              className={`border-l-2 py-2 pl-3 text-sm ${error ? "border-destructive text-destructive" : "border-primary text-muted-foreground"}`}
+              className={`rounded-xl px-4 py-3 text-sm font-medium ${error ? "bg-destructive-soft text-destructive" : "bg-primary-soft text-primary"}`}
             >
               {error || message}
             </p>
@@ -787,7 +787,7 @@ function Page() {
               {(brandMessage || brandError) && (
                 <p
                   role={brandError ? "alert" : "status"}
-                  className={`mt-4 border-l-2 py-2 pl-3 text-sm ${brandError ? "border-destructive text-destructive" : "border-primary text-muted-foreground"}`}
+                  className={`mt-4 rounded-xl px-4 py-3 text-sm font-medium ${brandError ? "bg-destructive-soft text-destructive" : "bg-primary-soft text-primary"}`}
                 >
                   {brandError || brandMessage}
                 </p>

@@ -38,7 +38,6 @@ export function AuthLayout({
 
         {/* Form content — centred, scrollable on very short screens */}
         <div className="mx-auto w-full max-w-md flex-1 animate-rise py-8 sm:py-12">
-          <p className="mb-5 text-xs font-semibold uppercase text-primary">{tagline}</p>
           <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{title}</h1>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{subtitle}</p>
           <div className="mt-7">{children}</div>
@@ -62,14 +61,17 @@ export function AuthLayout({
           height={1536}
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-x-0 bottom-0 bg-ink px-10 py-8 text-ink-foreground">
-          <p className="mb-3 text-xs font-medium uppercase text-ink-foreground/70">
-            For landlords in Ghana
-          </p>
+        {/* Gradient scrim so text always reads against the photo */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-transparent"
+          aria-hidden
+        />
+        <div className="absolute inset-x-0 bottom-0 px-10 py-10 text-ink-foreground">
+          <p className="mb-1 text-sm font-medium text-ink-foreground/60">{tagline}</p>
           <h2 className="max-w-lg text-3xl font-semibold leading-tight">
             A better home for your rental business.
           </h2>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-foreground/75">
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-foreground/70">
             {appName} · Properties, people and rent, together.
           </p>
         </div>
@@ -145,7 +147,7 @@ export function AuthNotice({ children, error = false }: { children: ReactNode; e
   return (
     <p
       role={error ? "alert" : "status"}
-      className={`border-l-2 py-2 pl-3 text-sm leading-relaxed ${error ? "border-destructive text-destructive" : "border-primary text-muted-foreground"}`}
+      className={`rounded-xl px-4 py-3 text-sm font-medium leading-relaxed ${error ? "bg-destructive-soft text-destructive" : "bg-primary-soft text-primary"}`}
     >
       {children}
     </p>

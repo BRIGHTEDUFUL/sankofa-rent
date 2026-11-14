@@ -139,12 +139,18 @@ export function Page() {
       </div>
 
       {properties.length === 0 && (
-        <Card className="py-12 text-center text-sm text-muted-foreground">
-          No properties yet. Add your first property to get started.
+        <Card className="py-16 text-center">
+          <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-primary-soft text-primary">
+            <Building2 className="h-6 w-6" />
+          </div>
+          <p className="font-semibold">No properties yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Add your first property to get started.
+          </p>
         </Card>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="stagger-children grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {properties.map((p) => {
           const pct = p.units.length ? Math.round((p.occupied / p.units.length) * 100) : 0;
           const rentRoll = p.units.reduce((s, u) => s + u.rent, 0);
@@ -192,9 +198,9 @@ export function Page() {
                   style={{ width: pct + "%" }}
                 />
               </div>
-              <div className="mt-5 flex items-center justify-between border-t pt-4">
+              <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4">
                 <span className="text-sm text-muted-foreground">Monthly rent roll</span>
-                <span className="font-semibold">{cediFromPesewas(rentRoll)}</span>
+                <span className="font-semibold tabular-nums">{cediFromPesewas(rentRoll)}</span>
               </div>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {p.units.map((u) => (

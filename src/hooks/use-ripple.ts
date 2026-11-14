@@ -6,8 +6,8 @@ export function useRipple() {
     if (getPlatform() !== "android") return;
     const el = e.currentTarget;
     const rect = el.getBoundingClientRect();
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+    const clientX = "touches" in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
+    const clientY = "touches" in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
     const x = clientX - rect.left;
     const y = clientY - rect.top;
     const size = Math.max(rect.width, rect.height) * 2;
