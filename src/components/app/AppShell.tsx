@@ -307,7 +307,7 @@ function BottomTabBar({
               </div>
 
               {/* Scrollable content */}
-              <div className="overflow-y-auto overscroll-contain">
+              <div className="overflow-y-auto overscroll-contain flex-1 min-h-0">
                 {/* Navigation items */}
                 <div className="grid grid-cols-3 gap-2 p-4">
                   {MORE_ITEMS.filter((m) => m.to !== "/settings").map((m) => (

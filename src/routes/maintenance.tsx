@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { friendlyError } from "@/lib/format";
+import { friendlyError, pesewasFromCedi } from "@/lib/format";
 
 export const Route = createFileRoute("/maintenance")({
   head: () => ({
@@ -388,8 +388,8 @@ function StatusDialog({
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const pesewas = cost.trim() ? Number(cost) * 100 : undefined;
-    if (pesewas !== undefined && (!Number.isSafeInteger(pesewas) || pesewas < 0)) {
+    const pesewas = cost.trim() ? pesewasFromCedi(cost) : undefined;
+    if (pesewas !== undefined && (Number.isNaN(pesewas) || pesewas < 0)) {
       setError("Enter a valid cost.");
       return;
     }

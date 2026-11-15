@@ -102,18 +102,20 @@ export function SelectField({
   options,
   placeholder = "Select…",
   onValueChange,
+  defaultValue,
 }: {
   label: string;
   name: string;
   options: { value: string; label: string }[];
   placeholder?: string;
+  defaultValue?: string;
   /** Optional hook to track the choice (e.g. to filter other fields' options). */
   onValueChange?: (value: string) => void;
 }) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
-      <Select name={name} onValueChange={onValueChange}>
+      <Select name={name} defaultValue={defaultValue} onValueChange={onValueChange}>
         <SelectTrigger>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

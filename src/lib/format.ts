@@ -18,7 +18,7 @@ export function pesewasFromCedi(value: string): number {
     .replace(/(gh₵|₵|ghc|ghs)/gi, "")
     .replace(/[,\s]/g, "");
   const cedi = Number(normalized);
-  if (!Number.isFinite(cedi) || cedi <= 0) return NaN;
+  if (!Number.isFinite(cedi) || cedi < 0) return NaN;
   return Math.round(cedi * 100);
 }
 
@@ -70,13 +70,14 @@ export function formatMonth(period: string): string {
 }
 
 export function initials(name: string): string {
-  return name
+  const result = name
     .split(" ")
     .filter(Boolean)
     .map((w) => w[0])
     .slice(0, 2)
     .join("")
     .toUpperCase();
+  return result || "?";
 }
 
 export const PAYMENT_METHODS: Record<string, string> = {
