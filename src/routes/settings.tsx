@@ -41,12 +41,12 @@ export const Route = createFileRoute("/settings")({
   },
   head: () => ({
     meta: [
-      { title: "Settings â€” Sankofa Rent" },
+      { title: "Settings — Sankofa Rent" },
       {
         name: "description",
         content: "Manage your profile, business, notifications, payments and team.",
       },
-      { property: "og:title", content: "Settings â€” Sankofa Rent" },
+      { property: "og:title", content: "Settings — Sankofa Rent" },
       {
         property: "og:description",
         content: "Manage your profile, business, notifications, payments and team.",
@@ -65,7 +65,7 @@ const tabs = [
   { id: "security", label: "Security", icon: ShieldCheck },
 ] as const;
 
-// Curated accents â€” all clear 4.5:1 against white so button text stays readable.
+// Curated accents — all clear 4.5:1 against white so button text stays readable.
 const ACCENT_SWATCHES = [
   "#4E735A", // default brand green
   "#1F6F5C", // teal green
@@ -187,12 +187,10 @@ function SettingsRow({
       <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${tone}`}>
         <Icon className="h-4 w-4" />
       </span>
-      <span
-        className={`flex-1 min-w-0 truncate text-sm font-medium ${destructive ? "text-destructive" : "text-foreground"}`}
-      >
-        {label}
+      <span className={`flex-1 min-w-0 ${destructive ? "text-destructive" : "text-foreground"}`}>
+        <span className="block truncate text-sm font-medium">{label}</span>
+        {value && <span className="block truncate text-xs text-muted-foreground">{value}</span>}
       </span>
-      {value && <span className="ml-auto max-w-[9rem] shrink-0 truncate text-sm text-muted-foreground">{value}</span>}
       <ChevronRight
         className={`h-5 w-5 shrink-0 text-muted-foreground/70 ${value ? "" : "ml-auto"}`}
       />
@@ -308,7 +306,7 @@ function SettingsListNav({
           hideChevron
         />
       </div>
-      <p className="mt-2 text-center text-xs text-muted-foreground">{appName} Â· v1.0</p>
+      <p className="mt-2 text-center text-xs text-muted-foreground">{appName} · v1.0</p>
     </nav>
   );
 }
@@ -425,7 +423,7 @@ function Page() {
       .map((w) => w[0])
       .slice(0, 2)
       .join("")
-      .toUpperCase() || "â€”";
+      .toUpperCase() || "—";
 
   async function saveBrandingChanges() {
     if (!brand) return;
@@ -444,7 +442,7 @@ function Page() {
           headers: { "Content-Type": logoFile.type },
           body: logoFile,
         });
-        if (!res.ok) throw new Error("Upload failed â€” try a smaller image.");
+        if (!res.ok) throw new Error("Upload failed — try a smaller image.");
         const { storageId } = (await res.json()) as { storageId: string };
         logoArg = { logoId: storageId as Id<"_storage"> };
       }
@@ -465,7 +463,7 @@ function Page() {
   }
 
   // Stage the shipped defaults (name/tagline/accent, no custom logo) in the
-  // editor â€” the user still has to press Save to apply them.
+  // editor — the user still has to press Save to apply them.
   function resetBrandingForm() {
     setBrand({
       appName: DEFAULT_BRANDING.appName,
@@ -475,7 +473,7 @@ function Page() {
     setLogoFile(null);
     setLogoRemoved(true);
     setBrandError("");
-    setBrandMessage("Defaults staged â€” press Save branding to apply them.");
+    setBrandMessage("Defaults staged — press Save branding to apply them.");
   }
 
   return (
@@ -576,7 +574,7 @@ function Page() {
                   disabled={saving}
                   className="h-12 w-full justify-center sm:h-auto sm:w-auto"
                 >
-                  {saving ? "Savingâ€¦" : "Save changes"}
+                  {saving ? "Saving…" : "Save changes"}
                 </Button>
               </SaveBar>
             </Section>
@@ -604,7 +602,7 @@ function Page() {
                 <TextField
                   label="Currency"
                   name="currency"
-                  value="GHâ‚µ Ghana cedi"
+                  value="GH₵ Ghana cedi"
                   readOnly
                   className="h-11 sm:h-9"
                 />
@@ -634,7 +632,7 @@ function Page() {
                   disabled={saving}
                   className="h-12 w-full justify-center sm:h-auto sm:w-auto"
                 >
-                  {saving ? "Savingâ€¦" : "Save changes"}
+                  {saving ? "Saving…" : "Save changes"}
                 </Button>
               </SaveBar>
             </Section>
@@ -643,7 +641,7 @@ function Page() {
           {detailTab === "branding" && isAdmin && brand && (
             <Section
               title="Branding"
-              desc="The name, logo and colour shown across the app â€” including the login page and browser tab"
+              desc="The name, logo and colour shown across the app — including the login page and browser tab"
             >
               {/* Live preview of the header + login identity */}
               <div className="mb-6 overflow-hidden rounded-2xl border border-border">
@@ -679,7 +677,7 @@ function Page() {
                   </span>
                 </div>
                 <div className="border-t border-border bg-card px-4 py-2.5 text-xs text-muted-foreground">
-                  Browser tab: {brand.appName || "Untitled"} â€” Settings
+                  Browser tab: {brand.appName || "Untitled"} — Settings
                 </div>
               </div>
 
@@ -734,7 +732,7 @@ function Page() {
                 </div>
                 {!isUsableAccent(brand.accentColor) && (
                   <p className="mt-2 text-xs text-destructive" role="alert">
-                    Too light â€” white text on this colour wouldn't be readable. Pick a darker shade.
+                    Too light — white text on this colour wouldn't be readable. Pick a darker shade.
                   </p>
                 )}
               </div>
@@ -782,7 +780,7 @@ function Page() {
                     </button>
                   )}
                   <span className="text-xs text-muted-foreground">
-                    PNG, SVG or JPG Â· max 1 MB Â· falls back to the default mark
+                    PNG, SVG or JPG · max 1 MB · falls back to the default mark
                   </span>
                 </div>
               </div>
@@ -816,7 +814,7 @@ function Page() {
                     }
                     className="flex-1 h-12 justify-center sm:flex-none sm:h-auto"
                   >
-                    {brandSaving ? "Savingâ€¦" : "Save branding"}
+                    {brandSaving ? "Saving…" : "Save branding"}
                   </Button>
                 </div>
               </SaveBar>
@@ -849,7 +847,7 @@ function Page() {
                   disabled={saving}
                   className="h-12 w-full justify-center sm:h-auto sm:w-auto"
                 >
-                  {saving ? "Savingâ€¦" : "Save changes"}
+                  {saving ? "Saving…" : "Save changes"}
                 </Button>
               </SaveBar>
             </Section>
@@ -893,7 +891,7 @@ function Page() {
                   name="bankAccount"
                   value={form.bankAccount}
                   onChange={(e) => set("bankAccount", e.target.value)}
-                  placeholder="â€¢â€¢â€¢â€¢ 4410"
+                  placeholder="•••• 4410"
                   className="h-11 sm:h-9"
                 />
               </div>
@@ -903,7 +901,7 @@ function Page() {
                   disabled={saving}
                   className="h-12 w-full justify-center sm:h-auto sm:w-auto"
                 >
-                  {saving ? "Savingâ€¦" : "Save changes"}
+                  {saving ? "Saving…" : "Save changes"}
                 </Button>
               </SaveBar>
             </Section>

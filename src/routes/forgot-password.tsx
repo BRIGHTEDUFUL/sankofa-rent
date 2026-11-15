@@ -22,7 +22,10 @@ function Page() {
       title="Password reset"
       subtitle="Resetting passwords by email is not enabled on this deployment yet."
       footer={
-        <Link to="/login" className="inline-flex items-center gap-2 font-semibold text-primary">
+        <Link
+          to="/login"
+          className="-my-2 inline-flex items-center gap-2 py-2 font-semibold text-primary"
+        >
           <ArrowLeft className="h-4 w-4" />
           Back to sign in
         </Link>

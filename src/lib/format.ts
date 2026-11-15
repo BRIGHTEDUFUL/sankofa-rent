@@ -18,7 +18,9 @@ export function pesewasFromCedi(value: string): number {
     .replace(/(gh₵|₵|ghc|ghs)/gi, "")
     .replace(/[,\s]/g, "");
   const cedi = Number(normalized);
-  if (!Number.isFinite(cedi) || cedi < 0) return NaN;
+  // Zero is rejected too: a zero-amount invoice, rent or deposit is always a
+  // data-entry mistake, and it silently skews every total in the app.
+  if (!Number.isFinite(cedi) || cedi <= 0) return NaN;
   return Math.round(cedi * 100);
 }
 
@@ -78,6 +80,11 @@ export function initials(name: string): string {
     .join("")
     .toUpperCase();
   return result || "?";
+}
+
+/** "1 property" / "2 properties" — keeps count labels grammatical. */
+export function plural(count: number, singular: string, many = `${singular}s`): string {
+  return `${count} ${count === 1 ? singular : many}`;
 }
 
 export const PAYMENT_METHODS: Record<string, string> = {

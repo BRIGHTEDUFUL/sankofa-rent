@@ -53,7 +53,7 @@ function Page() {
       footer={
         <>
           New to {appName}?{" "}
-          <Link to="/signup" className="font-semibold text-primary">
+          <Link to="/signup" className="-my-2 inline-block py-2 font-semibold text-primary">
             Create an account
           </Link>
         </>
@@ -76,7 +76,10 @@ function Page() {
           required
           placeholder="Enter your password"
           right={
-            <Link to="/forgot-password" className="text-xs font-semibold text-primary">
+            <Link
+              to="/forgot-password"
+              className="-my-2 inline-block py-2 text-xs font-semibold text-primary"
+            >
               Forgot password?
             </Link>
           }

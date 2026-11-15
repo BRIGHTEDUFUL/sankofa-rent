@@ -6,7 +6,13 @@ import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { DataPage } from "@/components/app/DataPage";
 import { Badge, Card } from "@/components/app/AppShell";
 import { ConfirmDialog, FormDialog, SelectField, TextField } from "@/components/app/FormDialog";
-import { cediFromPesewas, formatDate, msFromDateInput, pesewasFromCedi } from "@/lib/format";
+import {
+  cediFromPesewas,
+  formatDate,
+  msFromDateInput,
+  pesewasFromCedi,
+  plural,
+} from "@/lib/format";
 
 export const Route = createFileRoute("/leases")({
   head: () => ({
@@ -24,7 +30,7 @@ type LeaseRow = Doc<"leases">;
 
 const tone = { active: "green", expiring: "gold", ended: "gray" } as const;
 
-export function Page() {
+function Page() {
   const leases = useQuery(api.leases.list, {});
   const tenants = useQuery(api.tenants.list, {});
   const properties = useQuery(api.properties.list, {});
@@ -116,7 +122,7 @@ export function Page() {
     <>
       <DataPage
         title="Leases"
-        subtitle={`${leases.filter((l) => l.status === "active").length} active · ${leases.filter((l) => l.status === "expiring").length} expiring`}
+        subtitle={`${plural(leases.filter((l) => l.status === "active").length, "active lease")} · ${plural(leases.filter((l) => l.status === "expiring").length, "expiring lease")}`}
         action="New lease"
         onAction={() => setCreateOpen(true)}
         loading={false}

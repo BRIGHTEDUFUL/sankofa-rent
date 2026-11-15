@@ -93,7 +93,7 @@ function Page() {
       footer={
         <>
           Already have an account?{" "}
-          <Link to="/login" className="font-semibold text-primary">
+          <Link to="/login" className="-my-2 inline-block py-2 font-semibold text-primary">
             Sign in
           </Link>
         </>

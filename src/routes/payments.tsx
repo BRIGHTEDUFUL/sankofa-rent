@@ -47,7 +47,7 @@ type InvoiceRow = Doc<"invoices">;
 
 const methods = Object.entries(PAYMENT_METHODS).map(([value, label]) => ({ value, label }));
 
-export function Page() {
+function Page() {
   const payments = useQuery(api.payments.list, {});
   const tenants = useQuery(api.tenants.list, {});
   const invoices = useQuery(api.invoices.list, {});

@@ -7,7 +7,7 @@ import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { DataPage } from "@/components/app/DataPage";
 import { Badge, Card } from "@/components/app/AppShell";
 import { ConfirmDialog, FormDialog, SelectField, TextField } from "@/components/app/FormDialog";
-import { cediFromPesewas, formatDate, initials } from "@/lib/format";
+import { cediFromPesewas, formatDate, initials, plural } from "@/lib/format";
 
 export const Route = createFileRoute("/tenants")({
   head: () => ({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/tenants")({
 
 type TenantRow = Doc<"tenants"> & { balance: number };
 
-export function Page() {
+function Page() {
   const tenants = useQuery(api.tenants.list, {});
   const properties = useQuery(api.properties.list, {});
   const createTenant = useMutation(api.tenants.create);
@@ -107,7 +107,7 @@ export function Page() {
     <>
       <DataPage
         title="Tenants"
-        subtitle={`${tenants.length} active tenants`}
+        subtitle={plural(tenants.length, "active tenant")}
         action="Add tenant"
         onAction={() => setCreateOpen(true)}
         loading={false}

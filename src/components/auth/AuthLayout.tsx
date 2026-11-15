@@ -21,7 +21,7 @@ export function AuthLayout({
     <div className="grid min-h-dvh bg-card lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
       <div className="flex min-w-0 flex-col px-5 py-6 sm:px-10 sm:py-8 lg:px-16">
         {/* Brand header */}
-        <Link to="/" className="flex shrink-0 items-center gap-2 text-primary">
+        <Link to="/" className="-my-1 flex items-center gap-2 rounded-lg px-1 py-1 text-primary">
           {logoUrl ? (
             <img
               src={logoUrl}

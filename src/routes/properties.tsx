@@ -6,7 +6,7 @@ import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
 import { Card, Button } from "@/components/app/AppShell";
 import { ConfirmDialog, FormDialog, TextField } from "@/components/app/FormDialog";
-import { cediFromPesewas, pesewasFromCedi } from "@/lib/format";
+import { cediFromPesewas, pesewasFromCedi, plural } from "@/lib/format";
 
 export const Route = createFileRoute("/properties")({
   head: () => ({
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/properties")({
 type UnitRow = Doc<"units">;
 type PropertyRow = Doc<"properties"> & { units: UnitRow[]; occupied: number };
 
-export function Page() {
+function Page() {
   const properties = useQuery(api.properties.list, {});
   const createProperty = useMutation(api.properties.create);
   const updateProperty = useMutation(api.properties.update);
@@ -126,7 +126,7 @@ export function Page() {
         <div className="min-w-0">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Properties & units</h2>
           <p className="text-sm text-muted-foreground">
-            {properties.length} properties · {unitCount} units
+            {plural(properties.length, "property")} · {plural(unitCount, "unit")}
           </p>
         </div>
         <Button
@@ -198,9 +198,13 @@ export function Page() {
                   style={{ width: pct + "%" }}
                 />
               </div>
-              <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4">
-                <span className="text-sm text-muted-foreground">Monthly rent roll</span>
-                <span className="font-semibold tabular-nums">{cediFromPesewas(rentRoll)}</span>
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-border/60 pt-4">
+                <span className="min-w-0 truncate text-sm text-muted-foreground">
+                  Monthly rent roll
+                </span>
+                <span className="shrink-0 whitespace-nowrap font-semibold tabular-nums">
+                  {cediFromPesewas(rentRoll)}
+                </span>
               </div>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {p.units.map((u) => (
@@ -208,15 +212,16 @@ export function Page() {
                     key={u._id}
                     onClick={() => setEditingUnit({ property: p, unit: u })}
                     title={`${u.label} · ${u.status}`}
-                    className={`h-8 min-w-[2rem] rounded-md px-1.5 text-xs font-semibold ${u.status === "occupied" ? "bg-primary text-primary-foreground" : u.status === "maintenance" ? "bg-gold-soft text-gold" : "border-2 border-dashed border-border text-muted-foreground"}`}
+                    className={`h-11 min-w-[2.5rem] rounded-md px-2 text-xs font-semibold sm:h-8 sm:min-w-[2rem] sm:px-1.5 ${u.status === "occupied" ? "bg-primary text-primary-foreground" : u.status === "maintenance" ? "bg-gold-soft text-gold" : "border-2 border-dashed border-border text-muted-foreground"}`}
                   >
                     {u.label}
                   </button>
                 ))}
                 <button
                   onClick={() => setUnitProperty(p)}
-                  className="grid h-8 w-8 place-items-center rounded-md border-2 border-dashed border-border text-muted-foreground hover:bg-muted"
+                  className="grid h-11 w-11 place-items-center rounded-md border-2 border-dashed border-border text-muted-foreground hover:bg-muted sm:h-8 sm:w-8"
                   title="Add unit"
+                  aria-label="Add unit"
                 >
                   <Plus className="h-3.5 w-3.5" />
                 </button>

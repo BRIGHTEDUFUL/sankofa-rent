@@ -6,7 +6,6 @@ import { api } from "../../convex/_generated/api";
 import { Card, Badge } from "@/components/app/AppShell";
 import { Progress } from "@/components/ui/progress";
 import { cediFromPesewas, formatDateTime, initials, PAYMENT_METHODS } from "@/lib/format";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -40,7 +39,6 @@ function Dashboard() {
   const tenants = useQuery(api.tenants.list, {});
   const announcements = useQuery(api.announcements.list, {});
   const profile = useQuery(api.profiles.me, {});
-  const isMobile = useIsMobile();
 
   if (
     !summary ||
@@ -96,13 +94,13 @@ function Dashboard() {
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground sm:text-sm">Collected this month</p>
           <p
-            className="mt-1 font-semibold tabular-nums"
-            style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
+            className="mt-1 font-semibold tabular-nums whitespace-nowrap"
+            style={{ fontSize: "clamp(0.95rem, 4.2vw, 1.5rem)" }}
           >
             {cediFromPesewas(summary.collectedThisMonth)}
           </p>
         </div>
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-success-soft text-success">
+        <div className="hidden h-10 w-10 shrink-0 place-items-center rounded-full bg-success-soft text-success sm:grid">
           <Banknote className="h-5 w-5" />
         </div>
       </Card>
@@ -151,7 +149,7 @@ function Dashboard() {
       </Card>
 
       {/* Rent collection chart */}
-      <Card className="col-span-2 lg:col-span-2 min-w-0 overflow-hidden min-h-[400px]">
+      <Card className="col-span-2 lg:col-span-2 min-w-0 overflow-hidden min-h-[400px] flex flex-col">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className="text-base font-semibold sm:text-xl">Rent collection</h3>
@@ -172,7 +170,9 @@ function Dashboard() {
             </p>
           </div>
         </div>
-        <div className="mt-4 h-44 sm:h-48 overflow-hidden">
+        {/* The chart grows into whatever height the card has, so the card never
+            ends up with a large empty band under the plot. */}
+        <div className="mt-4 min-h-[11rem] flex-1 overflow-hidden">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthly} barGap={4} margin={{ left: -16, right: 8, top: 4, bottom: 0 }}>
               <XAxis
@@ -180,7 +180,7 @@ function Dashboard() {
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                interval={isMobile ? 1 : 0}
+                interval="preserveStartEnd"
               />
               <Tooltip
                 cursor={{ fill: "var(--muted)" }}
@@ -198,6 +198,7 @@ function Dashboard() {
                 fill="var(--chart-2)"
                 radius={[6, 6, 6, 6] as unknown as number}
                 maxBarSize={32}
+                animationDuration={600}
               />
               <Bar
                 dataKey="collected"
@@ -205,6 +206,7 @@ function Dashboard() {
                 fill="var(--chart-1)"
                 radius={[6, 6, 6, 6] as unknown as number}
                 maxBarSize={32}
+                animationDuration={600}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -212,7 +214,7 @@ function Dashboard() {
       </Card>
 
       {/* Collection rate */}
-      <Card className="min-h-[400px] flex flex-col">
+      <Card className="col-span-2 sm:col-span-1 min-h-[220px] sm:min-h-[400px] flex flex-col">
         <h3 className="text-base font-semibold sm:text-xl">Collection rate</h3>
         <p className="text-xs text-muted-foreground sm:text-sm">This month</p>
         <div className="flex-1 flex flex-col justify-center">
@@ -227,9 +229,11 @@ function Dashboard() {
         </div>
       </Card>
 
-      {/* Profile card */}
-      <Card className="col-span-2 sm:col-span-1 min-h-[400px] flex flex-col justify-between">
-        <div className="flex flex-row items-center gap-4 sm:flex-col sm:text-center">
+      {/* Profile card. The identity row is hidden on mobile because the hero
+          above already shows the same avatar and name — only the counts are
+          new information there. */}
+      <Card className="col-span-2 sm:col-span-1 min-h-[220px] sm:min-h-[400px] flex flex-col justify-between">
+        <div className="hidden flex-row items-center gap-4 sm:flex sm:flex-col sm:text-center">
           <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-base font-semibold text-ink-foreground sm:h-16 sm:w-16 sm:text-lg">
             {initials(fullName)}
           </div>
@@ -266,7 +270,7 @@ function Dashboard() {
           <h3 className="text-base font-semibold sm:text-xl">Recent payments</h3>
           <Link
             to="/payments"
-            className="flex items-center gap-1 text-sm font-semibold text-primary"
+            className="-my-2 flex min-h-11 items-center gap-1 py-2 text-sm font-semibold text-primary"
           >
             View all <ArrowUpRight className="h-4 w-4" />
           </Link>
@@ -327,7 +331,7 @@ function Dashboard() {
       </Card>
 
       {/* MoMo card */}
-      <Card className="col-span-2 flex flex-col items-center justify-center text-center lg:col-span-1 min-h-[280px]">
+      <Card className="col-span-2 sm:col-span-1 lg:col-span-1 flex flex-col items-center justify-center text-center min-h-[280px]">
         <Smartphone className="h-10 w-10 text-primary sm:h-12 sm:w-12" strokeWidth={1.5} />
         <h3 className="mt-3 text-base font-semibold sm:text-xl">Get paid by MoMo</h3>
         <p className="text-sm text-muted-foreground">
@@ -351,14 +355,17 @@ function Dashboard() {
           <div className="min-w-0 flex-1">
             {pinned ? (
               <>
-                <p className="font-semibold truncate">{pinned.title}</p>
-                <p className="truncate text-sm text-muted-foreground">{pinned.body}</p>
+                <p className="truncate font-semibold">{pinned.title}</p>
+                <p className="line-clamp-2 text-sm text-muted-foreground">{pinned.body}</p>
               </>
             ) : (
               <p className="text-sm text-muted-foreground">No announcements yet.</p>
             )}
           </div>
-          <Link to="/announcements" className="text-sm font-semibold text-primary shrink-0">
+          <Link
+            to="/announcements"
+            className="-my-2 flex min-h-11 w-full shrink-0 items-center py-2 text-sm font-semibold text-primary sm:w-auto"
+          >
             All announcements
           </Link>
         </div>

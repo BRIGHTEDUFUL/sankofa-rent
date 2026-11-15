@@ -102,31 +102,31 @@ export function DataPage<T>({
           {/* Desktop table view */}
           <Card className="hidden !p-0 md:block">
             <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-sm">
-              <thead>
-                <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
-                  {columns.map((c) => (
-                    <th key={c.key} className={`px-6 py-4 font-medium ${c.className ?? ""}`}>
-                      {c.label}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r, i) => (
-                  <tr
-                    key={i}
-                    className="border-b last:border-0 transition-colors hover:bg-muted/60"
-                  >
+              <table className="w-full min-w-[720px] text-sm">
+                <thead>
+                  <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
                     {columns.map((c) => (
-                      <td key={c.key} className={`px-6 py-4 ${c.className ?? ""}`}>
-                        {c.render(r)}
-                      </td>
+                      <th key={c.key} className={`px-6 py-4 font-medium ${c.className ?? ""}`}>
+                        {c.label}
+                      </th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {rows.map((r, i) => (
+                    <tr
+                      key={i}
+                      className="border-b last:border-0 transition-colors hover:bg-muted/60"
+                    >
+                      {columns.map((c) => (
+                        <td key={c.key} className={`px-6 py-4 ${c.className ?? ""}`}>
+                          {c.render(r)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </Card>
         </>

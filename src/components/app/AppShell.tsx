@@ -18,7 +18,10 @@ import {
   ChevronLeft,
   Sun,
   Moon,
+  User,
   X,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { api } from "../../../convex/_generated/api";
@@ -103,10 +106,10 @@ function MobileTopBar({
       style={{ paddingTop: "var(--sat)" }}
     >
       <div
-        className={`h-14 flex items-center px-2 gap-1 backdrop-blur-xl ${scrolled ? "bg-background/90 border-b border-border/60" : "bg-transparent"}`}
+        className={`h-14 flex items-center px-2 sm:px-3 gap-0.5 backdrop-blur-xl ${scrolled ? "bg-background/90 border-b border-border/60" : "bg-transparent"}`}
       >
-        {/* Left slot */}
-        <div className="flex w-12 items-center justify-start">
+        {/* Left slot — narrow enough that the page title still fits at 320px */}
+        <div className="flex w-11 shrink-0 items-center justify-start">
           {isTop ? (
             <div className="grid h-9 w-9 place-items-center text-primary">
               {logoUrl ? (
@@ -125,7 +128,7 @@ function MobileTopBar({
             <button
               onClick={() => router.history.back()}
               aria-label="Go back"
-              className="grid h-10 w-10 place-items-center rounded-full text-foreground pressable hover:bg-muted"
+              className="grid h-11 w-11 place-items-center rounded-full text-foreground pressable hover:bg-muted"
             >
               <ChevronLeft className="h-5 w-5" strokeWidth={2.5} />
             </button>
@@ -140,25 +143,26 @@ function MobileTopBar({
         </div>
 
         {/* Right slot */}
-        <div className="flex w-auto items-center gap-1">
+        <div className="flex w-auto items-center gap-0.5">
           <button
             onClick={onToggleTheme}
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            className="grid h-10 w-10 place-items-center rounded-full text-foreground pressable hover:bg-muted"
+            className="grid h-11 w-11 place-items-center rounded-full text-foreground pressable hover:bg-muted"
           >
             {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
           <Link
             to="/announcements"
             aria-label="Announcements"
-            className="grid h-10 w-10 place-items-center rounded-full text-foreground pressable hover:bg-muted"
+            className="grid h-11 w-11 place-items-center rounded-full text-foreground pressable hover:bg-muted"
           >
             <Bell className="h-5 w-5" />
           </Link>
-          <Link to="/settings" aria-label="Settings">
-            <div className="grid h-9 w-9 place-items-center rounded-full bg-ink text-[11px] font-semibold text-ink-foreground pressable">
-              {avatar}
-            </div>
+          <Link to="/settings" aria-label="Settings" className="pressable">
+            <AvatarCircle
+              initials={avatar}
+              className="h-10 w-10 text-[11px] ring-2 ring-transparent hover:ring-border"
+            />
           </Link>
         </div>
       </div>
@@ -288,9 +292,7 @@ function BottomTabBar({
 
               {/* User info */}
               <div className="flex items-center gap-3 px-5 py-3 border-b border-border/60 shrink-0">
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-ink-foreground">
-                  {avatarInitials}
-                </div>
+                <AvatarCircle initials={avatarInitials} className="h-10 w-10 text-sm" />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold">{fullName || "Account"}</p>
                   {profile?.businessName && (
@@ -369,6 +371,8 @@ function BottomTabBar({
 
 // ─── App shell ───────────────────────────────────────────────────────────────
 
+const NAV_KEY = "sankofa-nav-expanded";
+
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
@@ -378,6 +382,21 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { logoUrl } = useBranding();
   const platform = usePlatform();
   const { toggle: toggleTheme, effective: effectiveTheme } = useTheme();
+
+  // Rail can expand to show section labels. Persisted, and SSR-safe: the
+  // initial value comes from localStorage when there is one.
+  const [navExpanded, setNavExpanded] = useState<boolean>(() => {
+    if (typeof localStorage === "undefined") return false;
+    return localStorage.getItem(NAV_KEY) === "1";
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(NAV_KEY, navExpanded ? "1" : "0");
+    } catch {
+      // storage can be unavailable (private mode); expansion just won't persist
+    }
+  }, [navExpanded]);
 
   // Keyboard offset for mobile: shrink main when soft keyboard opens
   useEffect(() => {
@@ -414,9 +433,10 @@ export function AppShell({ children }: { children: ReactNode }) {
     );
   }
 
+  const profileReady = profile !== undefined;
   const firstName = profile?.firstName ?? "";
   const fullName = `${profile?.firstName ?? ""} ${profile?.lastName ?? ""}`.trim();
-  const avatar = initials(fullName);
+  const avatar = profileReady ? initials(fullName) : "";
 
   // platform is used for the data-platform attribute set by usePlatform hook
   void platform;
@@ -449,15 +469,35 @@ export function AppShell({ children }: { children: ReactNode }) {
               )}
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-semibold leading-tight">
-                {firstName ? `Akwaaba, ${firstName}!` : "Akwaaba!"}
-              </h1>
+              {profileReady ? (
+                <h1 className="truncate text-lg font-semibold leading-tight">
+                  {firstName ? `Akwaaba, ${firstName}!` : "Akwaaba!"}
+                </h1>
+              ) : (
+                <div className="h-5 w-36 animate-pulse rounded-md bg-muted" aria-hidden="true" />
+              )}
               <p className="truncate text-xs text-muted-foreground">
-                {path === "/" ? "Here's what's happening across your properties" : (PAGE_TITLES[path] ?? "Sankofa Rent")}
+                {path === "/"
+                  ? "Here's what's happening across your properties"
+                  : (PAGE_TITLES[path] ?? "Sankofa Rent")}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <button
+              onClick={toggleTheme}
+              aria-label={
+                effectiveTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+              }
+              title={effectiveTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground pressable hover:bg-muted hover:text-foreground"
+            >
+              {effectiveTheme === "dark" ? (
+                <Sun className="h-[18px] w-[18px]" />
+              ) : (
+                <Moon className="h-[18px] w-[18px]" />
+              )}
+            </button>
             <Link
               to="/announcements"
               aria-label="Announcements"
@@ -465,30 +505,40 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <Bell className="h-[18px] w-[18px]" />
             </Link>
-            <Link to="/settings" aria-label="Settings">
-              <div className="grid h-9 w-9 place-items-center rounded-full bg-ink text-[11px] font-semibold text-ink-foreground pressable ring-2 ring-transparent hover:ring-border">
-                {avatar}
-              </div>
+            <Link to="/settings" aria-label="Settings" className="pressable">
+              <AvatarCircle
+                initials={avatar}
+                className="h-10 w-10 text-[11px] ring-2 ring-transparent hover:ring-border"
+              />
             </Link>
           </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1400px] sm:px-6 sm:flex-1 sm:overflow-hidden sm:flex sm:flex-col">
-        <div className="flex gap-6 sm:pt-6 sm:flex-1 sm:overflow-hidden">
-          {/* Desktop sidebar */}
-          <aside className="hidden h-full overflow-y-auto w-20 shrink-0 flex-col items-center justify-between rounded-3xl bg-card py-5 shadow-soft sm:flex">
-            <nav className="flex flex-col items-center gap-2" aria-label="Primary">
+      {/* `w-full` matters: this sits inside a column flex container, so `mx-auto`
+          disables the default stretch and the box would shrink to its content
+          width (centred, and as narrow as 200px on quiet pages). */}
+      <div className="mx-auto w-full max-w-[1400px] sm:px-6 sm:flex-1 sm:overflow-hidden sm:flex sm:flex-col">
+        <div className="flex w-full gap-6 sm:pt-6 sm:flex-1 sm:overflow-hidden">
+          {/* Desktop sidebar — an icon rail that expands to labelled sections */}
+          <aside
+            className={`hidden h-full shrink-0 flex-col justify-between overflow-hidden rounded-3xl bg-card py-5 shadow-soft transition-[width] duration-200 ease-out sm:flex ${
+              navExpanded ? "w-64 items-stretch px-3" : "w-20 items-center"
+            }`}
+          >
+            <nav className="flex flex-col gap-1.5" id="primary-navigation" aria-label="Primary">
               {DESKTOP_NAV.map((n) => {
                 const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
                 return (
                   <Link
                     key={n.to}
                     to={n.to}
-                    title={n.label}
+                    title={navExpanded ? undefined : n.label}
                     aria-label={n.label}
                     aria-current={active ? "page" : undefined}
-                    className={`relative grid h-12 w-12 place-items-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    className={`relative flex h-11 items-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                      navExpanded ? "gap-3 px-3" : "justify-center"
+                    } ${
                       active
                         ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -497,18 +547,25 @@ export function AppShell({ children }: { children: ReactNode }) {
                     {active && (
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-primary" />
                     )}
-                    <n.icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
+                    <n.icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.2 : 1.8} />
+                    <span className={`truncate text-sm font-medium ${navExpanded ? "" : "hidden"}`}>
+                      {n.label}
+                    </span>
                   </Link>
                 );
               })}
             </nav>
-            <div className="flex flex-col items-center gap-2">
+            <div
+              className={`flex flex-col gap-1.5 ${navExpanded ? "items-stretch" : "items-center"}`}
+            >
               <Link
                 to="/settings"
-                title="Settings"
+                title={navExpanded ? undefined : "Settings"}
                 aria-label="Settings"
                 aria-current={path.startsWith("/settings") ? "page" : undefined}
-                className={`relative grid h-12 w-12 place-items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors ${
+                className={`relative flex h-11 items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors ${
+                  navExpanded ? "gap-3 px-3" : "justify-center"
+                } ${
                   path.startsWith("/settings")
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -517,38 +574,63 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {path.startsWith("/settings") && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-primary" />
                 )}
-                <Settings className="h-5 w-5" strokeWidth={path.startsWith("/settings") ? 2.2 : 1.8} />
+                <Settings
+                  className="h-5 w-5 shrink-0"
+                  strokeWidth={path.startsWith("/settings") ? 2.2 : 1.8}
+                />
+                <span className={`truncate text-sm font-medium ${navExpanded ? "" : "hidden"}`}>
+                  Settings
+                </span>
               </Link>
               <button
-                onClick={toggleTheme}
-                title={effectiveTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-                aria-label={
-                  effectiveTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-                }
-                className="grid h-12 w-12 place-items-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
-              >
-                {effectiveTheme === "dark" ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </button>
-              <button
                 onClick={logout}
-                title="Log out"
+                title={navExpanded ? undefined : "Log out"}
                 aria-label="Log out"
-                className="grid h-12 w-12 place-items-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+                className={`relative flex h-11 items-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors ${
+                  navExpanded ? "gap-3 px-3" : "justify-center"
+                }`}
               >
-                <LogOut className="h-5 w-5" />
+                <LogOut className="h-5 w-5 shrink-0" />
+                <span className={`truncate text-sm font-medium ${navExpanded ? "" : "hidden"}`}>
+                  Log out
+                </span>
               </button>
               <Link
                 to="/settings"
-                title={fullName || "Your account"}
+                title={navExpanded ? undefined : fullName || "Your account"}
                 aria-label={fullName ? `Settings – ${fullName}` : "Settings"}
-                className="mt-3 grid h-12 w-12 place-items-center rounded-xl bg-ink text-xs font-semibold text-ink-foreground pressable ring-2 ring-transparent hover:ring-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className={`mt-1 flex h-12 items-center rounded-xl bg-ink ring-2 ring-transparent hover:ring-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  navExpanded ? "gap-3 px-2" : "justify-center"
+                }`}
               >
-                {avatar}
+                <AvatarCircle
+                  initials={avatar}
+                  className="h-9 w-9 shrink-0 bg-transparent text-xs"
+                />
+                <span
+                  className={`truncate text-xs font-semibold text-ink-foreground ${navExpanded ? "" : "hidden"}`}
+                >
+                  {profileReady && fullName ? fullName : "Account"}
+                </span>
               </Link>
+              <button
+                onClick={() => setNavExpanded((v) => !v)}
+                aria-expanded={navExpanded}
+                aria-controls="primary-navigation"
+                title={navExpanded ? "Collapse navigation" : "Expand navigation"}
+                className={`flex h-11 items-center rounded-xl border-t border-border/70 pt-2 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors ${
+                  navExpanded ? "gap-2 px-3" : "w-12 justify-center"
+                }`}
+              >
+                {navExpanded ? (
+                  <ChevronsLeft className="h-5 w-5 shrink-0" />
+                ) : (
+                  <ChevronsRight className="h-5 w-5 shrink-0" />
+                )}
+                <span className={`truncate text-xs font-semibold ${navExpanded ? "" : "hidden"}`}>
+                  Collapse
+                </span>
+              </button>
             </div>
           </aside>
 
@@ -580,6 +662,34 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 // ─── Shared presentational components ────────────────────────────────────────
 
+/**
+ * Profile avatar. While the profile query is still in flight (or when the
+ * account genuinely has no name yet) we show a neutral person glyph instead of
+ * a bare "?" — a question mark reads as an error, not as a loading state.
+ */
+export function AvatarCircle({
+  initials: text,
+  className = "",
+  iconClassName = "h-4 w-4",
+}: {
+  initials: string;
+  className?: string;
+  iconClassName?: string;
+}) {
+  return (
+    <span
+      className={`grid shrink-0 place-items-center rounded-full bg-ink font-semibold text-ink-foreground ${className}`}
+      aria-hidden="true"
+    >
+      {text ? (
+        <span className="truncate">{text}</span>
+      ) : (
+        <User className={iconClassName} strokeWidth={2} />
+      )}
+    </span>
+  );
+}
+
 export function Card({ children, className = "" }: { children?: ReactNode; className?: string }) {
   return (
     <div className={`animate-rise rounded-3xl bg-card p-5 shadow-soft sm:p-6 ${className}`}>
@@ -598,7 +708,7 @@ export type Tone = keyof typeof tones;
 export function Badge({ tone = "gray", children }: { tone?: Tone; children: ReactNode }) {
   return (
     <span
-      className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold ${tones[tone]}`}
+      className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${tones[tone]}`}
     >
       {children}
     </span>

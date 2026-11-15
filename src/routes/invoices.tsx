@@ -37,7 +37,7 @@ const tone: Record<string, "green" | "red" | "gold" | "gray"> = {
   overdue: "red",
 };
 
-export function Page() {
+function Page() {
   const invoices = useQuery(api.invoices.list, {});
   const tenants = useQuery(api.tenants.list, {});
   const leases = useQuery(api.leases.list, {});

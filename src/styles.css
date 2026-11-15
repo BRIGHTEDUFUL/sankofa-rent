@@ -355,8 +355,8 @@
     --border: oklch(0.28 0.006 95);
     --input: oklch(0.28 0.006 95);
     --ring: oklch(0.6 0.08 152);
-    --chart-1: oklch(0.6 0.08 152);
-    --chart-2: oklch(0.38 0.04 152);
+    --chart-1: oklch(0.68 0.11 152);
+    --chart-2: oklch(0.44 0.06 152);
   }
 }
 
@@ -390,8 +390,8 @@
   --border: oklch(0.28 0.006 95);
   --input: oklch(0.28 0.006 95);
   --ring: oklch(0.6 0.08 152);
-  --chart-1: oklch(0.6 0.08 152);
-  --chart-2: oklch(0.38 0.04 152);
+  --chart-1: oklch(0.68 0.11 152);
+  --chart-2: oklch(0.44 0.06 152);
 }
 
 /* Class-based light: user explicitly chose light, overrides dark OS */

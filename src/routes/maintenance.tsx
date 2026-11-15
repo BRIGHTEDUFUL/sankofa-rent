@@ -40,7 +40,7 @@ const statusLabel: Record<string, string> = {
 };
 const nextStatus = { open: "in_progress", in_progress: "resolved", resolved: "open" } as const;
 
-export function Page() {
+function Page() {
   const maintenance = useQuery(api.maintenance.list, {});
   const properties = useQuery(api.properties.list, {});
   const createMaintenance = useMutation(api.maintenance.create);

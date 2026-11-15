@@ -28,7 +28,7 @@ const channels = [
   { value: "whatsapp", label: "WhatsApp" },
 ];
 
-export function Page() {
+function Page() {
   const announcements = useQuery(api.announcements.list, {});
   const properties = useQuery(api.properties.list, {});
   const createAnnouncement = useMutation(api.announcements.create);
