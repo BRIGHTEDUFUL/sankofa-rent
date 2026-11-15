@@ -29,8 +29,10 @@ export const monthly = query({ args: {}, handler: async (ctx) => {
   const now = new Date();
   const order: string[] = [];
   const buckets = new Map<string, { label: string; collected: number; due: number }>();
+  // Use UTC date to ensure consistent month calculation across timezones
+  const utcNow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   for (let i = 5; i >= 0; i--) {
-    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
+    const d = new Date(Date.UTC(utcNow.getUTCFullYear(), utcNow.getUTCMonth() - i, 1));
     const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
     order.push(key);
     buckets.set(key, { label: MONTH_NAMES[d.getUTCMonth()] ?? "", collected: 0, due: 0 });
