@@ -115,7 +115,8 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    overscroll-behavior-y: none;
+    /* overscroll-behavior-y: none is applied only on mobile (see @media below)
+       so trackpad momentum scrolling is preserved on desktop/laptop. */
   }
   /* Theme browser surfaces that belong to the design system */
   :root {
@@ -125,21 +126,10 @@
     background-color: color-mix(in srgb, var(--primary) 20%, transparent);
     color: var(--foreground);
   }
-  /* Custom scrollbar — webkit only, unobtrusive */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--muted-foreground);
-  }
+  /* Note: custom ::-webkit-scrollbar rules are intentionally omitted.
+     Defining them on macOS forces always-visible scrollbars which breaks
+     trackpad two-finger scrolling on the document. Native overlay scrollbars
+     are used instead — they look better and don't interfere with gestures. */
 }
 
 @keyframes rise {
@@ -268,6 +258,8 @@
 @media (max-width: 767px) {
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, system-ui, sans-serif;
+    /* Prevent pull-to-refresh and rubber-band overscroll on mobile only */
+    overscroll-behavior-y: none;
   }
 }
 
