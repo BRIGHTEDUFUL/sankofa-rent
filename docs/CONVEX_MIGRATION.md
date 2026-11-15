@@ -8,11 +8,11 @@ through `useQuery`; `src/lib/mock.ts` is deleted. Auth is email + password only
 (`@convex-dev/auth` 0.0.98). **Both deployments are live and verified, and the production
 frontend is deployed on Cloudflare Workers:**
 
-| Deployment | Role | Auth keys | Live test |
-|---|---|---|---|
-| `dev:adorable-pig-437` (`.env.local`) | development | SITE_URL/JWT/JWKS ✅ | Kojo + Ama test accounts |
-| `prod:usable-penguin-827` (`.env.production.local`, gitignored) | production backend | SITE_URL/JWT/JWKS ✅ | One seeded admin account + minimal data |
-| `final-year-rent-project` (Cloudflare Worker) | production frontend | n/a | https://final-year-rent-project.edimamfaidol.workers.dev — Git-connected Workers Builds; the earlier `edith-nonnon-project` worker (itself renamed from `rentwise-ghana`) was only updated manually and is stale |
+| Deployment                                                      | Role                | Auth keys            | Live test                                                                                                                                                                                                        |
+| --------------------------------------------------------------- | ------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dev:adorable-pig-437` (`.env.local`)                           | development         | SITE_URL/JWT/JWKS ✅ | Kojo + Ama test accounts                                                                                                                                                                                         |
+| `prod:usable-penguin-827` (`.env.production.local`, gitignored) | production backend  | SITE_URL/JWT/JWKS ✅ | One seeded admin account + minimal data                                                                                                                                                                          |
+| `final-year-rent-project` (Cloudflare Worker)                   | production frontend | n/a                  | https://final-year-rent-project.edimamfaidol.workers.dev — Git-connected Workers Builds; the earlier `edith-nonnon-project` worker (itself renamed from `rentwise-ghana`) was only updated manually and is stale |
 
 The full user journey was browser-verified against **dev** (sign-up, login, CRUD, invoice,
 payment, branding, non-admin gating) and against **prod** (sign-up → first account becomes
@@ -55,10 +55,12 @@ export default defineSchema({
     region: v.optional(v.string()),
     currency: v.literal("GHS"),
     momoNumber: v.optional(v.string()),
-    momoNetwork: v.optional(v.union(v.literal("MTN"), v.literal("Telecel"), v.literal("AirtelTigo"))),
+    momoNetwork: v.optional(
+      v.union(v.literal("MTN"), v.literal("Telecel"), v.literal("AirtelTigo")),
+    ),
     bankName: v.optional(v.string()),
     bankAccount: v.optional(v.string()),
-    rentDueDay: v.number(),            // e.g. 5
+    rentDueDay: v.number(), // e.g. 5
     lateFeePercent: v.optional(v.number()),
     notifySms: v.boolean(),
     notifyEmail: v.boolean(),
@@ -69,7 +71,7 @@ export default defineSchema({
   properties: defineTable({
     landlordId: v.id("users"),
     name: v.string(),
-    area: v.string(),                  // "Adenta, Accra"
+    area: v.string(), // "Adenta, Accra"
     region: v.optional(v.string()),
     ghanaPostGps: v.optional(v.string()),
     photoId: v.optional(v.id("_storage")),
@@ -78,11 +80,13 @@ export default defineSchema({
   units: defineTable({
     landlordId: v.id("users"),
     propertyId: v.id("properties"),
-    label: v.string(),                 // "A3", "2B"
+    label: v.string(), // "A3", "2B"
     bedrooms: v.optional(v.number()),
-    rent: v.number(),                  // pesewas / month
+    rent: v.number(), // pesewas / month
     status: v.union(v.literal("vacant"), v.literal("occupied"), v.literal("maintenance")),
-  }).index("by_property", ["propertyId"]).index("by_landlord", ["landlordId"]),
+  })
+    .index("by_property", ["propertyId"])
+    .index("by_landlord", ["landlordId"]),
 
   tenants: defineTable({
     landlordId: v.id("users"),
@@ -94,7 +98,9 @@ export default defineSchema({
     unitId: v.optional(v.id("units")),
     since: v.number(),
     archived: v.boolean(),
-  }).index("by_landlord", ["landlordId"]).index("by_unit", ["unitId"]),
+  })
+    .index("by_landlord", ["landlordId"])
+    .index("by_unit", ["unitId"]),
 
   leases: defineTable({
     landlordId: v.id("users"),
@@ -102,35 +108,55 @@ export default defineSchema({
     unitId: v.id("units"),
     start: v.number(),
     end: v.number(),
-    rent: v.number(),                  // pesewas / month
-    advanceMonths: v.number(),         // validate the applicable legal limit for the tenancy before launch
+    rent: v.number(), // pesewas / month
+    advanceMonths: v.number(), // validate the applicable legal limit for the tenancy before launch
     deposit: v.optional(v.number()),
     status: v.union(v.literal("active"), v.literal("expiring"), v.literal("ended")),
     documentId: v.optional(v.id("_storage")),
-  }).index("by_landlord", ["landlordId"]).index("by_tenant", ["tenantId"]).index("by_end", ["landlordId", "end"]),
+  })
+    .index("by_landlord", ["landlordId"])
+    .index("by_tenant", ["tenantId"])
+    .index("by_end", ["landlordId", "end"]),
 
   invoices: defineTable({
     landlordId: v.id("users"),
     leaseId: v.id("leases"),
     tenantId: v.id("tenants"),
-    number: v.string(),                // "INV-1042"
-    period: v.string(),                // "2026-11"
+    number: v.string(), // "INV-1042"
+    period: v.string(), // "2026-11"
     dueDate: v.number(),
     amount: v.number(),
     paid: v.number(),
-    status: v.union(v.literal("draft"), v.literal("sent"), v.literal("partial"), v.literal("paid"), v.literal("overdue")),
-  }).index("by_landlord", ["landlordId"]).index("by_status", ["landlordId", "status"]).index("by_tenant", ["tenantId"]),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("sent"),
+      v.literal("partial"),
+      v.literal("paid"),
+      v.literal("overdue"),
+    ),
+  })
+    .index("by_landlord", ["landlordId"])
+    .index("by_status", ["landlordId", "status"])
+    .index("by_tenant", ["tenantId"]),
 
   payments: defineTable({
     landlordId: v.id("users"),
     tenantId: v.id("tenants"),
     invoiceId: v.optional(v.id("invoices")),
-    receiptNo: v.string(),             // "RCP-0881"
-    method: v.union(v.literal("mtn_momo"), v.literal("telecel_cash"), v.literal("airteltigo_money"), v.literal("bank"), v.literal("cash")),
+    receiptNo: v.string(), // "RCP-0881"
+    method: v.union(
+      v.literal("mtn_momo"),
+      v.literal("telecel_cash"),
+      v.literal("airteltigo_money"),
+      v.literal("bank"),
+      v.literal("cash"),
+    ),
     reference: v.optional(v.string()),
     amount: v.number(),
     paidAt: v.number(),
-  }).index("by_landlord", ["landlordId", "paidAt"]).index("by_tenant", ["tenantId"]),
+  })
+    .index("by_landlord", ["landlordId", "paidAt"])
+    .index("by_tenant", ["tenantId"]),
 
   maintenance: defineTable({
     landlordId: v.id("users"),
@@ -143,7 +169,9 @@ export default defineSchema({
     status: v.union(v.literal("open"), v.literal("in_progress"), v.literal("resolved")),
     cost: v.optional(v.number()),
     photoIds: v.optional(v.array(v.id("_storage"))),
-  }).index("by_landlord", ["landlordId"]).index("by_status", ["landlordId", "status"]),
+  })
+    .index("by_landlord", ["landlordId"])
+    .index("by_status", ["landlordId", "status"]),
 
   announcements: defineTable({
     landlordId: v.id("users"),
@@ -154,8 +182,10 @@ export default defineSchema({
     channels: v.array(v.union(v.literal("sms"), v.literal("email"), v.literal("whatsapp"))),
   }).index("by_landlord", ["landlordId"]),
 
-  counters: defineTable({ landlordId: v.id("users"), name: v.string(), value: v.number() })
-    .index("by_name", ["landlordId", "name"]),
+  counters: defineTable({ landlordId: v.id("users"), name: v.string(), value: v.number() }).index(
+    "by_name",
+    ["landlordId", "name"],
+  ),
 });
 ```
 
@@ -176,6 +206,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 ```
 
 `convex/http.ts`:
+
 ```ts
 import { httpRouter } from "convex/server";
 import { auth } from "./auth";
@@ -189,20 +220,24 @@ Google: set `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` in the Convex deployment. Co
 Password reset is **not** enabled by `providers: [Password, Google]`. Create `convex/ResendOTPPasswordReset.ts` using the custom email-provider example in the [Password provider docs](https://labs.convex.dev/auth/config/passwords), install its additional dependencies with `npm install resend @oslojs/crypto`, import the exported provider into `convex/auth.ts`, and replace `Password` with `Password({ reset: ResendOTPPasswordReset })`. `ResendOTPPasswordReset` is a file you create, not a built-in export. Set `AUTH_RESEND_KEY` on Convex and use a verified sender domain; the example sender is not a production sender.
 
 The forgot-password page needs two states, with errors and a pending state on both:
+
 ```ts
 // Step 1: request the email code; preserve email for step 2.
 await signIn("password", { email, flow: "reset" });
 // Step 2: submit the emailed code and the replacement password.
 await signIn("password", { email, code, newPassword, flow: "reset-verification" });
 ```
+
 Never show a success message unless the request succeeded. Email verification is a separate Password `verify` configuration and is not enabled in the minimal example.
 
 `convex/auth.config.ts` (the `@convex-dev/auth` setup creates this; keep it):
+
 ```ts
 export default { providers: [{ domain: process.env.CONVEX_SITE_URL, applicationID: "convex" }] };
 ```
 
 **Create the landlord profile on sign-up.** Add a callback to `convexAuth({...})`:
+
 ```ts
 callbacks: {
   async afterUserCreatedOrUpdated(ctx, { userId }) {
@@ -216,9 +251,11 @@ callbacks: {
   },
 },
 ```
+
 The existence check prevents duplicate profiles on account linking and also creates a missing profile when this callback runs for an existing account. Keep `profiles.update` an authenticated mutation that derives `userId` from `requireUser`; do not accept a user ID or client-controlled `plan`. Save the sign-up names and phone through that mutation only after `useConvexAuth().isAuthenticated` becomes true, not merely after `signIn` resolves (email verification may still be pending). If custom fields are passed to Password, configure its `profile` callback and extend the auth users schema accordingly; the default provider does not persist arbitrary form fields.
 
 Shared helper — `convex/lib.ts`:
+
 ```ts
 import { getAuthUserId } from "@convex-dev/auth/server";
 import type { QueryCtx, MutationCtx } from "./_generated/server";
@@ -228,8 +265,16 @@ export async function requireUser(ctx: QueryCtx | MutationCtx) {
   if (!id) throw new Error("Not signed in");
   return id;
 }
-export async function nextNumber(ctx: MutationCtx, landlordId: Id<"users">, name: string, prefix: string) {
-  const c = await ctx.db.query("counters").withIndex("by_name", q => q.eq("landlordId", landlordId).eq("name", name)).unique();
+export async function nextNumber(
+  ctx: MutationCtx,
+  landlordId: Id<"users">,
+  name: string,
+  prefix: string,
+) {
+  const c = await ctx.db
+    .query("counters")
+    .withIndex("by_name", (q) => q.eq("landlordId", landlordId).eq("name", name))
+    .unique();
   const value = (c?.value ?? 1000) + 1;
   if (c) await ctx.db.patch(c._id, { value });
   else await ctx.db.insert("counters", { landlordId, name, value });
@@ -249,14 +294,25 @@ import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireUser } from "./lib";
 
-export const list = query({ args: {}, handler: async (ctx) => {
-  const me = await requireUser(ctx);
-  return ctx.db.query("tenants").withIndex("by_landlord", q => q.eq("landlordId", me))
-    .filter(q => q.eq(q.field("archived"), false)).collect();
-}});
+export const list = query({
+  args: {},
+  handler: async (ctx) => {
+    const me = await requireUser(ctx);
+    return ctx.db
+      .query("tenants")
+      .withIndex("by_landlord", (q) => q.eq("landlordId", me))
+      .filter((q) => q.eq(q.field("archived"), false))
+      .collect();
+  },
+});
 
 export const create = mutation({
-  args: { name: v.string(), phone: v.string(), email: v.optional(v.string()), unitId: v.optional(v.id("units")) },
+  args: {
+    name: v.string(),
+    phone: v.string(),
+    email: v.optional(v.string()),
+    unitId: v.optional(v.id("units")),
+  },
   handler: async (ctx, a) => {
     const me = await requireUser(ctx);
     if (a.unitId) {
@@ -270,19 +326,20 @@ export const create = mutation({
 });
 ```
 
-| Screen (route) | Queries | Mutations |
-|---|---|---|
-| Dashboard `/` | `dashboard.summary` (collected this month, occupancy %, arrears, expected), `dashboard.monthly` (6-month chart), `payments.recent`, `maintenance.open` | — |
-| Properties `/properties` | `properties.list` (with unit counts and occupancy) | `properties.create/update/remove`, `units.create/update` |
-| Tenants `/tenants` | `tenants.list` (+ balance = sum of unpaid invoices) | `tenants.create/update/archive` |
-| Leases `/leases` | `leases.list` | `leases.create/renew/end`, `files.generateUploadUrl` |
-| Invoices `/invoices` | `invoices.list` | `invoices.create`, `invoices.send`, `invoices.generateMonthly` (internal) |
-| Payments `/payments` | `payments.list` | `payments.record` (insert payment, increase `invoice.paid`, set status to partial/paid, generate the receipt number) |
-| Maintenance `/maintenance` | `maintenance.list` | `maintenance.create/updateStatus` |
-| Announcements `/announcements` | `announcements.list` | `announcements.create/pin/remove`, then an action sends SMS |
-| Settings `/settings` | `profiles.me` | `profiles.update`, `auth.signOut` |
+| Screen (route)                 | Queries                                                                                                                                                | Mutations                                                                                                            |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Dashboard `/`                  | `dashboard.summary` (collected this month, occupancy %, arrears, expected), `dashboard.monthly` (6-month chart), `payments.recent`, `maintenance.open` | —                                                                                                                    |
+| Properties `/properties`       | `properties.list` (with unit counts and occupancy)                                                                                                     | `properties.create/update/remove`, `units.create/update`                                                             |
+| Tenants `/tenants`             | `tenants.list` (+ balance = sum of unpaid invoices)                                                                                                    | `tenants.create/update/archive`                                                                                      |
+| Leases `/leases`               | `leases.list`                                                                                                                                          | `leases.create/renew/end`, `files.generateUploadUrl`                                                                 |
+| Invoices `/invoices`           | `invoices.list`                                                                                                                                        | `invoices.create`, `invoices.send`, `invoices.generateMonthly` (internal)                                            |
+| Payments `/payments`           | `payments.list`                                                                                                                                        | `payments.record` (insert payment, increase `invoice.paid`, set status to partial/paid, generate the receipt number) |
+| Maintenance `/maintenance`     | `maintenance.list`                                                                                                                                     | `maintenance.create/updateStatus`                                                                                    |
+| Announcements `/announcements` | `announcements.list`                                                                                                                                   | `announcements.create/pin/remove`, then an action sends SMS                                                          |
+| Settings `/settings`           | `profiles.me`                                                                                                                                          | `profiles.update`, `auth.signOut`                                                                                    |
 
 Recording a payment:
+
 ```ts
 // convex/payments.ts
 import { mutation } from "./_generated/server";
@@ -290,22 +347,37 @@ import { v } from "convex/values";
 import { requireUser, nextNumber } from "./lib";
 
 export const record = mutation({
-  args: { tenantId: v.id("tenants"), invoiceId: v.optional(v.id("invoices")), amount: v.number(),
-          method: v.union(v.literal("mtn_momo"), v.literal("telecel_cash"), v.literal("airteltigo_money"), v.literal("bank"), v.literal("cash")),
-          reference: v.optional(v.string()) },
+  args: {
+    tenantId: v.id("tenants"),
+    invoiceId: v.optional(v.id("invoices")),
+    amount: v.number(),
+    method: v.union(
+      v.literal("mtn_momo"),
+      v.literal("telecel_cash"),
+      v.literal("airteltigo_money"),
+      v.literal("bank"),
+      v.literal("cash"),
+    ),
+    reference: v.optional(v.string()),
+  },
   handler: async (ctx, a) => {
     const me = await requireUser(ctx);
-    if (!Number.isSafeInteger(a.amount) || a.amount <= 0) throw new Error("Amount must be positive integer pesewas");
+    if (!Number.isSafeInteger(a.amount) || a.amount <= 0)
+      throw new Error("Amount must be positive integer pesewas");
     const tenant = await ctx.db.get(a.tenantId);
     if (!tenant || tenant.landlordId !== me) throw new Error("Tenant not found");
     const receiptNo = await nextNumber(ctx, me, "receipt", "RCP");
     if (a.invoiceId) {
       const inv = await ctx.db.get(a.invoiceId);
-      if (!inv || inv.landlordId !== me || inv.tenantId !== a.tenantId) throw new Error("Invoice not found");
+      if (!inv || inv.landlordId !== me || inv.tenantId !== a.tenantId)
+        throw new Error("Invoice not found");
       if (inv.status === "draft") throw new Error("Invoice has not been issued");
       if (a.amount > inv.amount - inv.paid) throw new Error("Payment exceeds invoice balance");
       const paid = inv.paid + a.amount;
-      await ctx.db.patch(inv._id, { paid, status: paid === inv.amount ? "paid" : inv.dueDate < Date.now() ? "overdue" : "partial" });
+      await ctx.db.patch(inv._id, {
+        paid,
+        status: paid === inv.amount ? "paid" : inv.dueDate < Date.now() ? "overdue" : "partial",
+      });
     }
     return ctx.db.insert("payments", { ...a, landlordId: me, receiptNo, paidAt: Date.now() });
   },
@@ -313,61 +385,103 @@ export const record = mutation({
 ```
 
 The internal jobs the crons call (`convex/invoices.ts`):
+
 ```ts
 import { internalMutation } from "./_generated/server";
 import { nextNumber } from "./lib";
 
-export const markOverdue = internalMutation({ args: {}, handler: async (ctx) => {
-  const now = Date.now();
-  for (const status of ["sent", "partial"] as const) {
-    const rows = await ctx.db.query("invoices").filter(q => q.and(
-      q.eq(q.field("status"), status), q.lt(q.field("dueDate"), now))).collect();
-    for (const inv of rows) await ctx.db.patch(inv._id, { status: "overdue" });
-  }
-}});
+export const markOverdue = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    for (const status of ["sent", "partial"] as const) {
+      const rows = await ctx.db
+        .query("invoices")
+        .filter((q) => q.and(q.eq(q.field("status"), status), q.lt(q.field("dueDate"), now)))
+        .collect();
+      for (const inv of rows) await ctx.db.patch(inv._id, { status: "overdue" });
+    }
+  },
+});
 
-export const generateMonthly = internalMutation({ args: {}, handler: async (ctx) => {
-  const d = new Date(); const period = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
-  const monthStart = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
-  const nextMonth = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
-  const leases = await ctx.db.query("leases").filter(q => q.and(
-    q.neq(q.field("status"), "ended"), q.lt(q.field("start"), nextMonth),
-    q.gt(q.field("end"), monthStart))).collect();
-  for (const l of leases) {
-    const exists = await ctx.db.query("invoices").withIndex("by_tenant", q => q.eq("tenantId", l.tenantId))
-      .filter(q => q.and(q.eq(q.field("leaseId"), l._id), q.eq(q.field("period"), period))).first();
-    if (exists) continue;                        // safe to re-run
-    const profile = await ctx.db.query("profiles").withIndex("by_user", q => q.eq("userId", l.landlordId)).unique();
-    const day = profile?.rentDueDay ?? 5;
-    if (!Number.isInteger(day) || day < 1 || day > 31) throw new Error("Invalid rent due day");
-    const daysInMonth = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
-    // Due through the end of the selected Ghana/UTC calendar day.
-    const due = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), Math.min(day, daysInMonth) + 1) - 1;
-    const number = await nextNumber(ctx, l.landlordId, "invoice", "INV");
-    await ctx.db.insert("invoices", { landlordId: l.landlordId, leaseId: l._id, tenantId: l.tenantId,
-      number, period, dueDate: due, amount: l.rent, paid: 0, status: "draft" });
-  }
-}});
+export const generateMonthly = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const d = new Date();
+    const period = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+    const monthStart = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+    const nextMonth = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+    const leases = await ctx.db
+      .query("leases")
+      .filter((q) =>
+        q.and(
+          q.neq(q.field("status"), "ended"),
+          q.lt(q.field("start"), nextMonth),
+          q.gt(q.field("end"), monthStart),
+        ),
+      )
+      .collect();
+    for (const l of leases) {
+      const exists = await ctx.db
+        .query("invoices")
+        .withIndex("by_tenant", (q) => q.eq("tenantId", l.tenantId))
+        .filter((q) => q.and(q.eq(q.field("leaseId"), l._id), q.eq(q.field("period"), period)))
+        .first();
+      if (exists) continue; // safe to re-run
+      const profile = await ctx.db
+        .query("profiles")
+        .withIndex("by_user", (q) => q.eq("userId", l.landlordId))
+        .unique();
+      const day = profile?.rentDueDay ?? 5;
+      if (!Number.isInteger(day) || day < 1 || day > 31) throw new Error("Invalid rent due day");
+      const daysInMonth = new Date(
+        Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0),
+      ).getUTCDate();
+      // Due through the end of the selected Ghana/UTC calendar day.
+      const due = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), Math.min(day, daysInMonth) + 1) - 1;
+      const number = await nextNumber(ctx, l.landlordId, "invoice", "INV");
+      await ctx.db.insert("invoices", {
+        landlordId: l.landlordId,
+        leaseId: l._id,
+        tenantId: l.tenantId,
+        number,
+        period,
+        dueDate: due,
+        amount: l.rent,
+        paid: 0,
+        status: "draft",
+      });
+    }
+  },
+});
 ```
+
 At larger scale, process landlords in batches with `ctx.scheduler.runAfter` to stay within Convex's per-mutation limits.
 
 These examples assume exclusive lease end timestamps and full monthly charges for a lease overlapping the month; decide on proration and advance-rent allocation before implementing billing. Creating an invoice is not sending it: `invoices.send` must explicitly issue a draft, with delivery recorded separately. Failed SMS/email must be retryable without issuing a second invoice. Drafts are deliberately excluded from the overdue job.
 
 The third job referenced below also needs an implementation (`convex/leases.ts`):
+
 ```ts
 import { internalMutation } from "./_generated/server";
 
-export const flagExpiring = internalMutation({ args: {}, handler: async (ctx) => {
-  const now = Date.now();
-  const horizon = now + 60 * 24 * 60 * 60 * 1000;
-  const rows = await ctx.db.query("leases")
-    .filter(q => q.neq(q.field("status"), "ended")).collect();
-  for (const lease of rows) {
-    const status = lease.end <= now ? "ended" : lease.end <= horizon ? "expiring" : "active";
-    if (lease.status !== status) await ctx.db.patch(lease._id, { status });
-  }
-}});
+export const flagExpiring = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const horizon = now + 60 * 24 * 60 * 60 * 1000;
+    const rows = await ctx.db
+      .query("leases")
+      .filter((q) => q.neq(q.field("status"), "ended"))
+      .collect();
+    for (const lease of rows) {
+      const status = lease.end <= now ? "ended" : lease.end <= horizon ? "expiring" : "active";
+      if (lease.status !== status) await ctx.db.patch(lease._id, { status });
+    }
+  },
+});
 ```
+
 Lease status changes alone do not vacate a unit. End/renew/archive mutations must keep occupancy consistent and check for another current lease or tenant before freeing a unit.
 
 ---
@@ -379,7 +493,11 @@ import { cronJobs } from "convex/server";
 import { internal } from "./_generated/api";
 const crons = cronJobs();
 crons.daily("mark overdue invoices", { hourUTC: 6, minuteUTC: 0 }, internal.invoices.markOverdue);
-crons.monthly("generate rent invoices", { day: 1, hourUTC: 6, minuteUTC: 0 }, internal.invoices.generateMonthly);
+crons.monthly(
+  "generate rent invoices",
+  { day: 1, hourUTC: 6, minuteUTC: 0 },
+  internal.invoices.generateMonthly,
+);
 crons.daily("flag expiring leases", { hourUTC: 6, minuteUTC: 30 }, internal.leases.flagExpiring); // end within 60 days
 export default crons;
 ```
@@ -400,6 +518,7 @@ export default crons;
 For this SSR app, put the Convex client and provider in a dedicated React module, then render that subtree beneath TanStack's `ClientOnly` with a stable loading fallback. Keep `QueryClientProvider` and the document shell intact; auth/provider initialization must not read browser storage during SSR. Do not use Next.js-only Convex Auth helpers or introduce another router.
 
 Provider module sketch (create it before importing it from the root):
+
 ```tsx
 import { useState, type ReactNode } from "react";
 import { ConvexReactClient } from "convex/react";
@@ -414,9 +533,11 @@ export function ConvexProviders({ children }: { children: ReactNode }) {
   return <ConvexAuthProvider client={client}>{children}</ConvexAuthProvider>;
 }
 ```
+
 Place both public auth screens and the protected app beneath that provider after hydration; keep their current outside/inside `AppShell` distinction. Ensure the OAuth `code` query parameter survives the router's auth-page search validation until the provider consumes it. Verify Google return navigation with the actual deployed origin.
 
 Replacing mock data on a page (example: `src/routes/tenants.tsx`):
+
 ```tsx
 import { useQuery } from "convex/react";
 import { useConvexAuth } from "convex/react";
@@ -426,15 +547,18 @@ const { isAuthenticated } = useConvexAuth();
 const rows = useQuery(api.tenants.list, isAuthenticated ? {} : "skip");
 // undefined means loading/skipped, not an empty collection. Render an empty state only for [].
 ```
+
 Format money as `cedi(row.rent / 100)`.
 
 Login (`src/routes/login.tsx`):
+
 ```tsx
 import { useAuthActions } from "@convex-dev/auth/react";
 const { signIn } = useAuthActions();
-await signIn("password", { email, password, flow: "signIn" });   // signup: flow: "signUp"
+await signIn("password", { email, password, flow: "signIn" }); // signup: flow: "signUp"
 await signIn("google");
 ```
+
 Each `Field` needs a `name`, and the form should read its values from `FormData`.
 
 Auth pages: `/login`, `/signup`, `/forgot-password` render outside `AppShell` already, so they stay public.
@@ -492,12 +616,12 @@ Use `useAuthActions().signOut()` (not a custom mutation called `auth.signOut`), 
 
 ### Operator commands (`npx convex run <file:function>`)
 
-| Command | Purpose |
-|---|---|
-| `migration:backfillAdmin` | Promote earliest profile to admin iff none exists (safe to re-run) |
-| `migration:setAdmin` | Force-set one admin by email; demotes other admins |
-| `migration:renameDefaultBrand` | One-time rename of the default brand; skips customised rows |
-| `migration:deleteDraftInvoiceByNumber` | Delete a DRAFT invoice (e.g. an accidental duplicate) |
+| Command                                | Purpose                                                            |
+| -------------------------------------- | ------------------------------------------------------------------ |
+| `migration:backfillAdmin`              | Promote earliest profile to admin iff none exists (safe to re-run) |
+| `migration:setAdmin`                   | Force-set one admin by email; demotes other admins                 |
+| `migration:renameDefaultBrand`         | One-time rename of the default brand; skips customised rows        |
+| `migration:deleteDraftInvoiceByNumber` | Delete a DRAFT invoice (e.g. an accidental duplicate)              |
 
 Add `--env-file .env.production.local` to target prod instead of dev. Deploy keys live only in
 the gitignored env files; never commit them.
@@ -527,18 +651,20 @@ the gitignored env files; never commit them.
 ### Test evidence (2026-11-14)
 
 Browser-verified against **dev** (Kojo admin + Ama member):
+
 - Signup → profile auto-created; first account = admin; second = member.
 - Empty states everywhere; dashboard zeros; cross-tenant isolation (Ama sees none of Kojo's data).
 - Property → 2 units → tenant → lease (double-book rejected) → invoice INV-1001 → send →
   payment RCP-1001 (invoice flips to paid, collected GH₵ 1,600.00, rate 100%).
 - Duplicate invoice creation rejected with a friendly error (`Invoice INV-1001 already covers…`).
 - Settings: profile/business/payment-methods saved; branding changed live (name, tagline,
-  color, logo) and restored via *Reset to defaults*.
-- Non-admin: Branding tab hidden; Security shows *Member*.
+  color, logo) and restored via _Reset to defaults_.
+- Non-admin: Branding tab hidden; Security shows _Member_.
 - Forgot-password shows the honest not-enabled state; demo links/Google button removed.
 - Unit tests: 14/14 (`npm test`) — branding, pesewasFromCedi, auth validation.
 
 Seeded against **prod** (fresh deployment):
+
 - One admin account signup (first-account rule) → `Admin` role confirmed in Security tab.
 - Minimal display dataset: 1 property (Adenta Court), units A1/A2, 1 tenant (Kwame Asante),
   lease to 2027-12-31, INV-1001 sent, payment RCP-1001 (invoice paid), 1 open maintenance

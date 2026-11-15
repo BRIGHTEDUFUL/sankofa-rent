@@ -1,6 +1,7 @@
 # Mobile Audit — Phase 0 Findings
 
 ## What already works ✅
+
 - Viewport meta: `width=device-width, initial-scale=1, viewport-fit=cover` in `src/routes/__root.tsx`
 - Bottom tab bar is a full-width bar (not floating pill), with 3 primary tabs + More drawer
 - DataPage switches table→card layout at `md` (768 px) — already responsive
@@ -11,6 +12,7 @@
 - `overscroll-behavior-y: none` and `-webkit-tap-highlight-color: transparent` already set
 
 ## Real problems fixed ❌→✅
+
 1. No global `box-sizing: border-box`, no `overflow-x: hidden` on html/body → root cause of wide pages
 2. `whitespace-nowrap` + large GH₵ amounts in Dashboard KPI cards overflow at 320 px
 3. `grid-cols-2` inside form Drawers (invoices, leases, maintenance forms) — 320–360 px columns too narrow

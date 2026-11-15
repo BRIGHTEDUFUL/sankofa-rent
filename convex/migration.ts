@@ -17,9 +17,7 @@ export const backfillAdmin = internalMutation({
     if (profiles.length === 0) {
       return { promoted: false, reason: "No profiles yet — the first sign-up becomes admin" };
     }
-    const earliest = profiles.reduce((a, b) =>
-      a._creationTime <= b._creationTime ? a : b,
-    );
+    const earliest = profiles.reduce((a, b) => (a._creationTime <= b._creationTime ? a : b));
     await ctx.db.patch(earliest._id, { role: "admin" });
     return { promoted: true, userId: earliest.userId };
   },
@@ -53,16 +51,44 @@ export const deleteDraftInvoiceByNumber = internalMutation({
       .filter((q) => q.eq(q.field("number"), number.trim()))
       .first();
     if (!inv) return { deleted: false, reason: "not found" };
-    if (inv.status !== "draft") return { deleted: false, reason: "only draft invoices can be deleted" };
+    if (inv.status !== "draft")
+      return { deleted: false, reason: "only draft invoices can be deleted" };
     await ctx.db.delete(inv._id);
     return { deleted: true, number };
   },
 });
 
-// Escape hatch if backfillAdmin promoted the wrong account:
+// Promote or set an admin. Supports multi-admin (demoteOthers defaults to false).
 //   npx convex run migration:setAdmin '{"email":"you@example.com"}'
-// Demotes every other admin so exactly one account holds the role.
 export const setAdmin = internalMutation({
+  args: { email: v.string(), demoteOthers: v.optional(v.boolean()) },
+  handler: async (ctx, { email, demoteOthers = false }) => {
+    const target = email.trim().toLowerCase();
+    const users = await ctx.db.query("users").collect();
+    const user = users.find((u) => u.email?.toLowerCase() === target);
+    if (!user) throw new Error(`No user with email ${target}`);
+    const profiles = await ctx.db.query("profiles").collect();
+    const targetProfile = profiles.find((p) => p.userId === user._id);
+    if (!targetProfile) throw new Error("That user has no profile yet");
+
+    if (targetProfile.role !== "admin") {
+      await ctx.db.patch(targetProfile._id, { role: "admin" });
+    }
+
+    if (demoteOthers) {
+      for (const p of profiles) {
+        if (p._id !== targetProfile._id && p.role === "admin") {
+          await ctx.db.patch(p._id, { role: "user" });
+        }
+      }
+    }
+    return { admin: target, demoteOthers };
+  },
+});
+
+// Revoke admin status from an account while ensuring at least one admin remains:
+//   npx convex run migration:removeAdmin '{"email":"you@example.com"}'
+export const removeAdmin = internalMutation({
   args: { email: v.string() },
   handler: async (ctx, { email }) => {
     const target = email.trim().toLowerCase();
@@ -72,14 +98,87 @@ export const setAdmin = internalMutation({
     const profiles = await ctx.db.query("profiles").collect();
     const targetProfile = profiles.find((p) => p.userId === user._id);
     if (!targetProfile) throw new Error("That user has no profile yet");
-    for (const p of profiles) {
-      if (p._id === targetProfile._id) {
-        if (p.role !== "admin") await ctx.db.patch(p._id, { role: "admin" });
-      } else if (p.role === "admin") {
+
+    const admins = profiles.filter((p) => p.role === "admin");
+    if (admins.length <= 1 && targetProfile.role === "admin") {
+      throw new Error(
+        "Cannot demote the last remaining admin. The system requires at least one admin.",
+      );
+    }
+    await ctx.db.patch(targetProfile._id, { role: "user" });
+    return { demoted: target };
+  },
+});
+
+// Helper to create or sync an admin account directly (with password hash)
+// e.g. for syncing accounts across dev and production.
+export const syncAdminUser = internalMutation({
+  args: {
+    email: v.string(),
+    secret: v.string(),
+    firstName: v.string(),
+    lastName: v.string(),
+  },
+  handler: async (ctx, { email, secret, firstName, lastName }) => {
+    const norm = email.trim().toLowerCase();
+    const users = await ctx.db.query("users").collect();
+    let user = users.find((u) => u.email?.toLowerCase() === norm);
+    let userId = user?._id;
+
+    if (!user) {
+      userId = await ctx.db.insert("users", { email: norm });
+      await ctx.db.insert("authAccounts", {
+        userId,
+        provider: "password",
+        providerAccountId: norm,
+        secret,
+      });
+      await ctx.db.insert("profiles", {
+        userId,
+        role: "admin",
+        firstName,
+        lastName,
+        currency: "GHS",
+        rentDueDay: 5,
+        notifySms: true,
+        notifyEmail: true,
+        notifyWhatsapp: false,
+        plan: "free",
+        phone: "024 555 0101",
+        region: "Greater Accra",
+        businessName: "Sankofa Properties",
+        momoNetwork: "MTN",
+        momoNumber: "024 555 0101",
+      });
+    } else {
+      const authAccounts = await ctx.db.query("authAccounts").collect();
+      const authAcc = authAccounts.find((a) => a.userId === userId);
+      if (authAcc) {
+        await ctx.db.patch(authAcc._id, { secret });
+      } else {
+        await ctx.db.insert("authAccounts", {
+          userId,
+          provider: "password",
+          providerAccountId: norm,
+          secret,
+        });
+      }
+      const profiles = await ctx.db.query("profiles").collect();
+      const profile = profiles.find((p) => p.userId === userId);
+      if (profile) {
+        await ctx.db.patch(profile._id, { role: "admin" });
+      }
+    }
+
+    // Demote any other admins
+    const allProfiles = await ctx.db.query("profiles").collect();
+    for (const p of allProfiles) {
+      if (p.userId !== userId && p.role === "admin") {
         await ctx.db.patch(p._id, { role: "user" });
       }
     }
-    return { admin: target };
+
+    return { synced: true, email: norm, userId };
   },
 });
 

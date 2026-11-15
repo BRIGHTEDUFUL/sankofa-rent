@@ -29,10 +29,12 @@ export default defineSchema({
     region: v.optional(v.string()),
     currency: v.literal("GHS"),
     momoNumber: v.optional(v.string()),
-    momoNetwork: v.optional(v.union(v.literal("MTN"), v.literal("Telecel"), v.literal("AirtelTigo"))),
+    momoNetwork: v.optional(
+      v.union(v.literal("MTN"), v.literal("Telecel"), v.literal("AirtelTigo")),
+    ),
     bankName: v.optional(v.string()),
     bankAccount: v.optional(v.string()),
-    rentDueDay: v.number(),            // e.g. 5
+    rentDueDay: v.number(), // e.g. 5
     lateFeePercent: v.optional(v.number()),
     notifySms: v.boolean(),
     notifyEmail: v.boolean(),
@@ -43,7 +45,7 @@ export default defineSchema({
   properties: defineTable({
     landlordId: v.id("users"),
     name: v.string(),
-    area: v.string(),                  // "Adenta, Accra"
+    area: v.string(), // "Adenta, Accra"
     region: v.optional(v.string()),
     ghanaPostGps: v.optional(v.string()),
     photoId: v.optional(v.id("_storage")),
@@ -52,11 +54,13 @@ export default defineSchema({
   units: defineTable({
     landlordId: v.id("users"),
     propertyId: v.id("properties"),
-    label: v.string(),                 // "A3", "2B"
+    label: v.string(), // "A3", "2B"
     bedrooms: v.optional(v.number()),
-    rent: v.number(),                  // pesewas / month
+    rent: v.number(), // pesewas / month
     status: v.union(v.literal("vacant"), v.literal("occupied"), v.literal("maintenance")),
-  }).index("by_property", ["propertyId"]).index("by_landlord", ["landlordId"]),
+  })
+    .index("by_property", ["propertyId"])
+    .index("by_landlord", ["landlordId"]),
 
   tenants: defineTable({
     landlordId: v.id("users"),
@@ -68,7 +72,9 @@ export default defineSchema({
     unitId: v.optional(v.id("units")),
     since: v.number(),
     archived: v.boolean(),
-  }).index("by_landlord", ["landlordId"]).index("by_unit", ["unitId"]),
+  })
+    .index("by_landlord", ["landlordId"])
+    .index("by_unit", ["unitId"]),
 
   leases: defineTable({
     landlordId: v.id("users"),
@@ -76,35 +82,55 @@ export default defineSchema({
     unitId: v.id("units"),
     start: v.number(),
     end: v.number(),
-    rent: v.number(),                  // pesewas / month
-    advanceMonths: v.number(),         // validate the applicable legal limit for the tenancy before launch
+    rent: v.number(), // pesewas / month
+    advanceMonths: v.number(), // validate the applicable legal limit for the tenancy before launch
     deposit: v.optional(v.number()),
     status: v.union(v.literal("active"), v.literal("expiring"), v.literal("ended")),
     documentId: v.optional(v.id("_storage")),
-  }).index("by_landlord", ["landlordId"]).index("by_tenant", ["tenantId"]).index("by_end", ["landlordId", "end"]),
+  })
+    .index("by_landlord", ["landlordId"])
+    .index("by_tenant", ["tenantId"])
+    .index("by_end", ["landlordId", "end"]),
 
   invoices: defineTable({
     landlordId: v.id("users"),
     leaseId: v.id("leases"),
     tenantId: v.id("tenants"),
-    number: v.string(),                // "INV-1042"
-    period: v.string(),                // "2026-11"
+    number: v.string(), // "INV-1042"
+    period: v.string(), // "2026-11"
     dueDate: v.number(),
     amount: v.number(),
     paid: v.number(),
-    status: v.union(v.literal("draft"), v.literal("sent"), v.literal("partial"), v.literal("paid"), v.literal("overdue")),
-  }).index("by_landlord", ["landlordId"]).index("by_status", ["landlordId", "status"]).index("by_tenant", ["tenantId"]),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("sent"),
+      v.literal("partial"),
+      v.literal("paid"),
+      v.literal("overdue"),
+    ),
+  })
+    .index("by_landlord", ["landlordId"])
+    .index("by_status", ["landlordId", "status"])
+    .index("by_tenant", ["tenantId"]),
 
   payments: defineTable({
     landlordId: v.id("users"),
     tenantId: v.id("tenants"),
     invoiceId: v.optional(v.id("invoices")),
-    receiptNo: v.string(),             // "RCP-0881"
-    method: v.union(v.literal("mtn_momo"), v.literal("telecel_cash"), v.literal("airteltigo_money"), v.literal("bank"), v.literal("cash")),
+    receiptNo: v.string(), // "RCP-0881"
+    method: v.union(
+      v.literal("mtn_momo"),
+      v.literal("telecel_cash"),
+      v.literal("airteltigo_money"),
+      v.literal("bank"),
+      v.literal("cash"),
+    ),
     reference: v.optional(v.string()),
     amount: v.number(),
     paidAt: v.number(),
-  }).index("by_landlord", ["landlordId", "paidAt"]).index("by_tenant", ["tenantId"]),
+  })
+    .index("by_landlord", ["landlordId", "paidAt"])
+    .index("by_tenant", ["tenantId"]),
 
   maintenance: defineTable({
     landlordId: v.id("users"),
@@ -117,7 +143,9 @@ export default defineSchema({
     status: v.union(v.literal("open"), v.literal("in_progress"), v.literal("resolved")),
     cost: v.optional(v.number()),
     photoIds: v.optional(v.array(v.id("_storage"))),
-  }).index("by_landlord", ["landlordId"]).index("by_status", ["landlordId", "status"]),
+  })
+    .index("by_landlord", ["landlordId"])
+    .index("by_status", ["landlordId", "status"]),
 
   announcements: defineTable({
     landlordId: v.id("users"),
@@ -128,6 +156,8 @@ export default defineSchema({
     channels: v.array(v.union(v.literal("sms"), v.literal("email"), v.literal("whatsapp"))),
   }).index("by_landlord", ["landlordId"]),
 
-  counters: defineTable({ landlordId: v.id("users"), name: v.string(), value: v.number() })
-    .index("by_name", ["landlordId", "name"]),
+  counters: defineTable({ landlordId: v.id("users"), name: v.string(), value: v.number() }).index(
+    "by_name",
+    ["landlordId", "name"],
+  ),
 });

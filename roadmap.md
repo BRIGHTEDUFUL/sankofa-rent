@@ -14,6 +14,7 @@
 - [x] CI fix: `bun.lock`/`bunfig.toml` dropped — npm-only; `package-lock.json` is source of truth
 
 ### Mobile-native overhaul (2026-11-14)
+
 - [x] `usePlatform` hook — detects iOS/Android/other; stamps `data-platform` on `<html>` for CSS scoping
 - [x] `useRipple` hook — Android Material 3 DOM ripple on tap
 - [x] `haptics.ts` — `navigator.vibrate` wrappers for Android tap/medium feedback
@@ -37,6 +38,7 @@
 - [x] Theme toggle in desktop sidebar (Sun/Moon)
 
 ### Design system sweep (2026-11-14)
+
 - [x] Removed `border-l-4 border-primary` side-tab accent from Dashboard payment list (banned pattern)
 - [x] Replaced all `border-l-2` colored left-borders on error/status messages (6 files) with pill banners using `bg-destructive-soft` / `bg-primary-soft`
 - [x] Removed decorative hard-coded sparkline bars from Dashboard KPI card (not from real data)

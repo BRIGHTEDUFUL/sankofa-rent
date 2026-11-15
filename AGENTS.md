@@ -25,8 +25,13 @@
 - **Branding** is a global singleton (`convex/branding.ts` + `src/lib/branding.tsx`), publicly
   readable, admin-writable only. Route `head()` titles are build-time static; `BrandingEffects`
   rewrites `document.title` at runtime. Keep both `DEFAULT_BRANDING` copies in sync.
-- **Roles**: first account on a deployment becomes `admin`, the rest `user`. Admins only get the
-  Branding tab; the server enforces it via `requireAdmin` — UI gates are not authorization.
-- Operator migrations live in `convex/migration.ts` — promote admins
-  (`migration:backfillAdmin`), force one admin (`setAdmin`), rename the default brand
-  (`renameDefaultBrand`), delete a draft invoice by number. Run them with `--env-file` for prod.
+- **Roles & Accounts**: first account on a fresh deployment becomes `admin`, subsequent sign-ups
+  become `user`. The system supports multiple concurrent administrators. Admins can access
+  both Branding and the full Account Management interface (`convex/accounts.ts`) to view all
+  accounts, promote/demote administrators, reset user passwords, create accounts, and remove
+  accounts. All administrative actions are strictly enforced on the server via `requireAdmin`.
+  The last remaining administrator cannot be demoted or deleted.
+- Operator migrations live in `convex/migration.ts` — backfill admin (`backfillAdmin`), promote
+  admin (`setAdmin`), revoke admin (`removeAdmin`), sync admin accounts (`syncAdminUser`),
+  rename the default brand (`renameDefaultBrand`), adopt landlord data (`adoptLandlordData`),
+  and delete draft invoices by number. Run them with `--env-file` for prod.

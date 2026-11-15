@@ -3,6 +3,7 @@
 # ☀ Sankofa Rent
 
 ### Rent, handled beautifully.
+
 ### Made for Ghanaian landlords.
 
 Property management, rent invoicing, payments and receipts — one calm dashboard.<br/>
@@ -42,20 +43,20 @@ It works equally well on the phone in a landlord's pocket and the laptop on thei
 
 ## Features
 
-| | |
-|---|---|
-| **Dashboard** | Collected vs invoiced, collection rate, occupancy, arrears — last 6 months |
-| **Properties & units** | One-tap property + unit management, rent roll, occupancy KPIs |
-| **Tenants** | Profiles, unit assignment, balances derived from unpaid invoices |
-| **Leases** | Create / renew / end; duplicate-safe unit assignment |
-| **Invoices** | Draft → send → paid; monthly generation cron; duplicate guard |
-| **Payments & receipts** | MoMo (MTN, Telecel, AirtelTigo), bank, cash — numbered receipts |
-| **Maintenance** | Priority + status tracking per unit |
-| **Announcements** | SMS / email / WhatsApp channel selection |
-| **Branding** | Admin-only: live app name, tagline, 8 curated accents + custom colour, logo upload |
-| **Roles** | First account on a deployment becomes admin, the rest members |
-| **Mobile-native** | iOS translucency, Android M3 ripple + pill, page transitions, platform detection |
-| **Dark mode** | Full OKLCH token set; OS preference + manual toggle |
+|                         |                                                                                    |
+| ----------------------- | ---------------------------------------------------------------------------------- |
+| **Dashboard**           | Collected vs invoiced, collection rate, occupancy, arrears — last 6 months         |
+| **Properties & units**  | One-tap property + unit management, rent roll, occupancy KPIs                      |
+| **Tenants**             | Profiles, unit assignment, balances derived from unpaid invoices                   |
+| **Leases**              | Create / renew / end; duplicate-safe unit assignment                               |
+| **Invoices**            | Draft → send → paid; monthly generation cron; duplicate guard                      |
+| **Payments & receipts** | MoMo (MTN, Telecel, AirtelTigo), bank, cash — numbered receipts                    |
+| **Maintenance**         | Priority + status tracking per unit                                                |
+| **Announcements**       | SMS / email / WhatsApp channel selection                                           |
+| **Branding**            | Admin-only: live app name, tagline, 8 curated accents + custom colour, logo upload |
+| **Roles**               | First account on a deployment becomes admin, the rest members                      |
+| **Mobile-native**       | iOS translucency, Android M3 ripple + pill, page transitions, platform detection   |
+| **Dark mode**           | Full OKLCH token set; OS preference + manual toggle                                |
 
 ---
 
@@ -75,17 +76,17 @@ It works equally well on the phone in a landlord's pocket and the laptop on thei
 
 ## Tech stack
 
-| Layer | Choice |
-|---|---|
-| Framework | **TanStack Start** (SSR React 19, file-based routes) + TanStack Query |
-| Backend | **Convex** — schema, queries, mutations, crons, file storage |
-| Auth | **@convex-dev/auth 0.0.98** — email + password |
-| Styling | **Tailwind CSS v4** — OKLCH tokens, `@utility` custom utilities, dark mode |
-| Animation | **Framer Motion 14** — page transitions, Android M3 pill, More drawer |
-| Charts | **Recharts 2** — 6-month bar chart, collection gauge |
-| Money | Integer pesewas (GH₵ 1 = 100 p) — never floats |
-| Deploy | **Cloudflare Workers** (Nitro `cloudflare-module`), CI as npm-only |
-| Tests | **Vitest 4** + Testing Library — 14 unit tests |
+| Layer     | Choice                                                                     |
+| --------- | -------------------------------------------------------------------------- |
+| Framework | **TanStack Start** (SSR React 19, file-based routes) + TanStack Query      |
+| Backend   | **Convex** — schema, queries, mutations, crons, file storage               |
+| Auth      | **@convex-dev/auth 0.0.98** — email + password                             |
+| Styling   | **Tailwind CSS v4** — OKLCH tokens, `@utility` custom utilities, dark mode |
+| Animation | **Framer Motion 14** — page transitions, Android M3 pill, More drawer      |
+| Charts    | **Recharts 2** — 6-month bar chart, collection gauge                       |
+| Money     | Integer pesewas (GH₵ 1 = 100 p) — never floats                             |
+| Deploy    | **Cloudflare Workers** (Nitro `cloudflare-module`), CI as npm-only         |
+| Tests     | **Vitest 4** + Testing Library — 14 unit tests                             |
 
 ---
 
@@ -130,24 +131,24 @@ Create your first account — the first sign-up on a fresh deployment becomes th
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Vite dev server (SSR) |
-| `npx convex dev` | Push schema/functions to dev, regenerate types |
-| `npx convex deploy --env-file .env.production.local` | Push backend to prod |
-| `npm test` | Vitest (14 tests, 4 files) |
-| `npm run lint` | ESLint — 0 errors |
-| `npm run build` | Production build → `.output/` (Nitro) |
-| `npx tsc --noEmit` | Typecheck — 0 errors |
+| Command                                              | What it does                                   |
+| ---------------------------------------------------- | ---------------------------------------------- |
+| `npm run dev`                                        | Vite dev server (SSR)                          |
+| `npx convex dev`                                     | Push schema/functions to dev, regenerate types |
+| `npx convex deploy --env-file .env.production.local` | Push backend to prod                           |
+| `npm test`                                           | Vitest (14 tests, 4 files)                     |
+| `npm run lint`                                       | ESLint — 0 errors                              |
+| `npm run build`                                      | Production build → `.output/` (Nitro)          |
+| `npx tsc --noEmit`                                   | Typecheck — 0 errors                           |
 
 ---
 
 ## Deployments
 
-| Environment | URL | Convex deployment |
-|---|---|---|
+| Environment    | URL                                                          | Convex deployment         |
+| -------------- | ------------------------------------------------------------ | ------------------------- |
 | **Production** | **https://final-year-rent-project.edimamfaidol.workers.dev** | `prod:usable-penguin-827` |
-| Development | localhost:8081 | `dev:adorable-pig-437` |
+| Development    | localhost:8081                                               | `dev:adorable-pig-437`    |
 
 Backend and frontend deploy separately. The frontend auto-deploys to Cloudflare Workers on every push to `main` (Workers Builds). The backend deploys on demand with `npx convex deploy --env-file .env.production.local`.
 

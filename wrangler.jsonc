@@ -13,14 +13,14 @@
   "rules": [
     {
       "type": "ESModule",
-      "globs": ["**/*.mjs", "**/*.js"]
-    }
+      "globs": ["**/*.mjs", "**/*.js"],
+    },
   ],
   "assets": {
     "directory": "./.output/public",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
   },
   "observability": {
-    "enabled": true
-  }
+    "enabled": true,
+  },
 }

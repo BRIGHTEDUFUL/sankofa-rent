@@ -36,11 +36,7 @@ export function contrastVsWhite(hex: string): number {
   return 1.05 / (luminance(hex) + 0.05);
 }
 
-function assertBranding(args: {
-  appName: string;
-  tagline: string;
-  accentColor: string;
-}) {
+function assertBranding(args: { appName: string; tagline: string; accentColor: string }) {
   const appName = args.appName.trim();
   const tagline = args.tagline.trim();
   if (!appName) throw new Error("App name cannot be empty");
@@ -49,7 +45,9 @@ function assertBranding(args: {
   if (tagline.length > 120) throw new Error("Tagline must be 120 characters or fewer");
   if (!isHexColor(args.accentColor)) throw new Error("Accent color must be a #rrggbb hex value");
   if (contrastVsWhite(args.accentColor) < 4.5) {
-    throw new Error("That accent color is too light — white text on it would be hard to read. Pick a darker shade.");
+    throw new Error(
+      "That accent color is too light — white text on it would be hard to read. Pick a darker shade.",
+    );
   }
   return { appName, tagline, accentColor: args.accentColor.toLowerCase() };
 }

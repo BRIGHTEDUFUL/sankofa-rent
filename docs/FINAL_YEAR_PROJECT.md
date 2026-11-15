@@ -4,7 +4,7 @@
 
 **Author:** Edith Nonnon
 **Programme:** Final-Year Project · 2026
-**Supervisor:** __________________________ *(complete before submission)*
+**Supervisor:** __________________________ _(complete before submission)_
 **Live system:** https://final-year-rent-project.edimamfaidol.workers.dev
 **Source code:** https://github.com/BRIGHTEDUFUL/sankofa-rent
 
@@ -48,7 +48,7 @@ Sankofa Rent is a production-deployed, full-stack web application that centralis
 
 Small and mid-size landlords in Ghana manage their portfolios largely by hand: paper exercise books for tenants and amounts, WhatsApp groups for notices, loose MoMo receipts for proof of payment, and memory for what is due when. Problems compound quietly — a tenant pays without evidence, an invoice goes unnoticed until the arrears are large, a maintenance item is forgotten, or a property changes hands and the records do not survive the handover.
 
-The name **Sankofa** is drawn from the Akan Adinkra symbol *san ko fa* — "go back and fetch it" — an image of learning from the past. The name doubles as the product's promise: landlords can always go back and fetch an invoice, a receipt, a lease, a payment.
+The name **Sankofa** is drawn from the Akan Adinkra symbol _san ko fa_ — "go back and fetch it" — an image of learning from the past. The name doubles as the product's promise: landlords can always go back and fetch an invoice, a receipt, a lease, a payment.
 
 ### 2.2 Problem statement
 
@@ -60,25 +60,26 @@ There is no affordable, well-designed, single-source-of-truth rent-management sy
 
 **Specific objectives.**
 
-| # | Objective | Delivered |
-|---|---|---|
-| 1 | Account system with secure sign-in and sign-out | Email + password (Convex Auth) |
-| 2 | First account becomes admin; later accounts are members | Verified on both deployments |
-| 3 | Manage properties, units, tenants | CRUD with occupancy & rent-roll KPIs |
-| 4 | Leases with create/renew/end; safe unit assignment | End-to-end browser-verified |
-| 5 | Invoice generation, sending, paid receipts | Draft → send → paid/part-paid, duplicate guard |
-| 6 | Payment recording with receipt numbers | `RCP-####` numbering from a counter |
-| 7 | Announcements broadcast to tenants | SMS/Email/WhatsApp channel selection |
-| 8 | Dashboard with collection, occupancy, arrears | Live KPIs + 6-month bar chart |
-| 9 | Admin-only live rebranding of the entire app | Name, tagline, logo, accent colour, favicon, title |
-| 10 | Production deployment with real data | Live on Cloudflare Workers + Convex |
-| 11 | Full mobile-native experience | Bottom tab bar, iOS blur, Android M3 ripple, page transitions |
-| 12 | Coherent visual design system | No banned anti-patterns; browser surfaces themed; accessible error states |
-| 13 | Test, audit, and document the system | 14/14 unit tests; 49 browser checks; impeccable detector: 0 findings |
+| #   | Objective                                               | Delivered                                                                 |
+| --- | ------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 1   | Account system with secure sign-in and sign-out         | Email + password (Convex Auth)                                            |
+| 2   | First account becomes admin; later accounts are members | Verified on both deployments                                              |
+| 3   | Manage properties, units, tenants                       | CRUD with occupancy & rent-roll KPIs                                      |
+| 4   | Leases with create/renew/end; safe unit assignment      | End-to-end browser-verified                                               |
+| 5   | Invoice generation, sending, paid receipts              | Draft → send → paid/part-paid, duplicate guard                            |
+| 6   | Payment recording with receipt numbers                  | `RCP-####` numbering from a counter                                       |
+| 7   | Announcements broadcast to tenants                      | SMS/Email/WhatsApp channel selection                                      |
+| 8   | Dashboard with collection, occupancy, arrears           | Live KPIs + 6-month bar chart                                             |
+| 9   | Admin-only live rebranding of the entire app            | Name, tagline, logo, accent colour, favicon, title                        |
+| 10  | Production deployment with real data                    | Live on Cloudflare Workers + Convex                                       |
+| 11  | Full mobile-native experience                           | Bottom tab bar, iOS blur, Android M3 ripple, page transitions             |
+| 12  | Coherent visual design system                           | No banned anti-patterns; browser surfaces themed; accessible error states |
+| 13  | Test, audit, and document the system                    | 14/14 unit tests; 49 browser checks; impeccable detector: 0 findings      |
 
 ### 2.4 Scope and delimitations
 
 **In scope:**
+
 - Web app (desktop & mobile) for a single landlord per account
 - Property / unit / tenant / lease / invoice / payment / maintenance / announcement CRUD
 - A financial dashboard with 6-month trend
@@ -87,6 +88,7 @@ There is no affordable, well-designed, single-source-of-truth rent-management sy
 - Production deployment to a public URL, backend in the managed Convex cloud
 
 **Explicitly out of scope (documented as future work):**
+
 - Sending real SMS / WhatsApp / email — channels are recorded, delivery is not wired
 - Mobile-money collection webhooks (MTN/Telecel/AT) — records can be entered with a MoMo reference, money does not flow through the app
 - Password reset by email — shows an honest "not enabled yet" state rather than a dead button
@@ -101,21 +103,21 @@ There is no affordable, well-designed, single-source-of-truth rent-management sy
 
 ### 2.6 Definition of terms
 
-| Term | Meaning |
-|---|---|
-| Pesewa | 1/100 of a Ghana cedi (GH₵). Money is stored as integer pesewas |
-| Occupancy | % of non-vacant units (occupied ÷ total units) |
-| Collection rate | paid ÷ invoiced (this month), as a percentage |
-| Arrears | sum of unpaid-overdue invoice balances |
-| Advance rent | months of rent paid ahead of the tenancy start |
-| Invoice number / receipt number | sequential identifiers, e.g. `INV-1001`, `RCP-1001` |
-| Singleton | one table holding exactly one row (`branding`) |
-| Admin / member | the two roles; first account becomes admin |
-| Convex | managed backend platform: database, functions, crons, file storage, auth |
-| Workers | Cloudflare's serverless edge runtime hosting the SSR frontend |
-| dvh | dynamic viewport height — `100dvh` accounts for mobile browser chrome appearing/disappearing |
-| Safe-area insets | iOS/Android padding for notch, home indicator, and status bar |
-| M3 | Material Design 3, Google's design language for Android |
+| Term                            | Meaning                                                                                      |
+| ------------------------------- | -------------------------------------------------------------------------------------------- |
+| Pesewa                          | 1/100 of a Ghana cedi (GH₵). Money is stored as integer pesewas                              |
+| Occupancy                       | % of non-vacant units (occupied ÷ total units)                                               |
+| Collection rate                 | paid ÷ invoiced (this month), as a percentage                                                |
+| Arrears                         | sum of unpaid-overdue invoice balances                                                       |
+| Advance rent                    | months of rent paid ahead of the tenancy start                                               |
+| Invoice number / receipt number | sequential identifiers, e.g. `INV-1001`, `RCP-1001`                                          |
+| Singleton                       | one table holding exactly one row (`branding`)                                               |
+| Admin / member                  | the two roles; first account becomes admin                                                   |
+| Convex                          | managed backend platform: database, functions, crons, file storage, auth                     |
+| Workers                         | Cloudflare's serverless edge runtime hosting the SSR frontend                                |
+| dvh                             | dynamic viewport height — `100dvh` accounts for mobile browser chrome appearing/disappearing |
+| Safe-area insets                | iOS/Android padding for notch, home indicator, and status bar                                |
+| M3                              | Material Design 3, Google's design language for Android                                      |
 
 ---
 
@@ -149,20 +151,20 @@ An **iterative, build-verify loop**: each feature was specified, implemented, br
 
 ### 4.2 Technology choices
 
-| Layer | Choice | Why |
-|---|---|---|
-| Language | TypeScript 5.8 (strict) | type-safe API from client to database |
-| Framework | TanStack Start 1.168 (SSR, file routes) | modern SSR, type-safe routing, fast nitro builds |
-| React | React 19 | ecosystem compatibility, concurrent features |
-| State/query | TanStack React Query 5 | caching, loading states, background refetch |
-| Backend | Convex 1.50 | integrated DB + functions + crons + storage + auth; no separate server to operate |
-| Auth | @convex-dev/auth 0.0.98 | email+password, JWTs, deployed to the same backend |
-| Styling | Tailwind CSS v4 | token-driven, `@utility` custom utilities, mobile-first |
-| Animation | Framer Motion 14 | page transitions, Android M3 pill indicator, More drawer |
-| Charts | Recharts 2 | dashboard trend and collection gauge |
-| Testing | Vitest 4 + Testing Library | fast unit tests, zero-network |
-| Bundler | Vite 8 / nitro 3 | fast dev loop, Cloudflare-compatible output |
-| Deploy | Cloudflare Workers (nitro `cloudflare-module`) | global edge, free tier, one-command deploys |
+| Layer       | Choice                                         | Why                                                                               |
+| ----------- | ---------------------------------------------- | --------------------------------------------------------------------------------- |
+| Language    | TypeScript 5.8 (strict)                        | type-safe API from client to database                                             |
+| Framework   | TanStack Start 1.168 (SSR, file routes)        | modern SSR, type-safe routing, fast nitro builds                                  |
+| React       | React 19                                       | ecosystem compatibility, concurrent features                                      |
+| State/query | TanStack React Query 5                         | caching, loading states, background refetch                                       |
+| Backend     | Convex 1.50                                    | integrated DB + functions + crons + storage + auth; no separate server to operate |
+| Auth        | @convex-dev/auth 0.0.98                        | email+password, JWTs, deployed to the same backend                                |
+| Styling     | Tailwind CSS v4                                | token-driven, `@utility` custom utilities, mobile-first                           |
+| Animation   | Framer Motion 14                               | page transitions, Android M3 pill indicator, More drawer                          |
+| Charts      | Recharts 2                                     | dashboard trend and collection gauge                                              |
+| Testing     | Vitest 4 + Testing Library                     | fast unit tests, zero-network                                                     |
+| Bundler     | Vite 8 / nitro 3                               | fast dev loop, Cloudflare-compatible output                                       |
+| Deploy      | Cloudflare Workers (nitro `cloudflare-module`) | global edge, free tier, one-command deploys                                       |
 
 ### 4.3 Requirements elicitation
 
@@ -183,166 +185,166 @@ Features were taken from real rental life, anchored in a single seeded demo case
 
 **Authentication & accounts**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-A1 | Sign up with email + password; form validates before submit | ✅ |
-| FR-A2 | Sign in; failed attempts show a friendly error | ✅ |
-| FR-A3 | Sign out; session cleared; full reload recreates the client | ✅ |
-| FR-A4 | Redirect to `/login` when unauthenticated; redirect `/` → `/login` both ways | ✅ |
-| FR-A5 | First account on a deployment becomes `admin`; subsequent accounts are `member` | ✅ |
-| FR-A6 | Forgot-password state honestly reports "not enabled yet" | ✅ |
+| ID    | Requirement                                                                     | Status |
+| ----- | ------------------------------------------------------------------------------- | ------ |
+| FR-A1 | Sign up with email + password; form validates before submit                     | ✅     |
+| FR-A2 | Sign in; failed attempts show a friendly error                                  | ✅     |
+| FR-A3 | Sign out; session cleared; full reload recreates the client                     | ✅     |
+| FR-A4 | Redirect to `/login` when unauthenticated; redirect `/` → `/login` both ways    | ✅     |
+| FR-A5 | First account on a deployment becomes `admin`; subsequent accounts are `member` | ✅     |
+| FR-A6 | Forgot-password state honestly reports "not enabled yet"                        | ✅     |
 
 **Dashboard (`/`)**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-D1 | Show collected this month, occupancy %, arrears, expected this month | ✅ |
-| FR-D2 | 6-month bar chart: invoiced vs collected | ✅ |
-| FR-D3 | Collection-rate gauge for the current month | ✅ |
-| FR-D4 | Recent payments (latest first) | ✅ |
-| FR-D5 | Open maintenance requests list | ✅ |
-| FR-D6 | Tenant announcements feed | ✅ |
-| FR-D7 | Quick actions: "Set up MoMo", "Add property", "Record payment" | ✅ |
-| FR-D8 | Landlord identity card: name, business, properties/units/tenants counts | ✅ |
-| FR-D9 | Mobile greeting hero with avatar initials (hidden on desktop) | ✅ |
+| ID    | Requirement                                                             | Status |
+| ----- | ----------------------------------------------------------------------- | ------ |
+| FR-D1 | Show collected this month, occupancy %, arrears, expected this month    | ✅     |
+| FR-D2 | 6-month bar chart: invoiced vs collected                                | ✅     |
+| FR-D3 | Collection-rate gauge for the current month                             | ✅     |
+| FR-D4 | Recent payments (latest first)                                          | ✅     |
+| FR-D5 | Open maintenance requests list                                          | ✅     |
+| FR-D6 | Tenant announcements feed                                               | ✅     |
+| FR-D7 | Quick actions: "Set up MoMo", "Add property", "Record payment"          | ✅     |
+| FR-D8 | Landlord identity card: name, business, properties/units/tenants counts | ✅     |
+| FR-D9 | Mobile greeting hero with avatar initials (hidden on desktop)           | ✅     |
 
 **Properties & units (`/properties`)**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-P1 | Create/edit/delete property (name, area, region, GhanaPost GPS) | ✅ |
-| FR-P2 | Add/edit units (label, bedrooms, rent) | ✅ |
-| FR-P3 | Occupancy KPIs per property and portfolio-wide | ✅ |
-| FR-P4 | Total rent roll per property | ✅ |
-| FR-P5 | Unit status: vacant / occupied / maintenance | ✅ |
+| ID    | Requirement                                                     | Status |
+| ----- | --------------------------------------------------------------- | ------ |
+| FR-P1 | Create/edit/delete property (name, area, region, GhanaPost GPS) | ✅     |
+| FR-P2 | Add/edit units (label, bedrooms, rent)                          | ✅     |
+| FR-P3 | Occupancy KPIs per property and portfolio-wide                  | ✅     |
+| FR-P4 | Total rent roll per property                                    | ✅     |
+| FR-P5 | Unit status: vacant / occupied / maintenance                    | ✅     |
 
 **Tenants (`/tenants`)**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-T1 | Register tenant with name, phone, email | ✅ |
-| FR-T2 | Optionally assign to a vacant unit | ✅ |
-| FR-T3 | Balance derived from unpaid invoices | ✅ |
-| FR-T4 | Archive without deleting financial history | ✅ |
+| ID    | Requirement                                | Status |
+| ----- | ------------------------------------------ | ------ |
+| FR-T1 | Register tenant with name, phone, email    | ✅     |
+| FR-T2 | Optionally assign to a vacant unit         | ✅     |
+| FR-T3 | Balance derived from unpaid invoices       | ✅     |
+| FR-T4 | Archive without deleting financial history | ✅     |
 
 **Leases (`/leases`)**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-L1 | Create lease: tenant + unit, start/end, rent, advance months, deposit | ✅ |
-| FR-L2 | Unit is offered only if vacant or already assigned to the same tenant | ✅ |
-| FR-L3 | Renew a lease — new end date must be strictly later than current | ✅ |
-| FR-L4 | End a lease — unit goes back to `vacant` | ✅ |
-| FR-L5 | End date after start date; positive pesewas rent; safe-integer validation | ✅ |
+| ID    | Requirement                                                               | Status |
+| ----- | ------------------------------------------------------------------------- | ------ |
+| FR-L1 | Create lease: tenant + unit, start/end, rent, advance months, deposit     | ✅     |
+| FR-L2 | Unit is offered only if vacant or already assigned to the same tenant     | ✅     |
+| FR-L3 | Renew a lease — new end date must be strictly later than current          | ✅     |
+| FR-L4 | End a lease — unit goes back to `vacant`                                  | ✅     |
+| FR-L5 | End date after start date; positive pesewas rent; safe-integer validation | ✅     |
 
 **Rent invoices (`/invoices`)**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-I1 | Create a draft invoice for a lease and period | ✅ |
-| FR-I2 | Send: `draft → sent` | ✅ |
-| FR-I3 | Prevent duplicate invoice for the same lease + period | ✅ |
-| FR-I4 | Cron `generateMonthly` creates draft invoices for active leases each month | ✅ |
-| FR-I5 | Cron `markOverdue` flips past-due `sent`/`partial` to `overdue` | ✅ |
-| FR-I6 | Cron `flagExpiring` flags leases ending within 60 days | ✅ |
+| ID    | Requirement                                                                | Status |
+| ----- | -------------------------------------------------------------------------- | ------ |
+| FR-I1 | Create a draft invoice for a lease and period                              | ✅     |
+| FR-I2 | Send: `draft → sent`                                                       | ✅     |
+| FR-I3 | Prevent duplicate invoice for the same lease + period                      | ✅     |
+| FR-I4 | Cron `generateMonthly` creates draft invoices for active leases each month | ✅     |
+| FR-I5 | Cron `markOverdue` flips past-due `sent`/`partial` to `overdue`            | ✅     |
+| FR-I6 | Cron `flagExpiring` flags leases ending within 60 days                     | ✅     |
 
 **Payments & receipts (`/payments`)**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-Y1 | Record payment: tenant, optional invoice, amount, method, reference | ✅ |
-| FR-Y2 | MoMo names: MTN, Telecel, AirtelTigo | ✅ |
-| FR-Y3 | Methods: MTN MoMo, Telecel Cash, AirtelTigo Money, bank, cash | ✅ |
-| FR-Y4 | Payment increases `invoice.paid`; sets `partial` or `paid`; `overdue` if past due | ✅ |
-| FR-Y5 | Payment rejected if it exceeds the invoice balance | ✅ |
-| FR-Y6 | Receipt number issued: `RCP-1001`… | ✅ |
-| FR-Y7 | Listing shows lifetime received + this month | ✅ |
+| ID    | Requirement                                                                       | Status |
+| ----- | --------------------------------------------------------------------------------- | ------ |
+| FR-Y1 | Record payment: tenant, optional invoice, amount, method, reference               | ✅     |
+| FR-Y2 | MoMo names: MTN, Telecel, AirtelTigo                                              | ✅     |
+| FR-Y3 | Methods: MTN MoMo, Telecel Cash, AirtelTigo Money, bank, cash                     | ✅     |
+| FR-Y4 | Payment increases `invoice.paid`; sets `partial` or `paid`; `overdue` if past due | ✅     |
+| FR-Y5 | Payment rejected if it exceeds the invoice balance                                | ✅     |
+| FR-Y6 | Receipt number issued: `RCP-1001`…                                                | ✅     |
+| FR-Y7 | Listing shows lifetime received + this month                                      | ✅     |
 
 **Maintenance (`/maintenance`)**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-M1 | Open a request: title, description, property, unit, priority, reported by | ✅ |
-| FR-M2 | Priority: low / medium / high | ✅ |
-| FR-M3 | Status workflow: open → in progress → resolved | ✅ |
-| FR-M4 | Unit is auto-disabled for whole-property requests | ✅ |
+| ID    | Requirement                                                               | Status |
+| ----- | ------------------------------------------------------------------------- | ------ |
+| FR-M1 | Open a request: title, description, property, unit, priority, reported by | ✅     |
+| FR-M2 | Priority: low / medium / high                                             | ✅     |
+| FR-M3 | Status workflow: open → in progress → resolved                            | ✅     |
+| FR-M4 | Unit is auto-disabled for whole-property requests                         | ✅     |
 
 **Announcements (`/announcements`)**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-N1 | Compose announcement with title, body, audience (all or one property) | ✅ |
-| FR-N2 | Choose channels: SMS / Email / WhatsApp | ✅ |
-| FR-N3 | Pin/unpin; delete | ✅ |
-| FR-N4 | Record channels and pinned state; no delivery provider wired yet (see §10) | ✅ |
+| ID    | Requirement                                                                | Status |
+| ----- | -------------------------------------------------------------------------- | ------ |
+| FR-N1 | Compose announcement with title, body, audience (all or one property)      | ✅     |
+| FR-N2 | Choose channels: SMS / Email / WhatsApp                                    | ✅     |
+| FR-N3 | Pin/unpin; delete                                                          | ✅     |
+| FR-N4 | Record channels and pinned state; no delivery provider wired yet (see §10) | ✅     |
 
 **Settings (`/settings`) — six tabs**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-S1 | Profile: avatar initials, first/last name, phone | ✅ |
-| FR-S2 | Business: name, region, currency (GHS read-only), rent due day (1–31), late fee % | ✅ |
-| FR-S3 | **Branding (admin-only):** live rename of app, tagline, accent colour (8 curated swatches + custom, 4.5:1 contrast enforced), logo upload to Convex storage | ✅ |
-| FR-S4 | Notifications: rent reminders (SMS), payment received (email), WhatsApp updates | ✅ |
-| FR-S5 | Payment methods: MoMo number + network, bank name + account | ✅ |
-| FR-S6 | Security: role badge, plan, currency, honest "password change unavailable" notice | ✅ |
+| ID    | Requirement                                                                                                                                                 | Status |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| FR-S1 | Profile: avatar initials, first/last name, phone                                                                                                            | ✅     |
+| FR-S2 | Business: name, region, currency (GHS read-only), rent due day (1–31), late fee %                                                                           | ✅     |
+| FR-S3 | **Branding (admin-only):** live rename of app, tagline, accent colour (8 curated swatches + custom, 4.5:1 contrast enforced), logo upload to Convex storage | ✅     |
+| FR-S4 | Notifications: rent reminders (SMS), payment received (email), WhatsApp updates                                                                             | ✅     |
+| FR-S5 | Payment methods: MoMo number + network, bank name + account                                                                                                 | ✅     |
+| FR-S6 | Security: role badge, plan, currency, honest "password change unavailable" notice                                                                           | ✅     |
 
 **Mobile experience**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-X4 | Mobile bottom tab bar (Home, Properties, Tenants, Payments + More drawer) with safe-area padding | ✅ |
-| FR-X5 | Fixed mobile top bar with back/logo/bell/avatar; iOS: centred title; Android: left-aligned | ✅ |
-| FR-X6 | iOS translucent tab bar (backdrop-filter blur/saturate) | ✅ |
-| FR-X7 | Android Material 3 animated pill indicator (Framer Motion `layoutId`) | ✅ |
-| FR-X8 | Page transition animations (Framer Motion `AnimatePresence`) | ✅ |
-| FR-X9 | Platform detection hook (`usePlatform`) stamps `data-platform` on `<html>` | ✅ |
-| FR-X10 | Android haptic feedback via `navigator.vibrate` | ✅ |
-| FR-X11 | Android Material 3 ripple on tab bar items | ✅ |
-| FR-X12 | iOS input zoom prevention (`md:text-sm` removed from Input component) | ✅ |
-| FR-X13 | Form grids collapse to single-column on mobile (`grid-cols-1 sm:grid-cols-2`) | ✅ |
-| FR-X14 | Keyboard offset via `window.visualViewport` so forms are not obscured | ✅ |
-| FR-X15 | Scrollable chip tab strip in Settings on mobile | ✅ |
-| FR-X16 | Sticky save-bar above safe-area inset on mobile settings forms | ✅ |
-| FR-X17 | Dark mode token set for both OS preference and manual toggle | ✅ |
-| FR-X18 | Dual `theme-color` meta (light/dark `prefers-color-scheme`) | ✅ |
+| ID     | Requirement                                                                                      | Status |
+| ------ | ------------------------------------------------------------------------------------------------ | ------ |
+| FR-X4  | Mobile bottom tab bar (Home, Properties, Tenants, Payments + More drawer) with safe-area padding | ✅     |
+| FR-X5  | Fixed mobile top bar with back/logo/bell/avatar; iOS: centred title; Android: left-aligned       | ✅     |
+| FR-X6  | iOS translucent tab bar (backdrop-filter blur/saturate)                                          | ✅     |
+| FR-X7  | Android Material 3 animated pill indicator (Framer Motion `layoutId`)                            | ✅     |
+| FR-X8  | Page transition animations (Framer Motion `AnimatePresence`)                                     | ✅     |
+| FR-X9  | Platform detection hook (`usePlatform`) stamps `data-platform` on `<html>`                       | ✅     |
+| FR-X10 | Android haptic feedback via `navigator.vibrate`                                                  | ✅     |
+| FR-X11 | Android Material 3 ripple on tab bar items                                                       | ✅     |
+| FR-X12 | iOS input zoom prevention (`md:text-sm` removed from Input component)                            | ✅     |
+| FR-X13 | Form grids collapse to single-column on mobile (`grid-cols-1 sm:grid-cols-2`)                    | ✅     |
+| FR-X14 | Keyboard offset via `window.visualViewport` so forms are not obscured                            | ✅     |
+| FR-X15 | Scrollable chip tab strip in Settings on mobile                                                  | ✅     |
+| FR-X16 | Sticky save-bar above safe-area inset on mobile settings forms                                   | ✅     |
+| FR-X17 | Dark mode token set for both OS preference and manual toggle                                     | ✅     |
+| FR-X18 | Dual `theme-color` meta (light/dark `prefers-color-scheme`)                                      | ✅     |
 
 **Cross-cutting**
 
-| ID | Requirement | Status |
-|---|---|---|
-| FR-XC1 | Every query/mutation derives the landlord from the session — never from client input | ✅ |
-| FR-XC2 | Settings errors and validation messages as pill banners (not border-left lines) | ✅ |
-| FR-XC3 | Empty states on every screen with icon + heading + hint (no dead ends) | ✅ |
-| FR-XC4 | 404 and error pages use `min-h-dvh` and contextual icons | ✅ |
-| FR-XC5 | Browser surfaces themed: `caret-color`, `::selection`, custom scrollbars | ✅ |
-| FR-XC6 | Staggered list entrance animation via `stagger-children` utility | ✅ |
+| ID     | Requirement                                                                          | Status |
+| ------ | ------------------------------------------------------------------------------------ | ------ |
+| FR-XC1 | Every query/mutation derives the landlord from the session — never from client input | ✅     |
+| FR-XC2 | Settings errors and validation messages as pill banners (not border-left lines)      | ✅     |
+| FR-XC3 | Empty states on every screen with icon + heading + hint (no dead ends)               | ✅     |
+| FR-XC4 | 404 and error pages use `min-h-dvh` and contextual icons                             | ✅     |
+| FR-XC5 | Browser surfaces themed: `caret-color`, `::selection`, custom scrollbars             | ✅     |
+| FR-XC6 | Staggered list entrance animation via `stagger-children` utility                     | ✅     |
 
 ### 5.2 Non-functional requirements
 
-| ID | Requirement | How it's met |
-|---|---|---|
-| NF-1 | **Correctness of money** | integer pesewas everywhere; display via `format.ts` only |
-| NF-2 | **Data integrity** | ownership checks on every patch/delete; no cross-landlord reads possible |
-| NF-3 | **Performance** | server-side aggregation for dashboards; skeleton loading states; `isMobile` XAxis interval reduction |
-| NF-4 | **Availability** | Convex managed DB (multi-region reads), Cloudflare edge SSR |
-| NF-5 | **Security** | password hashing by Convex Auth; JWT sessions server-side; `.env.*.local` gitignored; deploy keys never committed |
-| NF-6 | **Reliability** | sign-out triggers full page reload (module-level Convex client recreated) |
-| NF-7 | **Usability** | 44 px+ touch targets; `clamp()` font sizes; `tabular-nums` on all money; no horizontal overflow on 320 px |
-| NF-8 | **Portability** | npm-only pins; Node ≥ 22; no bun requirement |
-| NF-9 | **Maintainability** | TypeScript strict mode (0 errors), ESLint 0 errors, Prettier; design detector: 0 findings |
-| NF-10 | **Accessibility** | contrast-enforced accent swatches; `aria-current="page"` on nav; `aria-label` on icon buttons; `role="alert"` on error banners |
-| NF-11 | **Responsiveness** | `dvh` for full-height layouts; `overflow-x: hidden` on html/body; global `box-sizing: border-box`; `overflow-wrap: anywhere` on body |
+| ID    | Requirement              | How it's met                                                                                                                         |
+| ----- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| NF-1  | **Correctness of money** | integer pesewas everywhere; display via `format.ts` only                                                                             |
+| NF-2  | **Data integrity**       | ownership checks on every patch/delete; no cross-landlord reads possible                                                             |
+| NF-3  | **Performance**          | server-side aggregation for dashboards; skeleton loading states; `isMobile` XAxis interval reduction                                 |
+| NF-4  | **Availability**         | Convex managed DB (multi-region reads), Cloudflare edge SSR                                                                          |
+| NF-5  | **Security**             | password hashing by Convex Auth; JWT sessions server-side; `.env.*.local` gitignored; deploy keys never committed                    |
+| NF-6  | **Reliability**          | sign-out triggers full page reload (module-level Convex client recreated)                                                            |
+| NF-7  | **Usability**            | 44 px+ touch targets; `clamp()` font sizes; `tabular-nums` on all money; no horizontal overflow on 320 px                            |
+| NF-8  | **Portability**          | npm-only pins; Node ≥ 22; no bun requirement                                                                                         |
+| NF-9  | **Maintainability**      | TypeScript strict mode (0 errors), ESLint 0 errors, Prettier; design detector: 0 findings                                            |
+| NF-10 | **Accessibility**        | contrast-enforced accent swatches; `aria-current="page"` on nav; `aria-label` on icon buttons; `role="alert"` on error banners       |
+| NF-11 | **Responsiveness**       | `dvh` for full-height layouts; `overflow-x: hidden` on html/body; global `box-sizing: border-box`; `overflow-wrap: anywhere` on body |
 
 ### 5.3 User roles and permissions
 
-| Capability | Member | Admin |
-|---|---|---|
-| Sign in / out | ✅ | ✅ |
-| Own properties/units/tenants/leases/invoices/payments/maintenance/announcements/profile/business/payment-methods/notifications | ✅ | ✅ |
-| **Settings → Branding** (rename app, recolour, upload logo) | ❌ hidden & server-rejected | ✅ |
-| Role badge | Member | Admin |
-| First account on a deployment | becomes Admin | — |
+| Capability                                                                                                                     | Member                      | Admin |
+| ------------------------------------------------------------------------------------------------------------------------------ | --------------------------- | ----- |
+| Sign in / out                                                                                                                  | ✅                          | ✅    |
+| Own properties/units/tenants/leases/invoices/payments/maintenance/announcements/profile/business/payment-methods/notifications | ✅                          | ✅    |
+| **Settings → Branding** (rename app, recolour, upload logo)                                                                    | ❌ hidden & server-rejected | ✅    |
+| Role badge                                                                                                                     | Member                      | Admin |
+| First account on a deployment                                                                                                  | becomes Admin               | —     |
 
 ---
 
@@ -384,20 +386,20 @@ Features were taken from real rental life, anchored in a single seeded demo case
 
 ### 6.2 Data model
 
-| Table | Purpose | Key indexes |
-|---|---|---|
-| `users` (auth) | Convex-managed accounts | `email` |
-| `profiles` | 1:1 with users — identity, business, MoMo, plan, role | `by_user` |
-| `branding` | singleton — app name/tagline/accent/logo | — |
-| `properties` | name / area / region / GPS / photo | `by_landlord` |
-| `units` | label / bedrooms / rent (pesewas) / status | `by_landlord`, `by_property` |
-| `tenants` | name / phone / email / ghanaCard / rent-since / archived | `by_landlord`, `by_unit` |
-| `leases` | tenant+unit, start/end, rent, advance, deposit, status | `by_landlord`, `by_tenant`, `by_end` |
-| `invoices` | number, period, dueDate, amount, paid, status | `by_landlord`, `by_status`, `by_tenant` |
-| `payments` | receiptNo, method, reference, amount, paidAt | `by_landlord`, `by_tenant` |
-| `maintenance` | title / priority / status / cost | `by_landlord`, `by_status` |
-| `announcements` | title / body / pinned / channels / propertyId? | `by_landlord` |
-| `counters` | invoice/receipt numbering per landlord | `by_name` |
+| Table           | Purpose                                                  | Key indexes                             |
+| --------------- | -------------------------------------------------------- | --------------------------------------- |
+| `users` (auth)  | Convex-managed accounts                                  | `email`                                 |
+| `profiles`      | 1:1 with users — identity, business, MoMo, plan, role    | `by_user`                               |
+| `branding`      | singleton — app name/tagline/accent/logo                 | —                                       |
+| `properties`    | name / area / region / GPS / photo                       | `by_landlord`                           |
+| `units`         | label / bedrooms / rent (pesewas) / status               | `by_landlord`, `by_property`            |
+| `tenants`       | name / phone / email / ghanaCard / rent-since / archived | `by_landlord`, `by_unit`                |
+| `leases`        | tenant+unit, start/end, rent, advance, deposit, status   | `by_landlord`, `by_tenant`, `by_end`    |
+| `invoices`      | number, period, dueDate, amount, paid, status            | `by_landlord`, `by_status`, `by_tenant` |
+| `payments`      | receiptNo, method, reference, amount, paidAt             | `by_landlord`, `by_tenant`              |
+| `maintenance`   | title / priority / status / cost                         | `by_landlord`, `by_status`              |
+| `announcements` | title / body / pinned / channels / propertyId?           | `by_landlord`                           |
+| `counters`      | invoice/receipt numbering per landlord                   | `by_name`                               |
 
 Money: **integer pesewas** everywhere (`185000` = GH₵ 1,850.00). Dates: epoch milliseconds (`Date.UTC`).
 
@@ -457,34 +459,34 @@ The two `DEFAULT_BRANDING` copies (server `convex/branding.ts`, client `src/lib/
 
 ### 6.7 API surface summary
 
-| Module | Exports |
-|---|---|
-| `profiles.ts` | `me` · `update` |
-| `dashboard.ts` | `summary` · `monthly` |
-| `properties.ts` | `list` · `create` · `update` · `remove` · `addUnit` · `updateUnit` |
-| `tenants.ts` | `list` · `create` · `update` · `archive` |
-| `leases.ts` | `list` · `create` · `renew` · `end` · `flagExpiring` (internal) |
-| `invoices.ts` | `list` · `create` · `send` · `generateMonthly` (internal) · `markOverdue` (internal) |
-| `payments.ts` | `list` · `record` |
-| `maintenance.ts` | `list` · `create` · `updateStatus` |
-| `announcements.ts` | `list` · `create` · `togglePin` · `remove` |
-| `branding.ts` | `get` · `update` · `DEFAULT_BRANDING` |
-| `files.ts` | `generateUploadUrl` |
-| `migration.ts` | `backfillAdmin` · `setAdmin` · `renameDefaultBrand` · `deleteDraftInvoiceByNumber` · `adoptLandlordData` |
+| Module             | Exports                                                                                                  |
+| ------------------ | -------------------------------------------------------------------------------------------------------- |
+| `profiles.ts`      | `me` · `update`                                                                                          |
+| `dashboard.ts`     | `summary` · `monthly`                                                                                    |
+| `properties.ts`    | `list` · `create` · `update` · `remove` · `addUnit` · `updateUnit`                                       |
+| `tenants.ts`       | `list` · `create` · `update` · `archive`                                                                 |
+| `leases.ts`        | `list` · `create` · `renew` · `end` · `flagExpiring` (internal)                                          |
+| `invoices.ts`      | `list` · `create` · `send` · `generateMonthly` (internal) · `markOverdue` (internal)                     |
+| `payments.ts`      | `list` · `record`                                                                                        |
+| `maintenance.ts`   | `list` · `create` · `updateStatus`                                                                       |
+| `announcements.ts` | `list` · `create` · `togglePin` · `remove`                                                               |
+| `branding.ts`      | `get` · `update` · `DEFAULT_BRANDING`                                                                    |
+| `files.ts`         | `generateUploadUrl`                                                                                      |
+| `migration.ts`     | `backfillAdmin` · `setAdmin` · `renameDefaultBrand` · `deleteDraftInvoiceByNumber` · `adoptLandlordData` |
 
 ### 6.8 Server-side invariants
 
-| Invariant | Enforced in |
-|---|---|
-| End date after start date | `leases.ts` |
-| Rent ≥ 1 pesewa | `Number.isSafeInteger` checks in leases & invoices |
-| A unit assigned to a tenant must stay consistent | `leases.create` |
-| Cannot invoice a draft or inactive lease | frontend flow + `invoices.create` guard |
-| Reject duplicate invoice (lease + period) | `invoices.create` queries by `leaseId+period` first |
-| Cannot pay more than invoice outstanding | `payments.record` |
-| Cannot double-assign same unit to two tenants | `leases.create` + unit dropdown filter |
-| `plan` & `currency` unchangeable by client | omitted from `profiles.update` allowlist |
-| Admin-only branding | `branding.update` → `requireAdmin` |
+| Invariant                                        | Enforced in                                         |
+| ------------------------------------------------ | --------------------------------------------------- |
+| End date after start date                        | `leases.ts`                                         |
+| Rent ≥ 1 pesewa                                  | `Number.isSafeInteger` checks in leases & invoices  |
+| A unit assigned to a tenant must stay consistent | `leases.create`                                     |
+| Cannot invoice a draft or inactive lease         | frontend flow + `invoices.create` guard             |
+| Reject duplicate invoice (lease + period)        | `invoices.create` queries by `leaseId+period` first |
+| Cannot pay more than invoice outstanding         | `payments.record`                                   |
+| Cannot double-assign same unit to two tenants    | `leases.create` + unit dropdown filter              |
+| `plan` & `currency` unchangeable by client       | omitted from `profiles.update` allowlist            |
+| Admin-only branding                              | `branding.update` → `requireAdmin`                  |
 
 ---
 
@@ -509,37 +511,37 @@ public/                   # favicon.svg, manifest.webmanifest, icons, robots.txt
 
 ### 7.2 Key new files (mobile overhaul, November 2026)
 
-| File | Purpose |
-|---|---|
-| `src/hooks/use-platform.ts` | iOS/Android/other detection; stamps `data-platform` on `<html>`; module-level cache |
-| `src/hooks/use-ripple.ts` | Android Material 3 ripple — injects a DOM `span.ripple-wave` on `mousedown`/`touchstart` |
-| `src/lib/haptics.ts` | Wraps `navigator.vibrate` for Android tap (8 ms) and medium (12-8-12 ms) feedback |
-| `MOBILE_AUDIT.md` | Phase-0 audit findings that drove the mobile overhaul |
+| File                        | Purpose                                                                                  |
+| --------------------------- | ---------------------------------------------------------------------------------------- |
+| `src/hooks/use-platform.ts` | iOS/Android/other detection; stamps `data-platform` on `<html>`; module-level cache      |
+| `src/hooks/use-ripple.ts`   | Android Material 3 ripple — injects a DOM `span.ripple-wave` on `mousedown`/`touchstart` |
+| `src/lib/haptics.ts`        | Wraps `navigator.vibrate` for Android tap (8 ms) and medium (12-8-12 ms) feedback        |
+| `MOBILE_AUDIT.md`           | Phase-0 audit findings that drove the mobile overhaul                                    |
 
 ### 7.3 Notable bugs found and fixed
 
-| # | Defect | Impact | Fix |
-|---|---|---|---|
-| 1 | `Button` in `AppShell` missed `onClick` | "New…" actions silently did nothing | widen `React.ComponentProps<"button">` |
-| 2 | `Card` required children | 9 skeleton sites failed typecheck | `children?: ReactNode` |
-| 3 | `AppShell` API import path wrong | typecheck broken before it ran | correct relative path |
-| 4 | `profiles.ts` index signature access | type error under strict mode | use bracket notation |
-| 5 | `.prettierrc` `endOfLine: lf` vs CRLF checkout | 5,380 false-positive lint errors | `endOfLine: auto` |
-| 6 | `document.title.replace` + `MutationObserver` without guards | infinite mutation loop — tab froze | compute-and-compare guard + cleanup in effect |
-| 7 | `pesewasFromCedi("1,600")` → NaN | thousands-separated placeholder rejected | strip commas/whitespace/prefix first |
-| 8 | `invoices.create` allowed same period twice | duplicate INV rows | query by `leaseId+period` before insert |
-| 9 | `leases.create` unit filter ignored assigned state | lease impossible after tenant created with unit | filter to vacant OR same-tenant units; server-side check |
-| 10 | `signOut` + client-side navigate left Convex client wedged | sign-out/in cycles froze tab | hard `window.location.assign` reload |
-| 11 | `afterUserCreatedOrUpdated` used anonymous type | typecheck blocked | `.filter()` by field |
-| 12 | `exactOptionalPropertyTypes: true` broke optional-args idiom | 17 call sites failed | set `false`, documented |
-| 13 | `whitespace-nowrap` on KPI currency amounts | horizontal overflow at 320 px | removed; replaced with `clamp()` font sizes |
-| 14 | `grid-cols-2` in Drawer forms at 320 px | columns too narrow to read | `grid-cols-1 sm:grid-cols-2` on all four form-pair grids |
-| 15 | `md:text-sm` on `Input` component | iOS zooms in on focus | removed; `text-base` throughout |
-| 16 | Recharts SVG escaping container on narrow viewports | chart overflow | `overflow-hidden` wrapper on chart div |
-| 17 | Decorative hard-coded sparkline bars in KPI card | banned pattern — data not from real source | replaced with contextual icon |
-| 18 | `border-l-4 border-primary` on payment list items | banned side-tab accent strip | removed; plain row layout |
-| 19 | `border-l-2` colored left-border on all error/status messages | banned pattern across 6 files | replaced with pill banner using soft-tinted background tokens |
-| 20 | Eyebrow kicker above auth page h1 (`text-xs uppercase`) | banned kicker/eyebrow pattern | removed; tagline moved to aside caption |
+| #   | Defect                                                        | Impact                                          | Fix                                                           |
+| --- | ------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------- |
+| 1   | `Button` in `AppShell` missed `onClick`                       | "New…" actions silently did nothing             | widen `React.ComponentProps<"button">`                        |
+| 2   | `Card` required children                                      | 9 skeleton sites failed typecheck               | `children?: ReactNode`                                        |
+| 3   | `AppShell` API import path wrong                              | typecheck broken before it ran                  | correct relative path                                         |
+| 4   | `profiles.ts` index signature access                          | type error under strict mode                    | use bracket notation                                          |
+| 5   | `.prettierrc` `endOfLine: lf` vs CRLF checkout                | 5,380 false-positive lint errors                | `endOfLine: auto`                                             |
+| 6   | `document.title.replace` + `MutationObserver` without guards  | infinite mutation loop — tab froze              | compute-and-compare guard + cleanup in effect                 |
+| 7   | `pesewasFromCedi("1,600")` → NaN                              | thousands-separated placeholder rejected        | strip commas/whitespace/prefix first                          |
+| 8   | `invoices.create` allowed same period twice                   | duplicate INV rows                              | query by `leaseId+period` before insert                       |
+| 9   | `leases.create` unit filter ignored assigned state            | lease impossible after tenant created with unit | filter to vacant OR same-tenant units; server-side check      |
+| 10  | `signOut` + client-side navigate left Convex client wedged    | sign-out/in cycles froze tab                    | hard `window.location.assign` reload                          |
+| 11  | `afterUserCreatedOrUpdated` used anonymous type               | typecheck blocked                               | `.filter()` by field                                          |
+| 12  | `exactOptionalPropertyTypes: true` broke optional-args idiom  | 17 call sites failed                            | set `false`, documented                                       |
+| 13  | `whitespace-nowrap` on KPI currency amounts                   | horizontal overflow at 320 px                   | removed; replaced with `clamp()` font sizes                   |
+| 14  | `grid-cols-2` in Drawer forms at 320 px                       | columns too narrow to read                      | `grid-cols-1 sm:grid-cols-2` on all four form-pair grids      |
+| 15  | `md:text-sm` on `Input` component                             | iOS zooms in on focus                           | removed; `text-base` throughout                               |
+| 16  | Recharts SVG escaping container on narrow viewports           | chart overflow                                  | `overflow-hidden` wrapper on chart div                        |
+| 17  | Decorative hard-coded sparkline bars in KPI card              | banned pattern — data not from real source      | replaced with contextual icon                                 |
+| 18  | `border-l-4 border-primary` on payment list items             | banned side-tab accent strip                    | removed; plain row layout                                     |
+| 19  | `border-l-2` colored left-border on all error/status messages | banned pattern across 6 files                   | replaced with pill banner using soft-tinted background tokens |
+| 20  | Eyebrow kicker above auth page h1 (`text-xs uppercase`)       | banned kicker/eyebrow pattern                   | removed; tagline moved to aside caption                       |
 
 ### 7.4 What is intentionally not implemented
 
@@ -560,28 +562,28 @@ Test Files  4 passed (4)
   Duration  5.49s
 ```
 
-| File | Coverage |
-|---|---|
-| `src/test/branding.test.ts` | DEFAULT_BRANDING shape, hex validation (3/8-char), contrast ≥ 4.5, `isUsableAccent` |
-| `src/test/format.test.ts` | `pesewasFromCedi` (plain, thousands-separated, GHS-prefixed), `friendlyError` (Convex error unwrap, plain passthrough, fallback) |
-| `src/test/auth-validation.test.ts` | email/password strength, match/confirm |
-| `src/test/app-routing.test.tsx` | root route renders without crash |
+| File                               | Coverage                                                                                                                         |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `src/test/branding.test.ts`        | DEFAULT_BRANDING shape, hex validation (3/8-char), contrast ≥ 4.5, `isUsableAccent`                                              |
+| `src/test/format.test.ts`          | `pesewasFromCedi` (plain, thousands-separated, GHS-prefixed), `friendlyError` (Convex error unwrap, plain passthrough, fallback) |
+| `src/test/auth-validation.test.ts` | email/password strength, match/confirm                                                                                           |
+| `src/test/app-routing.test.tsx`    | root route renders without crash                                                                                                 |
 
 ### 8.2 End-to-end browser verification (scripted, 2026-11-14)
 
 49 scripted actions, 0 console errors throughout.
 
-| # | Flow | Result |
-|---|---|---|
-| 1 | Prod: sign-up → profile created, first account = admin | ✅ Admin role confirmed |
-| 2 | Prop → 2 units → tenant Kwame Asante → lease → invoice INV-1001 | ✅ all created |
-| 3 | Payment RCP-1001 → invoice flips to `paid`, rate 100% | ✅ |
-| 4 | Cross-tenant: Ama sees zero of Kojo's data | ✅ isolation holds |
-| 5 | Branding: change accent to #2563EB → favicon/title/all accents re-skin | ✅ |
-| 6 | Reset to defaults → all reverts cleanly | ✅ |
-| 7 | Non-admin: Branding tab hidden; direct mutation throws | ✅ |
-| 8 | Sign-out → full reload → sign in → dashboard hydrates | ✅ |
-| 9 | 404 route renders branded "Page not found" | ✅ |
+| #   | Flow                                                                   | Result                  |
+| --- | ---------------------------------------------------------------------- | ----------------------- |
+| 1   | Prod: sign-up → profile created, first account = admin                 | ✅ Admin role confirmed |
+| 2   | Prop → 2 units → tenant Kwame Asante → lease → invoice INV-1001        | ✅ all created          |
+| 3   | Payment RCP-1001 → invoice flips to `paid`, rate 100%                  | ✅                      |
+| 4   | Cross-tenant: Ama sees zero of Kojo's data                             | ✅ isolation holds      |
+| 5   | Branding: change accent to #2563EB → favicon/title/all accents re-skin | ✅                      |
+| 6   | Reset to defaults → all reverts cleanly                                | ✅                      |
+| 7   | Non-admin: Branding tab hidden; direct mutation throws                 | ✅                      |
+| 8   | Sign-out → full reload → sign in → dashboard hydrates                  | ✅                      |
+| 9   | 404 route renders branded "Page not found"                             | ✅                      |
 
 ### 8.3 Design system audit (automated detector, post-sweep)
 
@@ -592,6 +594,7 @@ Findings: []   (0 issues)
 ```
 
 Previously identified violations that were fixed before this result:
+
 - `border-l-4 border-primary` side-tab accent (payment list)
 - `border-l-2` colored left-borders (all error/status message locations — 6 files)
 - Decorative sparkline bars with hard-coded data (Dashboard KPI card)
@@ -629,10 +632,10 @@ Previously identified violations that were fixed before this result:
 
 ### 9.1 Environments
 
-| Env | Frontend | Backend (Convex) | Seeded data |
-|---|---|---|---|
-| local dev | localhost:8081 (`npm run dev`) | `dev:adorable-pig-437` | 1 admin + 1 member, partial dataset |
-| production | https://final-year-rent-project.edimamfaidol.workers.dev | `prod:usable-penguin-827` | 1 admin + minimal demo set |
+| Env        | Frontend                                                 | Backend (Convex)          | Seeded data                         |
+| ---------- | -------------------------------------------------------- | ------------------------- | ----------------------------------- |
+| local dev  | localhost:8081 (`npm run dev`)                           | `dev:adorable-pig-437`    | 1 admin + 1 member, partial dataset |
+| production | https://final-year-rent-project.edimamfaidol.workers.dev | `prod:usable-penguin-827` | 1 admin + minimal demo set          |
 
 ### 9.2 Release process
 
@@ -653,13 +656,13 @@ npx convex run branding:get --env-file .env.production.local
 
 ### 9.3 Operator migrations
 
-| Command | Purpose |
-|---|---|
-| `npx convex run migration:backfillAdmin --env-file .env.local` | promote earliest profile if none is admin |
-| `npx convex run migration:setAdmin '{"email":"you@example.com"}'` | force-set the single admin by email |
+| Command                                                                        | Purpose                                     |
+| ------------------------------------------------------------------------------ | ------------------------------------------- |
+| `npx convex run migration:backfillAdmin --env-file .env.local`                 | promote earliest profile if none is admin   |
+| `npx convex run migration:setAdmin '{"email":"you@example.com"}'`              | force-set the single admin by email         |
 | `npx convex run migration:adoptLandlordData '{"fromEmail":"…","toEmail":"…"}'` | move all dataset ownership between accounts |
-| `npx convex run migration:renameDefaultBrand` | one-time rename of the default brand |
-| `npx convex run migration:deleteDraftInvoiceByNumber '{"number":"INV-1002"}'` | operator cleanup of draft duplicates |
+| `npx convex run migration:renameDefaultBrand`                                  | one-time rename of the default brand        |
+| `npx convex run migration:deleteDraftInvoiceByNumber '{"number":"INV-1002"}'`  | operator cleanup of draft duplicates        |
 
 ### 9.4 Live URLs
 
@@ -672,18 +675,18 @@ npx convex run branding:get --env-file .env.production.local
 
 ## 10. Limitations and future work
 
-| # | Limitation | Remediation |
-|---|---|---|
-| 1 | No actual SMS/WhatsApp/email delivery | wire Arkesel/mNotify for outbound; `channels` already recorded |
-| 2 | No MoMo collection webhooks | Paystack/Hubtel webhook → verify signature → `payments.record` |
-| 3 | No password reset | Resend OTP email flow (documented in `docs/CONVEX_MIGRATION.md`) |
-| 4 | Single-landlord deploy | keep two Convex deployments for demo/prod |
-| 5 | Seed data is a demo, not production-grade tenants | export-import flow for real onboarding |
-| 6 | No offline mode | Convex caches recent queries; cache-first-then-sync would extend this |
-| 7 | No audit log | add `auditEvents` table for financial mutations |
-| 8 | No unit/e2e suite in CI | add GitHub Actions: `npm ci && npm run build && npm test` |
-| 9 | No screenshot regression suite | add Playwright visual snapshots against the live URL |
-| 10 | Demo admin password is known | change via `migration:setAdmin` before or after submission |
+| #   | Limitation                                        | Remediation                                                           |
+| --- | ------------------------------------------------- | --------------------------------------------------------------------- |
+| 1   | No actual SMS/WhatsApp/email delivery             | wire Arkesel/mNotify for outbound; `channels` already recorded        |
+| 2   | No MoMo collection webhooks                       | Paystack/Hubtel webhook → verify signature → `payments.record`        |
+| 3   | No password reset                                 | Resend OTP email flow (documented in `docs/CONVEX_MIGRATION.md`)      |
+| 4   | Single-landlord deploy                            | keep two Convex deployments for demo/prod                             |
+| 5   | Seed data is a demo, not production-grade tenants | export-import flow for real onboarding                                |
+| 6   | No offline mode                                   | Convex caches recent queries; cache-first-then-sync would extend this |
+| 7   | No audit log                                      | add `auditEvents` table for financial mutations                       |
+| 8   | No unit/e2e suite in CI                           | add GitHub Actions: `npm ci && npm run build && npm test`             |
+| 9   | No screenshot regression suite                    | add Playwright visual snapshots against the live URL                  |
+| 10  | Demo admin password is known                      | change via `migration:setAdmin` before or after submission            |
 
 ---
 
@@ -699,29 +702,32 @@ For a final-year project, that is what completion looks like.
 
 ## 12. References
 
-- Convex Documentation, *Introduction to Convex*, convex.dev/docs
-- TanStack, *TanStack Start*, tanstack.com/start/v1/docs
-- Cloudflare Workers, *Cloudflare Workers*, workers.cloudflare.com/learn
+- Convex Documentation, _Introduction to Convex_, convex.dev/docs
+- TanStack, _TanStack Start_, tanstack.com/start/v1/docs
+- Cloudflare Workers, _Cloudflare Workers_, workers.cloudflare.com/learn
 - Tailwind CSS v4, tailwindcss.com
-- Framer Motion, *Motion for React*, motion.dev
-- Recharts, *Recharts documentation*, recharts.org
-- Akan Adinkra symbolism — *Sankofa*, Ghana Museums and Monuments Board
-- Material Design 3, *Design system for Android*, m3.material.io
-- Apple Human Interface Guidelines, *iOS Navigation*, developer.apple.com/design
-- WebAIM, *Contrast Checker*, webaim.org/resources/contrastchecker
-- Ghana Revenue Service, *Ghana cedi*, 2026
+- Framer Motion, _Motion for React_, motion.dev
+- Recharts, _Recharts documentation_, recharts.org
+- Akan Adinkra symbolism — _Sankofa_, Ghana Museums and Monuments Board
+- Material Design 3, _Design system for Android_, m3.material.io
+- Apple Human Interface Guidelines, _iOS Navigation_, developer.apple.com/design
+- WebAIM, _Contrast Checker_, webaim.org/resources/contrastchecker
+- Ghana Revenue Service, _Ghana cedi_, 2026
 
 ---
 
 ## 13. Appendix A — Screenshots
 
 ### A.1 Sign-in (custom courtyard imagery, auth layout)
+
 ![Sign in](assets/login.jpeg)
 
 ### A.2 Dashboard (seeded demo data, 50% occupancy)
+
 ![Dashboard](assets/dashboard.jpeg)
 
 ### A.3 Settings → Branding (admin-only live rebranding)
+
 ![Branding](assets/branding.jpeg)
 
 ---
@@ -747,21 +753,21 @@ public/                 favicon.svg, manifest.webmanifest, icons/, robots.txt
 
 ## 15. Appendix C — Route map
 
-| Route | Screen | Signed-in required |
-|---|---|---|
-| `/login` | Sign in | ❌ |
-| `/signup` | Create account | ❌ |
-| `/forgot-password` | Honest not-enabled state | ❌ |
-| `/` | Dashboard | ✅ |
-| `/properties` | Properties & units | ✅ |
-| `/tenants` | Tenants | ✅ |
-| `/leases` | Leases | ✅ |
-| `/invoices` | Rent invoices | ✅ |
-| `/payments` | Payments & receipts | ✅ |
-| `/maintenance` | Maintenance requests | ✅ |
-| `/announcements` | Announcements | ✅ |
-| `/settings` | Profile · Business · Branding · Notifications · Payment methods · Security | ✅ |
-| `*` | 404 — branded not-found page | ❌ |
+| Route              | Screen                                                                     | Signed-in required |
+| ------------------ | -------------------------------------------------------------------------- | ------------------ |
+| `/login`           | Sign in                                                                    | ❌                 |
+| `/signup`          | Create account                                                             | ❌                 |
+| `/forgot-password` | Honest not-enabled state                                                   | ❌                 |
+| `/`                | Dashboard                                                                  | ✅                 |
+| `/properties`      | Properties & units                                                         | ✅                 |
+| `/tenants`         | Tenants                                                                    | ✅                 |
+| `/leases`          | Leases                                                                     | ✅                 |
+| `/invoices`        | Rent invoices                                                              | ✅                 |
+| `/payments`        | Payments & receipts                                                        | ✅                 |
+| `/maintenance`     | Maintenance requests                                                       | ✅                 |
+| `/announcements`   | Announcements                                                              | ✅                 |
+| `/settings`        | Profile · Business · Branding · Notifications · Payment methods · Security | ✅                 |
+| `*`                | 404 — branded not-found page                                               | ❌                 |
 
 ---
 
@@ -781,6 +787,7 @@ See §6.7. All functions are exported from their respective module files in `con
 ```
 
 Coverage includes:
+
 - `pesewasFromCedi` — 6 input cases (plain, thousands-separated, GHS-prefixed, GH₵-prefixed, with whitespace, with commas)
 - `friendlyError` — Convex error wrapper unwrap, plain string passthrough, fallback string
 - `isUsableAccent` / contrast — WCAG 4.5:1 required; curated swatches verified
@@ -800,18 +807,18 @@ repo         github.com/BRIGHTEDUFUL/sankofa-rent
 
 **Key dependencies (production build):**
 
-| Package | Version | Role |
-|---|---|---|
-| react | 19.2.0 | UI framework |
-| @tanstack/start | 1.168.x | SSR router/framework |
-| convex | 1.50.0 | Backend platform |
-| @convex-dev/auth | 0.0.98 | Email + password auth |
-| tailwindcss | 4.x | Styling |
-| framer-motion | 14.14.0 | Animations (page transitions, M3 pill, More drawer) |
-| recharts | 2.x | Dashboard bar chart |
-| lucide-react | 0.575.0 | Icon library |
-| date-fns | 4.1.0 | Date formatting |
+| Package          | Version | Role                                                |
+| ---------------- | ------- | --------------------------------------------------- |
+| react            | 19.2.0  | UI framework                                        |
+| @tanstack/start  | 1.168.x | SSR router/framework                                |
+| convex           | 1.50.0  | Backend platform                                    |
+| @convex-dev/auth | 0.0.98  | Email + password auth                               |
+| tailwindcss      | 4.x     | Styling                                             |
+| framer-motion    | 14.14.0 | Animations (page transitions, M3 pill, More drawer) |
+| recharts         | 2.x     | Dashboard bar chart                                 |
+| lucide-react     | 0.575.0 | Icon library                                        |
+| date-fns         | 4.1.0   | Date formatting                                     |
 
 ---
 
-*Sankofa Rent — Ghana, 2026. Authored by Edith Nonnon.*
+_Sankofa Rent — Ghana, 2026. Authored by Edith Nonnon._

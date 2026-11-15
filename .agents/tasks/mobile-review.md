@@ -65,27 +65,27 @@ sm:static sm:bg-transparent sm:backdrop-filter-none sm:border-0 sm:pt-0 sm:pb-0
 <details>
 <summary>File map</summary>
 
-| File | What changed |
-|---|---|
-| `MOBILE_AUDIT.md` | New — phase-0 audit findings document |
-| `package.json` / `package-lock.json` | Added `framer-motion ^14.14.0` |
-| `src/styles.css` | Added safe-area vars, global box-sizing reset, `dvh`/`hide-scrollbar`/`pb-nav`/`sticky-save-bar` utilities, system-font rule, iOS blur and Android M3 CSS, dark mode tokens |
-| `src/hooks/use-platform.ts` | New — iOS/Android/other detection with `data-platform` stamp |
-| `src/hooks/use-ripple.ts` | New — Android M3 DOM ripple injection |
-| `src/lib/haptics.ts` | New — `navigator.vibrate` wrappers for Android tap feedback |
-| `src/routes/__root.tsx` | `usePlatform()` call added; dual `theme-color` meta (light/dark) |
-| `src/components/app/AppShell.tsx` | Full mobile shell: `MobileTopBar`, `BottomTabBar` with More drawer, `DESKTOP_NAV` split, page-transition `AnimatePresence`, keyboard-offset `visualViewport` listener |
-| `src/components/app/DataPage.tsx` | Mobile card grid `grid-cols-1 min-[420px]:grid-cols-2`, `overflow-wrap:anywhere` on `dd`, `tabular-nums` on stats |
-| `src/components/auth/AuthLayout.tsx` | `min-h-svh` → `min-h-dvh`, `truncate` on brand name |
-| `src/components/ui/input.tsx` | Removed `md:text-sm` to prevent iOS input zoom |
-| `src/routes/index.tsx` | Mobile greeting hero, `clamp` font sizes on KPIs, `overflow-hidden` chart container, `useIsMobile` for XAxis interval |
-| `src/routes/invoices.tsx` | `grid-cols-2` → `grid-cols-1 sm:grid-cols-2` on date/period pair |
-| `src/routes/payments.tsx` | Same grid fix for amount/date pair |
-| `src/routes/maintenance.tsx` | Same grid fix for unit/property pair |
-| `src/routes/leases.tsx` | Same grid fix on two date pairs |
-| `src/routes/settings.tsx` | Scrollable chip tab row (`hide-scrollbar`), `sticky-save-bar` on all four save button rows |
-| `src/routes/properties.tsx` | `h-10 sm:h-8` on action buttons, `h-8` unit badges |
-| `src/routes/announcements.tsx` | `h-10 sm:h-8` on action buttons, `line-clamp-3` on body, `text-base` on textarea |
+| File                                 | What changed                                                                                                                                                                |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `MOBILE_AUDIT.md`                    | New — phase-0 audit findings document                                                                                                                                       |
+| `package.json` / `package-lock.json` | Added `framer-motion ^14.14.0`                                                                                                                                              |
+| `src/styles.css`                     | Added safe-area vars, global box-sizing reset, `dvh`/`hide-scrollbar`/`pb-nav`/`sticky-save-bar` utilities, system-font rule, iOS blur and Android M3 CSS, dark mode tokens |
+| `src/hooks/use-platform.ts`          | New — iOS/Android/other detection with `data-platform` stamp                                                                                                                |
+| `src/hooks/use-ripple.ts`            | New — Android M3 DOM ripple injection                                                                                                                                       |
+| `src/lib/haptics.ts`                 | New — `navigator.vibrate` wrappers for Android tap feedback                                                                                                                 |
+| `src/routes/__root.tsx`              | `usePlatform()` call added; dual `theme-color` meta (light/dark)                                                                                                            |
+| `src/components/app/AppShell.tsx`    | Full mobile shell: `MobileTopBar`, `BottomTabBar` with More drawer, `DESKTOP_NAV` split, page-transition `AnimatePresence`, keyboard-offset `visualViewport` listener       |
+| `src/components/app/DataPage.tsx`    | Mobile card grid `grid-cols-1 min-[420px]:grid-cols-2`, `overflow-wrap:anywhere` on `dd`, `tabular-nums` on stats                                                           |
+| `src/components/auth/AuthLayout.tsx` | `min-h-svh` → `min-h-dvh`, `truncate` on brand name                                                                                                                         |
+| `src/components/ui/input.tsx`        | Removed `md:text-sm` to prevent iOS input zoom                                                                                                                              |
+| `src/routes/index.tsx`               | Mobile greeting hero, `clamp` font sizes on KPIs, `overflow-hidden` chart container, `useIsMobile` for XAxis interval                                                       |
+| `src/routes/invoices.tsx`            | `grid-cols-2` → `grid-cols-1 sm:grid-cols-2` on date/period pair                                                                                                            |
+| `src/routes/payments.tsx`            | Same grid fix for amount/date pair                                                                                                                                          |
+| `src/routes/maintenance.tsx`         | Same grid fix for unit/property pair                                                                                                                                        |
+| `src/routes/leases.tsx`              | Same grid fix on two date pairs                                                                                                                                             |
+| `src/routes/settings.tsx`            | Scrollable chip tab row (`hide-scrollbar`), `sticky-save-bar` on all four save button rows                                                                                  |
+| `src/routes/properties.tsx`          | `h-10 sm:h-8` on action buttons, `h-8` unit badges                                                                                                                          |
+| `src/routes/announcements.tsx`       | `h-10 sm:h-8` on action buttons, `line-clamp-3` on body, `text-base` on textarea                                                                                            |
 
 Full diff: `git diff origin/main`
 
