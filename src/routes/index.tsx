@@ -102,12 +102,12 @@ function Dashboard() {
       </div>
 
       {/* KPI: Collected this month */}
-      <Card className="!p-4 flex items-center justify-between sm:!p-6">
-        <div className="min-w-0">
+      <Card className="!p-4 flex items-center gap-2 sm:!p-6">
+        <div className="flex-1 min-w-0 overflow-hidden">
           <p className="text-xs text-muted-foreground sm:text-sm">Collected</p>
           <p
-            className="mt-1 font-semibold tabular-nums whitespace-nowrap"
-            style={{ fontSize: "clamp(0.95rem, 4.2vw, 1.5rem)" }}
+            className="mt-1 font-semibold tabular-nums truncate"
+            style={{ fontSize: "clamp(0.9rem, 3.8vw, 1.5rem)" }}
           >
             {cediFromPesewas(summary.collectedThisMonth)}
           </p>
@@ -118,12 +118,12 @@ function Dashboard() {
       </Card>
 
       {/* KPI: Occupancy */}
-      <Card className="flex items-center justify-between !p-4 sm:!p-6">
-        <div className="min-w-0">
+      <Card className="flex items-center gap-2 !p-4 sm:!p-6">
+        <div className="flex-1 min-w-0 overflow-hidden">
           <p className="text-xs text-muted-foreground sm:text-sm">Occupancy</p>
           <p
-            className="mt-1 font-semibold tabular-nums"
-            style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
+            className="mt-1 font-semibold tabular-nums truncate"
+            style={{ fontSize: "clamp(0.9rem, 3.8vw, 1.5rem)" }}
           >
             {summary.occupancyPercent}%
           </p>
@@ -134,12 +134,12 @@ function Dashboard() {
       </Card>
 
       {/* KPI: Arrears */}
-      <Card className="flex items-center justify-between !p-4 sm:!p-6">
-        <div className="min-w-0">
+      <Card className="flex items-center gap-2 !p-4 sm:!p-6">
+        <div className="flex-1 min-w-0 overflow-hidden">
           <p className="text-xs text-muted-foreground sm:text-sm">Arrears</p>
           <p
-            className="mt-1 font-semibold tabular-nums"
-            style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
+            className="mt-1 font-semibold tabular-nums truncate"
+            style={{ fontSize: "clamp(0.9rem, 3.8vw, 1.5rem)" }}
           >
             {cediFromPesewas(summary.arrears)}
           </p>
