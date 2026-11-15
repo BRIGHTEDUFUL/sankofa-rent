@@ -72,7 +72,7 @@ export function AuthLayout({
             A better home for your rental business.
           </h2>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-foreground/70">
-            {appName} · Properties, people and rent, together.
+            {appName} {"\u00B7"} Properties, people and rent, together.
           </p>
         </div>
       </aside>

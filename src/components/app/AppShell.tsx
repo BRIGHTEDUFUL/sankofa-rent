@@ -453,7 +453,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {firstName ? `Akwaaba, ${firstName}!` : "Akwaaba!"}
               </h1>
               <p className="truncate text-xs text-muted-foreground">
-                Here's what's happening across your properties
+                {path === "/" ? "Here's what's happening across your properties" : (PAGE_TITLES[path] ?? "Sankofa Rent")}
               </p>
             </div>
           </div>

@@ -147,7 +147,6 @@ function Page() {
           autoComplete="new-password"
           required
           placeholder="Re-enter your password"
-          error={error || undefined}
         />
         {error && <AuthNotice error>{error}</AuthNotice>}
         <SubmitButton>{pending ? "Creating account…" : "Create account"}</SubmitButton>
