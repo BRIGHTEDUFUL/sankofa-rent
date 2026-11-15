@@ -100,7 +100,8 @@ export function DataPage<T>({
             ))}
           </div>
           {/* Desktop table view */}
-          <Card className="hidden overflow-x-auto !p-0 md:block">
+          <Card className="hidden !p-0 md:block">
+            <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-sm">
               <thead>
                 <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -126,6 +127,7 @@ export function DataPage<T>({
                 ))}
               </tbody>
             </table>
+            </div>
           </Card>
         </>
       )}

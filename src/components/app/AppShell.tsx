@@ -422,7 +422,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   void platform;
 
   return (
-    <div className="min-h-dvh sm:p-6">
+    <div className="min-h-dvh">
       {/* Mobile top bar */}
       <MobileTopBar
         path={path}
@@ -474,10 +474,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1400px]">
+      <div className="mx-auto max-w-[1400px] sm:px-6">
         <div className="flex gap-6 sm:pt-6">
           {/* Desktop sidebar */}
-          <aside className="sticky top-6 hidden h-[calc(100vh-8rem)] w-16 shrink-0 flex-col items-center justify-between rounded-full bg-card py-4 shadow-soft sm:flex">
+          <aside className="sticky top-[5.5rem] hidden h-[calc(100vh-7rem)] w-16 shrink-0 flex-col items-center justify-between rounded-full bg-card py-4 shadow-soft sm:flex">
             <nav className="flex flex-col items-center gap-1.5" aria-label="Primary">
               {DESKTOP_NAV.map((n) => {
                 const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
