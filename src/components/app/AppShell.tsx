@@ -543,12 +543,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <Bell className="h-[18px] w-[18px]" />
             </Link>
-            <Link to="/settings" aria-label="Settings" className="pressable">
-              <AvatarCircle
-                initials={avatar}
-                className="h-10 w-10 text-[11px] ring-2 ring-transparent hover:ring-border"
-              />
-            </Link>
+            {/* Avatar is shown in the sidebar account pill on desktop — not duplicated here */}
           </div>
         </div>
       </header>
