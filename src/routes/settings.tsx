@@ -186,11 +186,11 @@ function SettingsRow({
         <Icon className="h-4 w-4" />
       </span>
       <span
-        className={`text-sm font-medium ${destructive ? "text-destructive" : "text-foreground"}`}
+        className={`flex-1 min-w-0 truncate text-sm font-medium ${destructive ? "text-destructive" : "text-foreground"}`}
       >
         {label}
       </span>
-      {value && <span className="ml-auto truncate text-sm text-muted-foreground">{value}</span>}
+      {value && <span className="ml-auto max-w-[9rem] shrink-0 truncate text-sm text-muted-foreground">{value}</span>}
       <ChevronRight
         className={`h-5 w-5 shrink-0 text-muted-foreground/70 ${value ? "" : "ml-auto"}`}
       />
