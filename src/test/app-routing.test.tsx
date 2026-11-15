@@ -14,4 +14,20 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
+
+  it("matches tenant notice board route /notices", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+
+    const matches = router.matchRoutes("/notices");
+
+    expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
+  });
+
+  it("matches password reset route /forgot-password", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+
+    const matches = router.matchRoutes("/forgot-password");
+
+    expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
+  });
 });

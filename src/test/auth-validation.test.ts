@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validatePassword, validateResetCode } from "@/lib/auth-validation";
+import { validatePassword, validateResetCode, validateResetEmail } from "@/lib/auth-validation";
 
 describe("Auth form validation", () => {
   it("requires at least eight password characters", () => {
@@ -15,5 +15,12 @@ describe("Auth form validation", () => {
     for (const invalid of ["1234567", "123456789", "abcdefgh", "1234 678"]) {
       expect(validateResetCode(invalid)).toBeDefined();
     }
+  });
+  it("validates reset email addresses correctly", () => {
+    expect(validateResetEmail("")).toBeDefined();
+    expect(validateResetEmail("not-an-email")).toBeDefined();
+    expect(validateResetEmail("user@example")).toBeDefined();
+    expect(validateResetEmail("user@example.com")).toBeUndefined();
+    expect(validateResetEmail("  admin@sankofa.rent  ")).toBeUndefined();
   });
 });

@@ -201,15 +201,15 @@ Key fields:
 
 #### `announcements`
 
-A broadcast message to tenants.
+A broadcast message to tenants published to the in-app Tenant Notice Board (`/notices`).
 
 Key fields:
 
-- `channels` — array of `"sms"` / `"email"` / `"whatsapp"` chosen by the landlord
-- `propertyId` — if set, the announcement targets one property; if absent, all properties
-- `pinned` — pinned announcements appear first and are highlighted
+- `channels` — defaults to `["in_app"]` (backward compatible with legacy arrays)
+- `propertyId` — if set, targets a specific property; if absent, all properties
+- `pinned` — pinned announcements appear first with urgent highlighting
 
-**Important:** channels are recorded but no message is actually sent. The delivery integration (Arkesel, Twilio, etc.) is listed as future work.
+**Delivery:** Announcements publish immediately to the in-app Tenant Notice Board (`/notices`) where tenants can view them on mobile or desktop without requiring third-party SMS or WhatsApp subscriptions.
 
 #### `counters`
 
@@ -794,14 +794,14 @@ npx convex run branding:get --env-file .env.production.local
 
 These are **honest gaps** — the UI shows them honestly, the backend records the intent, but no external system is wired.
 
-| Feature                  | Current state                              | What would be needed                                                              |
-| ------------------------ | ------------------------------------------ | --------------------------------------------------------------------------------- |
-| SMS delivery             | Channel recorded in DB                     | Arkesel or mNotify API key; a Convex action calling their HTTP API                |
-| WhatsApp delivery        | Channel recorded                           | WhatsApp Business API or a gateway like mNotify                                   |
-| Email delivery           | Channel recorded                           | Resend or SendGrid; a Convex action                                               |
-| Password reset           | `/forgot-password` shows "not enabled yet" | Resend OTP provider; documented in `CONVEX_MIGRATION.md`                          |
-| MoMo collection webhooks | Reference stored manually                  | Paystack or Hubtel webhook; signature verification; `payments.record` wired to it |
-| Google sign-in           | Provider code present, keys not set        | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` environment variables in Convex           |
+| Feature                  | Current state                       | What would be needed                                                                                                    |
+| ------------------------ | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| SMS delivery             | Channel recorded in DB              | Arkesel or mNotify API key; a Convex action calling their HTTP API                                                      |
+| WhatsApp delivery        | Channel recorded                    | WhatsApp Business API or a gateway like mNotify                                                                         |
+| Email delivery           | Channel recorded                    | Resend or SendGrid; a Convex action                                                                                     |
+| Password reset           | Admin-managed reset flow            | Users request reset via `/forgot-password`; admins issue temporary passwords with mandatory first-login password update |
+| MoMo collection webhooks | Reference stored manually           | Paystack or Hubtel webhook; signature verification; `payments.record` wired to it                                       |
+| Google sign-in           | Provider code present, keys not set | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` environment variables in Convex                                                 |
 
 ---
 

@@ -40,6 +40,7 @@ export default defineSchema({
     notifyEmail: v.boolean(),
     notifyWhatsapp: v.boolean(),
     plan: v.union(v.literal("free"), v.literal("pro"), v.literal("business")),
+    mustChangePassword: v.optional(v.boolean()),
   }).index("by_user", ["userId"]),
 
   properties: defineTable({
@@ -153,11 +154,25 @@ export default defineSchema({
     body: v.string(),
     propertyId: v.optional(v.id("properties")), // undefined = all properties
     pinned: v.boolean(),
-    channels: v.array(v.union(v.literal("sms"), v.literal("email"), v.literal("whatsapp"))),
+    channels: v.optional(v.array(v.string())),
   }).index("by_landlord", ["landlordId"]),
 
   counters: defineTable({ landlordId: v.id("users"), name: v.string(), value: v.number() }).index(
     "by_name",
     ["landlordId", "name"],
   ),
+
+  passwordResetRequests: defineTable({
+    userId: v.optional(v.id("users")),
+    email: v.string(), // normalized lowercase email
+    note: v.optional(v.string()), // user note/phone/message
+    status: v.union(v.literal("pending"), v.literal("resolved"), v.literal("rejected")),
+    adminNote: v.optional(v.string()), // note entered by admin
+    temporaryPassword: v.optional(v.string()), // temporary password set by admin
+    requestedAt: v.number(),
+    resolvedAt: v.optional(v.number()),
+    resolvedBy: v.optional(v.id("users")),
+  })
+    .index("by_status", ["status"])
+    .index("by_email", ["email"]),
 });

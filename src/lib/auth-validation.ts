@@ -9,3 +9,10 @@ export function validatePassword(password: string, confirmation?: string): strin
 export function validateResetCode(code: string): string | undefined {
   return /^\d{8}$/.test(code) ? undefined : "Enter the 8-digit code from your email.";
 }
+
+export function validateResetEmail(email: string): string | undefined {
+  const norm = email.trim().toLowerCase();
+  if (!norm) return "Email address is required.";
+  if (!norm.includes("@") || !norm.includes(".")) return "Please enter a valid email address.";
+  return undefined;
+}

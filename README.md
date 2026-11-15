@@ -52,7 +52,7 @@ It works equally well on the phone in a landlord's pocket and the laptop on thei
 | **Invoices**            | Draft → send → paid; monthly generation cron; duplicate guard                      |
 | **Payments & receipts** | MoMo (MTN, Telecel, AirtelTigo), bank, cash — numbered receipts                    |
 | **Maintenance**         | Priority + status tracking per unit                                                |
-| **Announcements**       | SMS / email / WhatsApp channel selection                                           |
+| **Announcements**       | In-app Tenant Notice Board (`/notices`) with property targeting & urgent pinning   |
 | **Accounts & Admins**   | Multi-admin support, promote/demote, password resets, account provisioning         |
 | **Branding**            | Admin-only: live app name, tagline, 8 curated accents + custom colour, logo upload |
 | **Roles**               | First account on a deployment becomes admin, the rest members                      |

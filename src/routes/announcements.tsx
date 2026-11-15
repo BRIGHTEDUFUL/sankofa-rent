@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Pin, Trash2, Plus } from "lucide-react";
+import { Pin, Trash2, Plus, ExternalLink, Copy, Check } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Doc, Id } from "../../convex/_generated/dataModel";
@@ -22,12 +22,6 @@ export const Route = createFileRoute("/announcements")({
 
 type AnnouncementRow = Doc<"announcements">;
 
-const channels = [
-  { value: "sms", label: "SMS" },
-  { value: "email", label: "Email" },
-  { value: "whatsapp", label: "WhatsApp" },
-];
-
 function Page() {
   const announcements = useQuery(api.announcements.list, {});
   const properties = useQuery(api.properties.list, {});
@@ -37,6 +31,7 @@ function Page() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [removing, setRemoving] = useState<AnnouncementRow | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   if (!announcements || !properties) {
     return (
@@ -50,18 +45,29 @@ function Page() {
 
   const propertyName = new Map(properties.map((p) => [p._id, p.name]));
 
+  async function copyNoticeBoardLink() {
+    try {
+      const url = `${window.location.origin}/notices`;
+      await navigator.clipboard.writeText(url);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2200);
+    } catch {
+      // fallback
+    }
+  }
+
   async function submit(values: FormData) {
     const title = String(values.get("title") || "").trim();
     const body = String(values.get("body") || "").trim();
     const propertyRaw = String(values.get("propertyId") || "none");
-    const selected = channels.filter((c) => values.has(`channel_${c.value}`)).map((c) => c.value);
+    const pinned = values.has("pinned");
     if (!title || !body) throw new Error("Title and message are required.");
-    if (selected.length === 0) throw new Error("Choose at least one channel.");
     await createAnnouncement({
       title,
       body,
       propertyId: propertyRaw === "none" ? undefined : (propertyRaw as Id<"properties">),
-      channels: selected as ("sms" | "email" | "whatsapp")[],
+      pinned,
+      channels: ["in_app"],
     });
     setCreateOpen(false);
   }
@@ -73,17 +79,52 @@ function Page() {
           <div className="min-w-0">
             <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Announcements</h2>
             <p className="text-sm text-muted-foreground">
-              {announcements.length} {announcements.length === 1 ? "notice" : "notices"} sent to
-              your tenants
+              {announcements.length} {announcements.length === 1 ? "notice" : "notices"} published
+              to your tenants
             </p>
           </div>
-          <Button
-            className="h-12 w-full justify-center sm:h-auto sm:w-auto sm:justify-start"
-            onClick={() => setCreateOpen(true)}
-          >
-            <Plus className="h-4 w-4" />
-            New announcement
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={copyNoticeBoardLink}
+              className="inline-flex h-11 sm:h-9 items-center gap-1.5 rounded-xl border border-input bg-background px-3 text-xs sm:text-sm font-semibold text-foreground transition hover:bg-muted pressable"
+              title="Copy the public notice board URL to share with tenants"
+            >
+              {copiedLink ? (
+                <Check className="h-4 w-4 text-emerald-600" />
+              ) : (
+                <Copy className="h-4 w-4 text-muted-foreground" />
+              )}
+              {copiedLink ? "Link copied!" : "Copy tenant notice link"}
+            </button>
+            <Link
+              to="/notices"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 sm:h-9 items-center gap-1.5 rounded-xl border border-input bg-background px-3 text-xs sm:text-sm font-semibold text-foreground transition hover:bg-muted pressable"
+              title="Open the public tenant notice board"
+            >
+              <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              View notice board
+            </Link>
+            <Button
+              className="h-11 sm:h-9 w-full sm:w-auto justify-center"
+              onClick={() => setCreateOpen(true)}
+            >
+              <Plus className="h-4 w-4" />
+              New announcement
+            </Button>
+          </div>
+        </div>
+
+        {/* In-app notice delivery banner */}
+        <div className="rounded-xl border border-primary/20 bg-primary-soft/50 p-4 text-xs sm:text-sm text-foreground">
+          <p className="font-semibold text-primary">In-app notice board active</p>
+          <p className="mt-0.5 text-muted-foreground">
+            Notices published here appear immediately on the in-app Tenant Notice Board at{" "}
+            <span className="font-mono text-xs font-semibold">/notices</span>. Tenants can view them
+            without requiring third-party SMS, WhatsApp, or email subscriptions.
+          </p>
         </div>
 
         {announcements.length === 0 && (
@@ -100,21 +141,19 @@ function Page() {
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-semibold">{a.title}</h3>
                     {a.pinned && <Badge tone="gold">Pinned</Badge>}
+                    <Badge tone="green">In-app</Badge>
                   </div>
-                  <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{a.body}</p>
+                  <p className="mt-1 text-sm text-muted-foreground line-clamp-3 whitespace-pre-line">
+                    {a.body}
+                  </p>
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <span>
+                    <span className="font-medium text-foreground">
                       {a.propertyId
                         ? (propertyName.get(a.propertyId) ?? "Property")
                         : "All properties"}
                     </span>
                     <span>·</span>
                     <span>{formatDate(a._creationTime)}</span>
-                    {a.channels.map((c) => (
-                      <Badge key={c} tone="gray">
-                        {c}
-                      </Badge>
-                    ))}
                   </div>
                 </div>
                 <div className="flex shrink-0 gap-1">
@@ -122,9 +161,11 @@ function Page() {
                     onClick={() => togglePin({ id: a._id })}
                     className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted pressable"
                     title={a.pinned ? "Unpin announcement" : "Pin announcement"}
-                    aria-label={a.pinned ? `Unpin announcement ${a.title}` : `Pin announcement ${a.title}`}
+                    aria-label={
+                      a.pinned ? `Unpin announcement ${a.title}` : `Pin announcement ${a.title}`
+                    }
                   >
-                    <Pin className={`h-4 w-4 ${a.pinned ? "text-primary" : ""}`} />
+                    <Pin className={`h-4 w-4 ${a.pinned ? "text-primary fill-primary" : ""}`} />
                   </button>
                   <button
                     onClick={() => setRemoving(a)}
@@ -146,7 +187,7 @@ function Page() {
         onOpenChange={setCreateOpen}
         title="New announcement"
         onSubmit={submit}
-        submitLabel="Send announcement"
+        submitLabel="Publish notice"
       >
         <TextField label="Title" name="title" required placeholder="Water supply interruption" />
         <div className="space-y-1.5">
@@ -163,7 +204,7 @@ function Page() {
           />
         </div>
         <SelectField
-          label="Send to"
+          label="Target audience"
           name="propertyId"
           defaultValue="none"
           options={[
@@ -171,21 +212,19 @@ function Page() {
             ...properties.map((p) => ({ value: p._id, label: p.name })),
           ]}
         />
-        <div className="space-y-1.5">
-          <span className="text-sm font-medium">Channels</span>
-          <div className="flex flex-wrap gap-3">
-            {channels.map((c) => (
-              <label key={c.value} className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  name={`channel_${c.value}`}
-                  defaultChecked={c.value === "sms"}
-                  className="h-4 w-4 accent-primary"
-                />
-                {c.label}
-              </label>
-            ))}
-          </div>
+        <div className="space-y-2 pt-1">
+          <label className="flex items-center gap-2.5 text-sm font-medium">
+            <input
+              type="checkbox"
+              name="pinned"
+              className="h-4 w-4 rounded border-input accent-primary"
+            />
+            <span>Pin to top as urgent / important notice</span>
+          </label>
+          <p className="text-xs text-muted-foreground">
+            This notice publishes directly to the in-app Tenant Notice Board. No external SMS or
+            WhatsApp services required.
+          </p>
         </div>
       </FormDialog>
 

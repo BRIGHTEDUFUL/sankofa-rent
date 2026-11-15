@@ -16,6 +16,7 @@ import { Route as InvoicesRouteImport } from './routes/invoices'
 import { Route as LeasesRouteImport } from './routes/leases'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
+import { Route as NoticesRouteImport } from './routes/notices'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -57,6 +58,11 @@ const MaintenanceRoute = MaintenanceRouteImport.update({
   path: '/maintenance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NoticesRoute = NoticesRouteImport.update({
+  id: '/notices',
+  path: '/notices',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PaymentsRoute = PaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/leases': typeof LeasesRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/notices': typeof NoticesRoute
   '/payments': typeof PaymentsRoute
   '/properties': typeof PropertiesRoute
   '/settings': typeof SettingsRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/leases': typeof LeasesRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/notices': typeof NoticesRoute
   '/payments': typeof PaymentsRoute
   '/properties': typeof PropertiesRoute
   '/settings': typeof SettingsRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/leases': typeof LeasesRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/notices': typeof NoticesRoute
   '/payments': typeof PaymentsRoute
   '/properties': typeof PropertiesRoute
   '/settings': typeof SettingsRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/leases'
     | '/login'
     | '/maintenance'
+    | '/notices'
     | '/payments'
     | '/properties'
     | '/settings'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/leases'
     | '/login'
     | '/maintenance'
+    | '/notices'
     | '/payments'
     | '/properties'
     | '/settings'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/leases'
     | '/login'
     | '/maintenance'
+    | '/notices'
     | '/payments'
     | '/properties'
     | '/settings'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   LeasesRoute: typeof LeasesRoute
   LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
+  NoticesRoute: typeof NoticesRoute
   PaymentsRoute: typeof PaymentsRoute
   PropertiesRoute: typeof PropertiesRoute
   SettingsRoute: typeof SettingsRoute
@@ -237,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MaintenanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notices': {
+      id: '/notices'
+      path: '/notices'
+      fullPath: '/notices'
+      preLoaderRoute: typeof NoticesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/payments': {
       id: '/payments'
       path: '/payments'
@@ -283,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeasesRoute: LeasesRoute,
   LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,
+  NoticesRoute: NoticesRoute,
   PaymentsRoute: PaymentsRoute,
   PropertiesRoute: PropertiesRoute,
   SettingsRoute: SettingsRoute,

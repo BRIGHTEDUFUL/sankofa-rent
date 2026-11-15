@@ -164,7 +164,7 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const isAuth = ["/login", "/signup", "/forgot-password"].includes(path);
+  const isStandalone = ["/login", "/signup", "/forgot-password", "/notices"].includes(path);
   usePlatform();
 
   return (
@@ -183,7 +183,7 @@ function RootComponent() {
           <BrandingProvider>
             <BrandingEffects />
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            {isAuth ? (
+            {isStandalone ? (
               <Outlet />
             ) : (
               <AppShell>

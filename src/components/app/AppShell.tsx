@@ -31,6 +31,10 @@ import { usePlatform } from "@/hooks/use-platform";
 import { hapticTap } from "@/lib/haptics";
 import { useRipple } from "@/hooks/use-ripple";
 import { useTheme } from "@/hooks/use-theme";
+import {
+  MustChangePasswordModal,
+  TemporaryPasswordBanner,
+} from "@/components/auth/MustChangePasswordModal";
 
 // ─── Navigation config ───────────────────────────────────────────────────────
 
@@ -176,6 +180,7 @@ function BottomTabBar({
   path,
   onLogout,
   profile,
+  pendingResetCount,
 }: {
   path: string;
   onLogout: () => void | Promise<void>;
@@ -183,6 +188,7 @@ function BottomTabBar({
     | { firstName?: string | null; lastName?: string | null; businessName?: string | null }
     | null
     | undefined;
+  pendingResetCount?: number;
 }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const platform = usePlatform();
@@ -259,7 +265,12 @@ function BottomTabBar({
               moreActive ? "text-primary" : "text-muted-foreground"
             }`}
           >
-            <MoreHorizontal className="h-[22px] w-[22px]" strokeWidth={moreActive ? 2.3 : 1.7} />
+            <div className="relative">
+              <MoreHorizontal className="h-[22px] w-[22px]" strokeWidth={moreActive ? 2.3 : 1.7} />
+              {(pendingResetCount ?? 0) > 0 && (
+                <span className="absolute -top-0.5 -right-1 h-2 w-2 rounded-full bg-amber-500" />
+              )}
+            </div>
             <span className="text-[10px] font-semibold leading-none tracking-tight">More</span>
           </button>
         </div>
@@ -347,7 +358,12 @@ function BottomTabBar({
                     className="flex min-h-[52px] items-center gap-3 px-4 text-sm font-semibold pressable hover:bg-muted/80"
                   >
                     <Settings className="h-5 w-5 text-primary" />
-                    Settings
+                    <span className="flex-1">Settings</span>
+                    {(pendingResetCount ?? 0) > 0 && (
+                      <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                        {pendingResetCount} reset request{pendingResetCount === 1 ? "" : "s"}
+                      </span>
+                    )}
                   </Link>
                   <button
                     type="button"
@@ -383,9 +399,19 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { signOut } = useAuthActions();
   const profile = useQuery(api.profiles.me, isAuthenticated ? {} : "skip");
+  const isAdmin = profile?.role === "admin";
+  const pendingResetCount = useQuery(api.passwordReset.countPending, isAdmin ? {} : "skip");
   const { logoUrl } = useBranding();
   const platform = usePlatform();
   const { toggle: toggleTheme, effective: effectiveTheme } = useTheme();
+
+  const [mustChangePwModalOpen, setMustChangePwModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (profile?.mustChangePassword) {
+      setMustChangePwModalOpen(true);
+    }
+  }, [profile?.mustChangePassword]);
 
   // Rail can expand to show section labels. Persisted, and SSR-safe: the
   // initial value comes from localStorage when there is one.
@@ -479,7 +505,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="min-w-0">
               {profileReady ? (
                 <h1 className="truncate text-lg font-semibold leading-tight">
-                  {path === "/" ? (firstName ? `Akwaaba, ${firstName}!` : "Akwaaba!") : (PAGE_TITLES[path] ?? "Sankofa Rent")}
+                  {path === "/"
+                    ? firstName
+                      ? `Akwaaba, ${firstName}!`
+                      : "Akwaaba!"
+                    : (PAGE_TITLES[path] ?? "Sankofa Rent")}
                 </h1>
               ) : (
                 <div className="h-5 w-36 animate-pulse rounded-md bg-muted" aria-hidden="true" />
@@ -590,6 +620,17 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <span className={`truncate text-sm font-medium ${navExpanded ? "" : "hidden"}`}>
                   Settings
                 </span>
+                {(pendingResetCount ?? 0) > 0 && (
+                  <span
+                    className={`rounded-full bg-amber-500 font-bold text-white ${
+                      navExpanded
+                        ? "ml-auto px-1.5 py-0.5 text-[10px]"
+                        : "absolute right-2 top-2 h-2 w-2 ring-2 ring-background"
+                    }`}
+                  >
+                    {navExpanded ? pendingResetCount : ""}
+                  </span>
+                )}
               </Link>
 
               {/* Log out */}
@@ -655,6 +696,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             className="min-w-0 flex-1 sm:overflow-y-auto px-3 pb-nav pt-[calc(3.75rem+var(--sat)+1rem)] sm:px-0 sm:pb-6 sm:pt-0"
             style={{ marginBottom: "var(--keyboard-offset, 0px)" }}
           >
+            {profile?.mustChangePassword && (
+              <div className="mb-4">
+                <TemporaryPasswordBanner onOpenModal={() => setMustChangePwModalOpen(true)} />
+              </div>
+            )}
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={path}
@@ -670,8 +716,21 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </div>
 
+      {/* Must change temporary password modal */}
+      {profile?.mustChangePassword && (
+        <MustChangePasswordModal
+          open={mustChangePwModalOpen}
+          onOpenChange={setMustChangePwModalOpen}
+        />
+      )}
+
       {/* Bottom tab bar — mobile only */}
-      <BottomTabBar path={path} onLogout={logout} profile={profile} />
+      <BottomTabBar
+        path={path}
+        onLogout={logout}
+        profile={profile}
+        pendingResetCount={pendingResetCount}
+      />
     </div>
   );
 }
@@ -723,7 +782,15 @@ const tones = {
   blue: "bg-primary-soft text-primary",
 } as const;
 export type Tone = keyof typeof tones;
-export function Badge({ tone = "gray", children, className = "" }: { tone?: Tone; children: ReactNode; className?: string }) {
+export function Badge({
+  tone = "gray",
+  children,
+  className = "",
+}: {
+  tone?: Tone;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <span
       className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${tones[tone]} ${className}`}
@@ -754,7 +821,11 @@ export function Button({
           ? "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
           : "bg-muted text-foreground hover:bg-accent";
   const s =
-    size === "sm" ? "px-2.5 py-1 text-xs" : size === "lg" ? "px-6 py-3 text-base" : "px-4 py-2.5 text-sm";
+    size === "sm"
+      ? "px-2.5 py-1 text-xs"
+      : size === "lg"
+        ? "px-6 py-3 text-base"
+        : "px-4 py-2.5 text-sm";
   return (
     <button
       className={`inline-flex items-center gap-2 rounded-xl font-semibold transition pressable ${s} ${v} ${className}`}

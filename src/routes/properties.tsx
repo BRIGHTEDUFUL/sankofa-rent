@@ -185,7 +185,10 @@ function Page() {
               <h3 className="mt-4 text-lg font-semibold">{p.name}</h3>
               <p className="flex items-center gap-1 text-sm text-muted-foreground">
                 <MapPin className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{p.area}{p.region ? ` · ${p.region}` : ""}</span>
+                <span className="truncate">
+                  {p.area}
+                  {p.region ? ` · ${p.region}` : ""}
+                </span>
               </p>
               <div className="mt-5 flex justify-between text-sm">
                 <span className="text-muted-foreground">Occupancy</span>

@@ -95,7 +95,10 @@ export function DataPage<T>({
                       <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">
                         {c.label}
                       </dt>
-                      <dd className="mt-0.5 min-w-0 overflow-hidden" style={{ overflowWrap: "anywhere" }}>
+                      <dd
+                        className="mt-0.5 min-w-0 overflow-hidden"
+                        style={{ overflowWrap: "anywhere" }}
+                      >
                         {c.render(r)}
                       </dd>
                     </div>

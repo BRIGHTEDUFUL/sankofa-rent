@@ -89,9 +89,9 @@ There is no affordable, well-designed, single-source-of-truth rent-management sy
 
 **Explicitly out of scope (documented as future work):**
 
-- Sending real SMS / WhatsApp / email — channels are recorded, delivery is not wired
+- Third-party outbound SMS / WhatsApp gateway subscriptions (Arkesel/mNotify) — replaced with a 100% self-contained in-app Tenant Notice Board (`/notices`)
 - Mobile-money collection webhooks (MTN/Telecel/AT) — records can be entered with a MoMo reference, money does not flow through the app
-- Password reset by email — shows an honest "not enabled yet" state rather than a dead button
+- Third-party email SMTP service — replaced with a self-contained admin-managed password reset and forced reset verification workflow
 - Multi-landlord SaaS onboarding, billing plans, and team accounts
 - Native iOS/Android apps — the web app is fully responsive with a native-feel bottom nav
 
@@ -192,7 +192,7 @@ Features were taken from real rental life, anchored in a single seeded demo case
 | FR-A3 | Sign out; session cleared; full reload recreates the client                     | ✅     |
 | FR-A4 | Redirect to `/login` when unauthenticated; redirect `/` → `/login` both ways    | ✅     |
 | FR-A5 | First account on a deployment becomes `admin`; subsequent accounts are `member` | ✅     |
-| FR-A6 | Forgot-password state honestly reports "not enabled yet"                        | ✅     |
+| FR-A6 | Forgot-password allows requesting admin reset; admin sets temporary password    | ✅     |
 
 **Dashboard (`/`)**
 
@@ -269,14 +269,14 @@ Features were taken from real rental life, anchored in a single seeded demo case
 | FR-M3 | Status workflow: open → in progress → resolved                            | ✅     |
 | FR-M4 | Unit is auto-disabled for whole-property requests                         | ✅     |
 
-**Announcements (`/announcements`)**
+**Announcements & Tenant Notices (`/announcements` & `/notices`)**
 
-| ID    | Requirement                                                                | Status |
-| ----- | -------------------------------------------------------------------------- | ------ |
-| FR-N1 | Compose announcement with title, body, audience (all or one property)      | ✅     |
-| FR-N2 | Choose channels: SMS / Email / WhatsApp                                    | ✅     |
-| FR-N3 | Pin/unpin; delete                                                          | ✅     |
-| FR-N4 | Record channels and pinned state; no delivery provider wired yet (see §10) | ✅     |
+| ID    | Requirement                                                                            | Status |
+| ----- | -------------------------------------------------------------------------------------- | ------ |
+| FR-N1 | Compose announcement with title, body, target audience (all or specific property)      | ✅     |
+| FR-N2 | Self-contained in-app delivery: publishes directly to Tenant Notice Board (`/notices`) | ✅     |
+| FR-N3 | Pin/unpin; urgent notice highlighting; delete                                          | ✅     |
+| FR-N4 | One-click copy notice board link & view live tenant notice board without external APIs | ✅     |
 
 **Settings (`/settings`) — seven tabs**
 
@@ -286,29 +286,29 @@ Features were taken from real rental life, anchored in a single seeded demo case
 | FR-S2 | Business: name, region, currency (GHS read-only), rent due day (1–31), late fee %                                                                           | ✅     |
 | FR-S3 | **Accounts (admin-only):** multi-admin management, promote/demote roles, password resets, account creation and deletion                                     | ✅     |
 | FR-S4 | **Branding (admin-only):** live rename of app, tagline, accent colour (8 curated swatches + custom, 4.5:1 contrast enforced), logo upload to Convex storage | ✅     |
-| FR-S5 | Notifications: rent reminders (SMS), payment received (email), WhatsApp updates                                                                             | ✅     |
+| FR-S5 | Notifications: in-app notice board integration; zero external SMS/WhatsApp/email dependencies                                                               | ✅     |
 | FR-S6 | Payment methods: MoMo number + network, bank name + account                                                                                                 | ✅     |
-| FR-S7 | Security: role badge, plan, currency, honest "password change unavailable" notice                                                                           | ✅     |
+| FR-S7 | Security: role badge, plan, currency, self-contained admin-managed password reset workflow                                                                  | ✅     |
 
 **Mobile experience**
 
-| ID     | Requirement                                                                                      | Status |
-| ------ | ------------------------------------------------------------------------------------------------ | ------ |
-| FR-X4  | Mobile bottom tab bar (Home, Properties, Tenants, Payments + More drawer) with safe-area padding | ✅     |
-| FR-X5  | Fixed mobile top bar with back/logo/bell/avatar; iOS: centred title; Android: left-aligned       | ✅     |
-| FR-X6  | iOS translucent tab bar (backdrop-filter blur/saturate)                                          | ✅     |
-| FR-X7  | Android Material 3 animated pill indicator (Framer Motion `layoutId`)                            | ✅     |
-| FR-X8  | Page transition animations (Framer Motion `AnimatePresence`)                                     | ✅     |
-| FR-X9  | Platform detection hook (`usePlatform`) stamps `data-platform` on `<html>`                       | ✅     |
-| FR-X10 | Android haptic feedback via `navigator.vibrate`                                                  | ✅     |
-| FR-X11 | Android Material 3 ripple on tab bar items                                                       | ✅     |
-| FR-X12 | iOS input zoom prevention (`md:text-sm` removed from Input component)                            | ✅     |
-| FR-X13 | Form grids collapse to single-column on mobile (`grid-cols-1 sm:grid-cols-2`)                    | ✅     |
-| FR-X14 | Keyboard offset via `window.visualViewport` so forms are not obscured                            | ✅     |
-| FR-X15 | Scrollable chip tab strip in Settings on mobile                                                  | ✅     |
-| FR-X16 | Sticky save-bar above safe-area inset on mobile settings forms                                   | ✅     |
-| FR-X17 | Dark mode token set for both OS preference and manual toggle                                     | ✅     |
-| FR-X18 | Dual `theme-color` meta (light/dark `prefers-color-scheme`)                                      | ✅     |
+| ID     | Requirement                                                                                            | Status |
+| ------ | ------------------------------------------------------------------------------------------------------ | ------ |
+| FR-X4  | Mobile bottom tab bar (Home, Properties, Tenants, Payments + More drawer) with safe-area padding       | ✅     |
+| FR-X5  | Fixed mobile top bar with back/logo/bell/avatar; iOS: centred title; Android: left-aligned             | ✅     |
+| FR-X6  | iOS translucent tab bar (backdrop-filter blur/saturate)                                                | ✅     |
+| FR-X7  | Android Material 3 animated pill indicator (Framer Motion `layoutId`)                                  | ✅     |
+| FR-X8  | Page transition animations (Framer Motion `AnimatePresence`)                                           | ✅     |
+| FR-X9  | Platform detection hook (`usePlatform`) stamps `data-platform` on `<html>`                             | ✅     |
+| FR-X10 | Android haptic feedback via `navigator.vibrate`                                                        | ✅     |
+| FR-X11 | Android Material 3 ripple on tab bar items                                                             | ✅     |
+| FR-X12 | iOS input zoom prevention (`md:text-sm` removed from Input component)                                  | ✅     |
+| FR-X13 | Form grids collapse to single-column on mobile (`grid-cols-1 sm:grid-cols-2`)                          | ✅     |
+| FR-X14 | Keyboard offset via `window.visualViewport` so forms are not obscured                                  | ✅     |
+| FR-X15 | Scrollable chip tab strip in Settings on mobile                                                        | ✅     |
+| FR-X16 | Sticky save-bar above safe-area inset on mobile settings forms                                         | ✅     |
+| FR-X17 | Dark mode token set for both OS preference and manual toggle                                           | ✅     |
+| FR-X18 | Dual `theme-color` meta (light/dark `prefers-color-scheme`)                                            | ✅     |
 | FR-X19 | Standardized 44 px touch targets for selects & inputs (`SelectTrigger` + `Input` height `h-11 sm:h-9`) | ✅     |
 | FR-X20 | Accessible label-control associations & touch micro-interactions (`pressable`) across all data actions | ✅     |
 
@@ -549,7 +549,7 @@ public/                   # favicon.svg, manifest.webmanifest, icons, robots.txt
 ### 7.4 What is intentionally not implemented
 
 - **SMS/Email/WhatsApp delivery** — `channels` is recorded; no provider wired.
-- **Password reset** — `/forgot-password` renders an honest "not enabled yet" state.
+- **Automated transactional emails** — Outbound emails require a configured provider (e.g. Resend); password reset is handled via admin-assigned temporary passwords with mandatory first-login password update.
 - **MoMo collection** — payments recorded with MoMo references; money does not move.
 - **Multi-tenancy** — one landlord per deployment.
 
@@ -678,18 +678,18 @@ npx convex run branding:get --env-file .env.production.local
 
 ## 10. Limitations and future work
 
-| #   | Limitation                                        | Remediation                                                           |
-| --- | ------------------------------------------------- | --------------------------------------------------------------------- |
-| 1   | No actual SMS/WhatsApp/email delivery             | wire Arkesel/mNotify for outbound; `channels` already recorded        |
-| 2   | No MoMo collection webhooks                       | Paystack/Hubtel webhook → verify signature → `payments.record`        |
-| 3   | No password reset                                 | Resend OTP email flow (documented in `docs/CONVEX_MIGRATION.md`)      |
-| 4   | Single-landlord deploy                            | keep two Convex deployments for demo/prod                             |
-| 5   | Seed data is a demo, not production-grade tenants | export-import flow for real onboarding                                |
-| 6   | No offline mode                                   | Convex caches recent queries; cache-first-then-sync would extend this |
-| 7   | No audit log                                      | add `auditEvents` table for financial mutations                       |
-| 8   | No unit/e2e suite in CI                           | add GitHub Actions: `npm ci && npm run build && npm test`             |
-| 9   | No screenshot regression suite                    | add Playwright visual snapshots against the live URL                  |
-| 10  | Demo admin password is known                      | change via `migration:setAdmin` before or after submission            |
+| #   | Limitation                                        | Remediation                                                                |
+| --- | ------------------------------------------------- | -------------------------------------------------------------------------- |
+| 1   | Optional external SMS/WhatsApp broadcast gateway  | wire Arkesel/mNotify for outbound push; in-app notice board already active |
+| 2   | No MoMo collection webhooks                       | Paystack/Hubtel webhook → verify signature → `payments.record`             |
+| 3   | Automated email OTP password delivery             | wire Resend SMTP; admin-managed temporary password flow already active     |
+| 4   | Single-landlord deploy                            | keep two Convex deployments for demo/prod                                  |
+| 5   | Seed data is a demo, not production-grade tenants | export-import flow for real onboarding                                     |
+| 6   | No offline mode                                   | Convex caches recent queries; cache-first-then-sync would extend this      |
+| 7   | No audit log                                      | add `auditEvents` table for financial mutations                            |
+| 8   | No unit/e2e suite in CI                           | add GitHub Actions: `npm ci && npm run build && npm test`                  |
+| 9   | No screenshot regression suite                    | add Playwright visual snapshots against the live URL                       |
+| 10  | Demo admin password is known                      | change via `migration:setAdmin` before or after submission                 |
 
 ---
 
@@ -760,7 +760,7 @@ public/                 favicon.svg, manifest.webmanifest, icons/, robots.txt
 | ------------------ | -------------------------------------------------------------------------- | ------------------ |
 | `/login`           | Sign in                                                                    | ❌                 |
 | `/signup`          | Create account                                                             | ❌                 |
-| `/forgot-password` | Honest not-enabled state                                                   | ❌                 |
+| `/forgot-password` | Request admin password reset                                               | ❌                 |
 | `/`                | Dashboard                                                                  | ✅                 |
 | `/properties`      | Properties & units                                                         | ✅                 |
 | `/tenants`         | Tenants                                                                    | ✅                 |

@@ -201,6 +201,35 @@ export const updatePasswordSecretInternal = internalMutation({
       });
     }
 
+    // Set mustChangePassword: true so the user is prompted to set their own password
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+
+    if (profile) {
+      await ctx.db.patch(profile._id, { mustChangePassword: true });
+    }
+
+    // Resolve any pending reset requests for this user/email
+    if (user.email) {
+      const pendingRequests = await ctx.db
+        .query("passwordResetRequests")
+        .withIndex("by_status", (q) => q.eq("status", "pending"))
+        .collect();
+
+      for (const pr of pendingRequests) {
+        if (pr.email.toLowerCase() === user.email.toLowerCase() || pr.userId === userId) {
+          await ctx.db.patch(pr._id, {
+            userId,
+            status: "resolved",
+            resolvedAt: Date.now(),
+            adminNote: "Resolved via Account Management reset.",
+          });
+        }
+      }
+    }
+
     return { success: true };
   },
 });
@@ -232,6 +261,16 @@ export const updateOwnPasswordInternal = internalMutation({
         providerAccountId: user?.email ?? String(userId),
         secret,
       });
+    }
+
+    // Clear mustChangePassword if it was set
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .first();
+
+    if (profile && profile.mustChangePassword) {
+      await ctx.db.patch(profile._id, { mustChangePassword: false });
     }
 
     return { success: true };

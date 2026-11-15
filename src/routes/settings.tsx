@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import {
   User,
   Building2,
-  Bell,
   CreditCard,
   ShieldCheck,
   Palette,
@@ -18,6 +17,14 @@ import {
   UserPlus,
   Search,
   Shield,
+  ShieldAlert,
+  CheckCircle2,
+  Clock,
+  Copy,
+  Check,
+  RefreshCw,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -27,20 +34,29 @@ import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { Badge, Button, Card } from "@/components/app/AppShell";
 import { ConfirmDialog, FormDialog, TextField } from "@/components/app/FormDialog";
 import { ResponsiveDialog } from "@/components/app/ResponsiveDialog";
-import { Switch } from "@/components/ui/switch";
 import { useBranding, isHexColor, isUsableAccent, DEFAULT_BRANDING } from "@/lib/branding";
 import { formatDate, friendlyError } from "@/lib/format";
 
-const TAB_IDS = [
-  "profile",
-  "business",
-  "accounts",
-  "branding",
-  "notifications",
-  "payments",
-  "security",
-] as const;
+const TAB_IDS = ["profile", "business", "accounts", "branding", "payments", "security"] as const;
 type Tab = (typeof TAB_IDS)[number];
+
+function generateMemorablePassword() {
+  const words = [
+    "Akwaaba",
+    "Sankofa",
+    "Oseikrom",
+    "Kejetia",
+    "Labadi",
+    "Kasoa",
+    "Tema",
+    "Kumasi",
+    "Sunyani",
+    "Tamale",
+  ];
+  const word = words[Math.floor(Math.random() * words.length)];
+  const num = Math.floor(1000 + Math.random() * 9000);
+  return `${word}@${num}`;
+}
 
 export const Route = createFileRoute("/settings")({
   validateSearch: (search: Record<string, unknown>): { tab?: Tab } => {
@@ -52,12 +68,12 @@ export const Route = createFileRoute("/settings")({
       { title: "Settings — Sankofa Rent" },
       {
         name: "description",
-        content: "Manage your profile, business, accounts, notifications, payments and team.",
+        content: "Manage your profile, business, accounts, payments and team.",
       },
       { property: "og:title", content: "Settings — Sankofa Rent" },
       {
         property: "og:description",
-        content: "Manage your profile, business, accounts, notifications, payments and team.",
+        content: "Manage your profile, business, accounts, payments and team.",
       },
     ],
   }),
@@ -69,7 +85,6 @@ const tabs = [
   { id: "business", label: "Business", icon: Building2 },
   { id: "accounts", label: "Accounts", icon: Users },
   { id: "branding", label: "Branding", icon: Palette },
-  { id: "notifications", label: "Notifications", icon: Bell },
   { id: "payments", label: "Payment methods", icon: CreditCard },
   { id: "security", label: "Security", icon: ShieldCheck },
 ] as const;
@@ -98,9 +113,6 @@ type FormState = {
   bankAccount: string;
   rentDueDay: number;
   lateFeePercent: string;
-  notifySms: boolean;
-  notifyEmail: boolean;
-  notifyWhatsapp: boolean;
 };
 
 function fromProfile(p: Doc<"profiles">): FormState {
@@ -116,9 +128,6 @@ function fromProfile(p: Doc<"profiles">): FormState {
     bankAccount: p.bankAccount ?? "",
     rentDueDay: p.rentDueDay,
     lateFeePercent: p.lateFeePercent !== undefined ? String(p.lateFeePercent) : "",
-    notifySms: p.notifySms,
-    notifyEmail: p.notifyEmail,
-    notifyWhatsapp: p.notifyWhatsapp,
   };
 }
 
@@ -207,28 +216,6 @@ function SettingsRow({
   );
 }
 
-function NotificationRow({
-  label,
-  hint,
-  checked,
-  onCheckedChange,
-}: {
-  label: string;
-  hint: string;
-  checked: boolean;
-  onCheckedChange: (v: boolean) => void;
-}) {
-  return (
-    <div className="flex min-h-[64px] items-center justify-between gap-4 border-b border-border py-3 last:border-0">
-      <div className="min-w-0">
-        <p className="text-sm font-medium">{label}</p>
-        <p className="text-xs text-muted-foreground">{hint}</p>
-      </div>
-      <Switch checked={checked} onCheckedChange={onCheckedChange} aria-label={label} />
-    </div>
-  );
-}
-
 function SettingsListNav({
   form,
   isAdmin,
@@ -262,16 +249,6 @@ function SettingsListNav({
           value={form.businessName || undefined}
           onClick={() => onSelect("business")}
           selected={detailTab === "business"}
-        />
-      </SettingsGroup>
-
-      <SettingsGroup title="Preferences">
-        <SettingsRow
-          icon={Bell}
-          tone="bg-ink text-ink-foreground"
-          label="Notifications"
-          onClick={() => onSelect("notifications")}
-          selected={detailTab === "notifications"}
         />
       </SettingsGroup>
 
@@ -351,6 +328,11 @@ function Page() {
   const resetPasswordAction = useAction(api.accounts.resetPassword);
   const changeOwnPasswordAction = useAction(api.accounts.changePassword);
 
+  // Password reset requests (admin only)
+  const resetRequests = useQuery(api.passwordReset.listRequests, isAdmin ? {} : "skip");
+  const fulfillResetAction = useAction(api.passwordReset.fulfillRequest);
+  const rejectResetMutation = useMutation(api.passwordReset.rejectRequest);
+
   const [searchAccount, setSearchAccount] = useState("");
   const [createAccountOpen, setCreateAccountOpen] = useState(false);
   const [resetAccountTarget, setResetAccountTarget] = useState<{
@@ -369,6 +351,27 @@ function Page() {
     fullName: string;
     email: string;
   } | null>(null);
+
+  // Password reset request fulfillment state
+  const [fulfillTarget, setFulfillTarget] = useState<{
+    requestId: Id<"passwordResetRequests">;
+    email: string;
+    fullName: string;
+  } | null>(null);
+  const [tempPasswordVal, setTempPasswordVal] = useState("");
+  const [fulfillAdminNote, setFulfillAdminNote] = useState("");
+  const [showTempPw, setShowTempPw] = useState(false);
+  const [copiedTempPw, setCopiedTempPw] = useState(false);
+  const [fulfilledResult, setFulfilledResult] = useState<{
+    email: string;
+    temporaryPassword: string;
+  } | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<{
+    requestId: Id<"passwordResetRequests">;
+    email: string;
+  } | null>(null);
+  const [showHistoryRequests, setShowHistoryRequests] = useState(false);
+
   const [accountActionLoading, setAccountActionLoading] = useState(false);
   const [accountActionMessage, setAccountActionMessage] = useState("");
   const [accountActionError, setAccountActionError] = useState("");
@@ -471,9 +474,6 @@ function Page() {
         bankAccount: next.bankAccount,
         rentDueDay: next.rentDueDay,
         lateFeePercent: next.lateFeePercent.trim() ? Number(next.lateFeePercent) : undefined,
-        notifySms: next.notifySms,
-        notifyEmail: next.notifyEmail,
-        notifyWhatsapp: next.notifyWhatsapp,
       });
       setForm(next);
       setMessage("Saved.");
@@ -712,30 +712,195 @@ function Page() {
           {detailTab === "accounts" && isAdmin && (
             <div className="space-y-6">
               {/* Overview Metrics Cards */}
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <Card className="p-4 bg-card/60 backdrop-blur">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Total Accounts
-                  </p>
-                  <p className="mt-1 text-2xl font-bold tracking-tight">{accounts?.length ?? 0}</p>
-                </Card>
-                <Card className="p-4 bg-card/60 backdrop-blur">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Administrators
-                  </p>
-                  <p className="mt-1 text-2xl font-bold tracking-tight text-primary">
-                    {accounts?.filter((a) => a.role === "admin").length ?? 0}
-                  </p>
-                </Card>
-                <Card className="col-span-2 p-4 bg-card/60 backdrop-blur sm:col-span-1">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Standard Users
-                  </p>
-                  <p className="mt-1 text-2xl font-bold tracking-tight">
-                    {accounts?.filter((a) => a.role !== "admin").length ?? 0}
-                  </p>
-                </Card>
-              </div>
+              {(() => {
+                const pendingRequests = (resetRequests ?? []).filter((r) => r.status === "pending");
+                const pastRequests = (resetRequests ?? []).filter((r) => r.status !== "pending");
+                const pendingCount = pendingRequests.length;
+
+                return (
+                  <>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                      <Card className="p-4 bg-card/60 backdrop-blur">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                          Total Accounts
+                        </p>
+                        <p className="mt-1 text-2xl font-bold tracking-tight">
+                          {accounts?.length ?? 0}
+                        </p>
+                      </Card>
+                      <Card className="p-4 bg-card/60 backdrop-blur">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                          Administrators
+                        </p>
+                        <p className="mt-1 text-2xl font-bold tracking-tight text-primary">
+                          {accounts?.filter((a) => a.role === "admin").length ?? 0}
+                        </p>
+                      </Card>
+                      <Card className="p-4 bg-card/60 backdrop-blur">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                          Standard Users
+                        </p>
+                        <p className="mt-1 text-2xl font-bold tracking-tight">
+                          {accounts?.filter((a) => a.role !== "admin").length ?? 0}
+                        </p>
+                      </Card>
+                      <Card
+                        className={`p-4 backdrop-blur ${
+                          pendingCount > 0
+                            ? "border border-amber-500/40 bg-amber-500/10 dark:bg-amber-950/20"
+                            : "bg-card/60"
+                        }`}
+                      >
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                          Reset Requests
+                        </p>
+                        <p
+                          className={`mt-1 text-2xl font-bold tracking-tight ${
+                            pendingCount > 0 ? "text-amber-600 dark:text-amber-400" : ""
+                          }`}
+                        >
+                          {pendingCount}
+                        </p>
+                      </Card>
+                    </div>
+
+                    {/* Pending Password Reset Requests Banner */}
+                    {pendingCount > 0 && (
+                      <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5 space-y-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                            <h3 className="text-sm font-semibold text-amber-950 dark:text-amber-200">
+                              Pending Password Reset Requests ({pendingCount})
+                            </h3>
+                          </div>
+                          <Badge tone="gold" className="text-xs">
+                            Action Required
+                          </Badge>
+                        </div>
+                        <div className="divide-y divide-amber-500/20 rounded-xl bg-card border border-amber-500/20 overflow-hidden shadow-soft">
+                          {pendingRequests.map((req) => (
+                            <div
+                              key={req._id}
+                              className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-muted/30 transition-colors"
+                            >
+                              <div className="min-w-0 space-y-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="text-sm font-semibold text-foreground">
+                                    {req.email}
+                                  </span>
+                                  {req.userExists ? (
+                                    <Badge tone="purple" className="text-[10px]">
+                                      {req.fullName} ({req.role})
+                                    </Badge>
+                                  ) : (
+                                    <Badge tone="gray" className="text-[10px]">
+                                      Unregistered email
+                                    </Badge>
+                                  )}
+                                </div>
+                                {req.note && (
+                                  <p className="text-xs text-foreground/80">
+                                    <span className="font-semibold text-foreground">
+                                      User note/contact:
+                                    </span>{" "}
+                                    {req.note}
+                                  </p>
+                                )}
+                                <p className="text-[11px] text-muted-foreground">
+                                  Requested {formatDate(req.requestedAt)}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 text-xs text-muted-foreground hover:text-destructive"
+                                  onClick={() =>
+                                    setRejectTarget({
+                                      requestId: req._id,
+                                      email: req.email,
+                                    })
+                                  }
+                                >
+                                  Dismiss
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  className="h-8 text-xs gap-1.5"
+                                  onClick={() => {
+                                    setTempPasswordVal(generateMemorablePassword());
+                                    setFulfillAdminNote("");
+                                    setFulfillTarget({
+                                      requestId: req._id,
+                                      email: req.email,
+                                      fullName: req.fullName,
+                                    });
+                                  }}
+                                >
+                                  <KeyRound className="h-3.5 w-3.5" />
+                                  Set Temp Password
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Request History Accordion Toggle */}
+                    {pastRequests.length > 0 && (
+                      <div className="rounded-xl border border-border/70 bg-card/60 p-3">
+                        <button
+                          type="button"
+                          onClick={() => setShowHistoryRequests((v) => !v)}
+                          className="flex w-full items-center justify-between text-xs font-semibold text-muted-foreground hover:text-foreground"
+                        >
+                          <span className="flex items-center gap-2">
+                            <Clock className="h-3.5 w-3.5" />
+                            Password Reset History ({pastRequests.length})
+                          </span>
+                          <span>{showHistoryRequests ? "Hide history" : "Show history"}</span>
+                        </button>
+                        {showHistoryRequests && (
+                          <div className="mt-3 divide-y divide-border/60 border-t border-border/60 pt-2 text-xs">
+                            {pastRequests.slice(0, 10).map((req) => (
+                              <div
+                                key={req._id}
+                                className="py-2.5 flex flex-wrap items-center justify-between gap-2"
+                              >
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-semibold">{req.email}</span>
+                                    <Badge
+                                      tone={req.status === "resolved" ? "green" : "gray"}
+                                      className="text-[10px]"
+                                    >
+                                      {req.status}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                                    Requested: {formatDate(req.requestedAt)}
+                                    {req.resolvedAt
+                                      ? ` · Resolved: ${formatDate(req.resolvedAt)}`
+                                      : ""}
+                                    {req.adminNote ? ` · Note: ${req.adminNote}` : ""}
+                                  </p>
+                                </div>
+                                {req.temporaryPassword && (
+                                  <div className="flex items-center gap-1 font-mono text-[11px] bg-muted px-2 py-0.5 rounded">
+                                    <span>Temp PW: {req.temporaryPassword}</span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
 
               {/* Action and Search Header */}
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -1096,38 +1261,6 @@ function Page() {
             </Section>
           )}
 
-          {detailTab === "notifications" && (
-            <Section title="Notifications" desc="Choose what you and your tenants are told about">
-              <NotificationRow
-                label="Rent reminders to tenants"
-                hint="SMS before rent is due"
-                checked={form.notifySms}
-                onCheckedChange={(v) => set("notifySms", v)}
-              />
-              <NotificationRow
-                label="Payment received"
-                hint="Get a message when money comes in"
-                checked={form.notifyEmail}
-                onCheckedChange={(v) => set("notifyEmail", v)}
-              />
-              <NotificationRow
-                label="WhatsApp updates"
-                hint="Send notices over WhatsApp"
-                checked={form.notifyWhatsapp}
-                onCheckedChange={(v) => set("notifyWhatsapp", v)}
-              />
-              <SaveBar>
-                <Button
-                  onClick={() => save()}
-                  disabled={saving}
-                  className="h-12 w-full justify-center sm:h-auto sm:w-auto"
-                >
-                  {saving ? "Saving…" : "Save changes"}
-                </Button>
-              </SaveBar>
-            </Section>
-          )}
-
           {detailTab === "payments" && (
             <Section title="Payment methods" desc="Where your tenants pay rent">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -1432,6 +1565,10 @@ function Page() {
               required
               autoFocus
             />
+            <p className="text-xs text-muted-foreground">
+              Note: The user will automatically be prompted to choose their own new password the
+              next time they sign in.
+            </p>
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="ghost" onClick={() => setResetAccountTarget(null)}>
                 Cancel
@@ -1442,6 +1579,196 @@ function Page() {
             </div>
           </form>
         </ResponsiveDialog>
+      )}
+
+      {/* Fulfill Password Reset Request Dialog */}
+      {fulfillTarget && (
+        <ResponsiveDialog
+          open={Boolean(fulfillTarget)}
+          onOpenChange={(open) => !open && setFulfillTarget(null)}
+          title={`Set Temporary Password for ${fulfillTarget.fullName}`}
+          description={`Issue a temporary password for ${fulfillTarget.email}`}
+        >
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (tempPasswordVal.length < 8) {
+                setAccountActionError("Password must be at least 8 characters.");
+                return;
+              }
+              setAccountActionLoading(true);
+              try {
+                await fulfillResetAction({
+                  requestId: fulfillTarget.requestId,
+                  temporaryPassword: tempPasswordVal,
+                  adminNote: fulfillAdminNote || undefined,
+                });
+                setFulfilledResult({
+                  email: fulfillTarget.email,
+                  temporaryPassword: tempPasswordVal,
+                });
+                setFulfillTarget(null);
+              } catch (err) {
+                setAccountActionError(friendlyError(err, "Could not set temporary password."));
+              } finally {
+                setAccountActionLoading(false);
+              }
+            }}
+            className="space-y-4 pt-2"
+          >
+            <div className="rounded-xl bg-accent/40 p-3 text-xs text-muted-foreground">
+              Account: <span className="font-semibold text-foreground">{fulfillTarget.email}</span>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground">Temporary Password</label>
+                <button
+                  type="button"
+                  onClick={() => setTempPasswordVal(generateMemorablePassword())}
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  Regenerate
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type={showTempPw ? "text" : "password"}
+                  value={tempPasswordVal}
+                  onChange={(e) => setTempPasswordVal(e.target.value)}
+                  className="h-10 w-full rounded-xl border border-input bg-card px-3 text-sm font-mono pr-10 focus:outline-none focus:ring-2 focus:ring-ring"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowTempPw((v) => !v)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={showTempPw ? "Hide password" : "Show password"}
+                >
+                  {showTempPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                The user will be required to change this password as soon as they sign in.
+              </p>
+            </div>
+
+            <TextField
+              label="Admin note (optional)"
+              name="adminNote"
+              placeholder="e.g. Sent via WhatsApp, verified by phone"
+              value={fulfillAdminNote}
+              onChange={(e) => setFulfillAdminNote(e.target.value)}
+            />
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button type="button" variant="ghost" onClick={() => setFulfillTarget(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={accountActionLoading}>
+                {accountActionLoading ? "Setting password…" : "Set Password & Resolve"}
+              </Button>
+            </div>
+          </form>
+        </ResponsiveDialog>
+      )}
+
+      {/* Temporary Password Result & Copy Dialog */}
+      {fulfilledResult && (
+        <ResponsiveDialog
+          open={Boolean(fulfilledResult)}
+          onOpenChange={(open) => {
+            if (!open) {
+              setFulfilledResult(null);
+              setCopiedTempPw(false);
+            }
+          }}
+          title="Temporary Password Ready"
+          description="Share this temporary password with the user."
+        >
+          <div className="space-y-4 py-2">
+            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-center space-y-1">
+              <CheckCircle2 className="mx-auto h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+              <p className="text-sm font-semibold text-emerald-950 dark:text-emerald-200">
+                Temporary Password Set Successfully
+              </p>
+              <p className="text-xs text-muted-foreground">
+                For account:{" "}
+                <span className="font-semibold text-foreground">{fulfilledResult.email}</span>
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Temporary Password
+              </p>
+              <div className="flex items-center justify-between gap-3 rounded-lg bg-muted p-3 font-mono text-base font-bold text-foreground">
+                <span className="tracking-wider">{fulfilledResult.temporaryPassword}</span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5 h-8 text-xs font-sans"
+                  onClick={() => {
+                    navigator.clipboard.writeText(fulfilledResult.temporaryPassword);
+                    setCopiedTempPw(true);
+                    setTimeout(() => setCopiedTempPw(false), 2000);
+                  }}
+                >
+                  {copiedTempPw ? (
+                    <>
+                      <Check className="h-3.5 w-3.5 text-emerald-600" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" />
+                      Copy password
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Provide this temporary password to the user. When they log in with it, they will
+                automatically be prompted to set their own permanent password.
+              </p>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button
+                onClick={() => {
+                  setFulfilledResult(null);
+                  setCopiedTempPw(false);
+                }}
+              >
+                Done
+              </Button>
+            </div>
+          </div>
+        </ResponsiveDialog>
+      )}
+
+      {/* Reject Reset Request Confirm Dialog */}
+      {rejectTarget && (
+        <ConfirmDialog
+          open={Boolean(rejectTarget)}
+          onOpenChange={(open) => !open && setRejectTarget(null)}
+          title={`Dismiss reset request for ${rejectTarget.email}?`}
+          message="This request will be marked as dismissed. The user's existing credentials will remain unchanged."
+          confirming="Dismiss request"
+          onConfirm={async () => {
+            try {
+              await rejectResetMutation({
+                requestId: rejectTarget.requestId,
+              });
+              setAccountActionMessage(`Request for ${rejectTarget.email} dismissed.`);
+            } catch (err) {
+              setAccountActionError(friendlyError(err, "Could not dismiss request."));
+            } finally {
+              setRejectTarget(null);
+            }
+          }}
+        />
       )}
 
       {roleChangeTarget && (
