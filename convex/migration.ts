@@ -1,5 +1,7 @@
-import { internalMutation } from "./_generated/server";
+import { internalMutation, internalAction } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { v } from "convex/values";
+import { Scrypt } from "lucia";
 
 // One-time fixes for deployments whose profiles predate the `role` field.
 // Run with:  npx convex run migration:backfillAdmin
@@ -253,5 +255,139 @@ export const adoptLandlordData = internalMutation({
     });
 
     return { moved };
+  },
+});
+
+// Operator mutation: clean up all secondary/demo accounts and retain exactly:
+// 1. Primary admin: edimamfaidol@gmail.com
+// 2. Primary tenant: kwame.asante@example.com (or specified email)
+//   npx convex run migration:cleanAccountsAndCreateTenant
+export const cleanAccountsAndCreateTenant = internalMutation({
+  args: {
+    adminEmail: v.optional(v.string()),
+    tenantEmail: v.optional(v.string()),
+    tenantPasswordSecret: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const adminEmail = (args.adminEmail ?? "edimamfaidol@gmail.com").trim().toLowerCase();
+    const tenantEmail = (args.tenantEmail ?? "kwame.asante@example.com").trim().toLowerCase();
+    const secret =
+      args.tenantPasswordSecret ??
+      "c9e332650ca9bdf8f128184fb59ef5c8:a2c5988cc773a5d54a9ef9b6608dacca61c7fe834bfb66230f494461f0cede63f95d459be74bb5049147f0fc6f363d8389b6e9b9d2b469ab381a59bffbfdfaa0";
+
+    const users = await ctx.db.query("users").collect();
+    const adminUser = users.find((u) => u.email?.toLowerCase() === adminEmail);
+    if (!adminUser) throw new Error(`Admin user ${adminEmail} not found`);
+
+    // Ensure admin user profile has role: admin
+    const adminProfile = (await ctx.db.query("profiles").collect()).find(
+      (p) => p.userId === adminUser._id,
+    );
+    if (adminProfile && adminProfile.role !== "admin") {
+      await ctx.db.patch(adminProfile._id, { role: "admin" });
+    }
+
+    // Ensure tenant user exists
+    let tenantUser = users.find((u) => u.email?.toLowerCase() === tenantEmail);
+    let tenantUserId = tenantUser?._id;
+
+    if (!tenantUser) {
+      tenantUserId = await ctx.db.insert("users", { email: tenantEmail });
+      await ctx.db.insert("authAccounts", {
+        userId: tenantUserId,
+        provider: "password",
+        providerAccountId: tenantEmail,
+        secret,
+      });
+      await ctx.db.insert("profiles", {
+        userId: tenantUserId,
+        role: "user",
+        firstName: "Kwame",
+        lastName: "Asante",
+        phone: "024 777 0199",
+        region: "Greater Accra",
+        currency: "GHS",
+        rentDueDay: 5,
+        notifySms: true,
+        notifyEmail: true,
+        notifyWhatsapp: true,
+        plan: "free",
+      });
+    } else {
+      const authAccounts = await ctx.db.query("authAccounts").collect();
+      const pwAcc = authAccounts.find((a) => a.userId === tenantUserId);
+      if (pwAcc) {
+        await ctx.db.patch(pwAcc._id, { secret });
+      } else {
+        await ctx.db.insert("authAccounts", {
+          userId: tenantUserId,
+          provider: "password",
+          providerAccountId: tenantEmail,
+          secret,
+        });
+      }
+      const tenantProfile = (await ctx.db.query("profiles").collect()).find(
+        (p) => p.userId === tenantUserId,
+      );
+      if (tenantProfile) {
+        await ctx.db.patch(tenantProfile._id, {
+          role: "user",
+          firstName: "Kwame",
+          lastName: "Asante",
+          phone: "024 777 0199",
+        });
+      }
+    }
+
+    // Delete all other users and their profiles, authAccounts, authSessions
+    const keepUserIds = new Set([String(adminUser._id), String(tenantUserId)]);
+    const allUsers = await ctx.db.query("users").collect();
+    const deleted: string[] = [];
+
+    for (const u of allUsers) {
+      if (!keepUserIds.has(String(u._id))) {
+        deleted.push(u.email ?? String(u._id));
+
+        const profs = await ctx.db
+          .query("profiles")
+          .filter((q) => q.eq(q.field("userId"), u._id))
+          .collect();
+        for (const p of profs) await ctx.db.delete(p._id);
+
+        const accs = await ctx.db
+          .query("authAccounts")
+          .filter((q) => q.eq(q.field("userId"), u._id))
+          .collect();
+        for (const a of accs) await ctx.db.delete(a._id);
+
+        const sess = await ctx.db
+          .query("authSessions")
+          .filter((q) => q.eq(q.field("userId"), u._id))
+          .collect();
+        for (const s of sess) await ctx.db.delete(s._id);
+
+        await ctx.db.delete(u._id);
+      }
+    }
+
+    return {
+      admin: adminEmail,
+      tenant: tenantEmail,
+      deletedAccounts: deleted,
+      totalRemaining: 2,
+    };
+  },
+});
+
+export const cleanAndSetupTwoAccounts = internalAction({
+  args: {},
+  handler: async (ctx) => {
+    const scrypt = new Scrypt();
+    const tenantSecret = await scrypt.hash("Kwame-Sankofa-2026!");
+    return await ctx.runMutation(internal.migration.cleanAccountsAndCreateTenant, {
+      adminEmail: "edimamfaidol@gmail.com",
+      tenantEmail: "kwame.asante@example.com",
+      tenantPasswordSecret: tenantSecret,
+    });
   },
 });
