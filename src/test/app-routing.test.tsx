@@ -30,4 +30,12 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
+
+  it("matches announcements route /announcements", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+
+    const matches = router.matchRoutes("/announcements");
+
+    expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
+  });
 });

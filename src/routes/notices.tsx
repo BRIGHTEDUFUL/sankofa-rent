@@ -1,7 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import { Megaphone, Pin, Search, Building2, Bell, ShieldCheck, ArrowLeft } from "lucide-react";
+import {
+  Megaphone,
+  Pin,
+  Search,
+  Building2,
+  Bell,
+  ShieldCheck,
+  ArrowLeft,
+  ArrowUpRight,
+} from "lucide-react";
 import { useQuery } from "convex/react";
+import { useConvexAuth } from "@convex-dev/auth/react";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { useBranding } from "@/lib/branding";
@@ -26,7 +36,8 @@ export const Route = createFileRoute("/notices")({
 });
 
 function TenantNoticeBoardPage() {
-  const { branding } = useBranding();
+  const { appName, logoUrl } = useBranding();
+  const { isAuthenticated } = useConvexAuth();
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -50,19 +61,25 @@ function TenantNoticeBoardPage() {
   const pinnedNotices = useMemo(() => filteredNotices.filter((n) => n.pinned), [filteredNotices]);
   const regularNotices = useMemo(() => filteredNotices.filter((n) => !n.pinned), [filteredNotices]);
 
+  const displayBrandName = appName || "Sankofa Rent";
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Bar */}
       <header className="sticky top-0 z-20 border-b border-border/80 bg-background/90 backdrop-blur-md px-4 sm:px-6 py-3.5 transition-colors">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground font-bold shadow-sm">
-              <Megaphone className="h-5 w-5" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground font-bold shadow-sm overflow-hidden">
+              {logoUrl ? (
+                <img src={logoUrl} alt="" className="h-7 w-7 object-contain rounded-lg" />
+              ) : (
+                <Megaphone className="h-5 w-5" />
+              )}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base sm:text-lg font-bold tracking-tight">
-                  {branding.brandName || "Sankofa Rent"}
+                  {displayBrandName}
                 </h1>
                 <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
                   <ShieldCheck className="h-3 w-3" /> Official Notices
@@ -73,13 +90,23 @@ function TenantNoticeBoardPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
-              to="/login"
-              className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-input bg-card px-3 text-xs font-semibold text-foreground transition hover:bg-muted pressable"
-            >
-              <ArrowLeft className="h-3.5 w-3.5 text-muted-foreground" />
-              <span>Landlord Login</span>
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                to="/announcements"
+                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-input bg-card px-3 text-xs font-semibold text-foreground transition hover:bg-muted pressable"
+              >
+                <ArrowLeft className="h-3.5 w-3.5 text-muted-foreground" />
+                <span>Landlord Portal</span>
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-input bg-card px-3 text-xs font-semibold text-foreground transition hover:bg-muted pressable"
+              >
+                <ArrowLeft className="h-3.5 w-3.5 text-muted-foreground" />
+                <span>Landlord Login</span>
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -247,9 +274,7 @@ function TenantNoticeBoardPage() {
 
       {/* Footer */}
       <footer className="mt-auto border-t border-border/80 bg-background/90 px-4 sm:px-6 py-6 text-center text-xs text-muted-foreground">
-        <p className="font-medium text-foreground">
-          {branding.brandName || "Sankofa Rent"} Notice Board
-        </p>
+        <p className="font-medium text-foreground">{displayBrandName} Notice Board</p>
         <p className="mt-1">
           Direct in-app communication between property administration and tenants. No external SMS
           or WhatsApp gateways required.

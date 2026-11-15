@@ -46,26 +46,47 @@ function Page() {
   const propertyName = new Map(properties.map((p) => [p._id, p.name]));
 
   async function copyNoticeBoardLink() {
-    try {
-      const url = `${window.location.origin}/notices`;
-      await navigator.clipboard.writeText(url);
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2200);
-    } catch {
-      // fallback
+    const url = `${window.location.origin}/notices`;
+    let copied = false;
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(url);
+        copied = true;
+      } catch {
+        // Try fallback
+      }
     }
+    if (!copied) {
+      try {
+        const input = document.createElement("input");
+        input.value = url;
+        input.style.position = "fixed";
+        input.style.opacity = "0";
+        document.body.appendChild(input);
+        input.focus();
+        input.select();
+        document.execCommand("copy");
+        document.body.removeChild(input);
+      } catch {
+        // Fallback error ignored
+      }
+    }
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2200);
   }
 
   async function submit(values: FormData) {
     const title = String(values.get("title") || "").trim();
     const body = String(values.get("body") || "").trim();
-    const propertyRaw = String(values.get("propertyId") || "none");
+    const propertyRaw = String(values.get("propertyId") || "").trim();
     const pinned = values.has("pinned");
     if (!title || !body) throw new Error("Title and message are required.");
+    const propertyId =
+      propertyRaw && propertyRaw !== "none" ? (propertyRaw as Id<"properties">) : undefined;
     await createAnnouncement({
       title,
       body,
-      propertyId: propertyRaw === "none" ? undefined : (propertyRaw as Id<"properties">),
+      propertyId,
       pinned,
       channels: ["in_app"],
     });
@@ -99,8 +120,6 @@ function Page() {
             </button>
             <Link
               to="/notices"
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-flex h-11 sm:h-9 items-center gap-1.5 rounded-xl border border-input bg-background px-3 text-xs sm:text-sm font-semibold text-foreground transition hover:bg-muted pressable"
               title="Open the public tenant notice board"
             >

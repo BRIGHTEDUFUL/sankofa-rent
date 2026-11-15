@@ -164,7 +164,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const isStandalone = ["/login", "/signup", "/forgot-password", "/notices"].includes(path);
+  const normalizedPath = path.replace(/\/$/, "");
+  const isStandalone =
+    ["/login", "/signup", "/forgot-password", "/notices"].includes(normalizedPath) ||
+    path.startsWith("/notices");
   usePlatform();
 
   return (

@@ -1,11 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
-import { Users, Banknote, Wrench, Smartphone, ArrowUpRight, Megaphone } from "lucide-react";
+import {
+  Users,
+  Banknote,
+  Wrench,
+  Smartphone,
+  ArrowUpRight,
+  Megaphone,
+  Building2,
+  Plus,
+  ExternalLink,
+} from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Card, Badge } from "@/components/app/AppShell";
 import { Progress } from "@/components/ui/progress";
-import { cediFromPesewas, formatDateTime, initials, PAYMENT_METHODS } from "@/lib/format";
+import { cediFromPesewas, formatDateTime, PAYMENT_METHODS } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -76,16 +86,18 @@ function Dashboard() {
     <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
       {/* Mobile greeting hero */}
       <div className="sm:hidden col-span-2 lg:col-span-4">
-        <div className="mb-1 flex items-center gap-3">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-ink-foreground">
-            {initials(fullName)}
-          </div>
+        <div className="flex items-center justify-between py-1">
           <div className="min-w-0">
-            <p className="truncate text-lg font-semibold leading-tight">
+            <h2 className="truncate text-xl font-bold tracking-tight text-foreground">
               {firstName ? `Akwaaba, ${firstName}!` : "Akwaaba!"}
+            </h2>
+            <p className="truncate text-xs text-muted-foreground mt-0.5">
+              Here's your property overview
             </p>
-            <p className="truncate text-xs text-muted-foreground">Here's your property overview</p>
           </div>
+          <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
+            Active
+          </span>
         </div>
       </div>
 
@@ -100,56 +112,58 @@ function Dashboard() {
             {cediFromPesewas(summary.collectedThisMonth)}
           </p>
         </div>
-        <div className="hidden h-10 w-10 shrink-0 place-items-center rounded-full bg-success-soft text-success sm:grid">
-          <Banknote className="h-5 w-5" />
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-success-soft text-success sm:h-12 sm:w-12">
+          <Banknote className="h-4 w-4 sm:h-5 sm:w-5" />
         </div>
       </Card>
 
       {/* KPI: Occupancy */}
-      <Card className="flex items-center gap-3 !p-4 sm:gap-4 sm:!p-6">
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-soft text-primary sm:h-12 sm:w-12">
-          <Users className="h-5 w-5" />
-        </div>
+      <Card className="flex items-center justify-between !p-4 sm:!p-6">
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground sm:text-sm">Occupancy</p>
           <p
-            className="font-semibold tabular-nums"
+            className="mt-1 font-semibold tabular-nums"
             style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
           >
             {summary.occupancyPercent}%
           </p>
         </div>
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary-soft text-primary sm:h-12 sm:w-12">
+          <Users className="h-4 w-4 sm:h-5 sm:w-5" />
+        </div>
       </Card>
 
       {/* KPI: Arrears */}
-      <Card className="flex items-center gap-3 !p-4 sm:gap-4 sm:!p-6">
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold-soft text-gold sm:h-12 sm:w-12">
-          <Banknote className="h-5 w-5" />
-        </div>
+      <Card className="flex items-center justify-between !p-4 sm:!p-6">
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground sm:text-sm">Arrears</p>
           <p
-            className="font-semibold tabular-nums"
+            className="mt-1 font-semibold tabular-nums"
             style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
           >
             {cediFromPesewas(summary.arrears)}
           </p>
         </div>
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold-soft text-gold sm:h-12 sm:w-12">
+          <Banknote className="h-4 w-4 sm:h-5 sm:w-5" />
+        </div>
       </Card>
 
       {/* KPI: Expected this month */}
-      <Card className="relative overflow-hidden bg-gradient-primary text-primary-foreground !p-4 sm:!p-6">
-        <p className="text-xs opacity-80 sm:text-sm">Expected</p>
-        <p
-          className="mt-1 font-semibold tabular-nums"
-          style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
-        >
-          {cediFromPesewas(summary.expectedThisMonth)}
-        </p>
+      <Card className="relative overflow-hidden bg-gradient-primary text-primary-foreground !p-4 sm:!p-6 flex flex-col justify-between">
+        <div>
+          <p className="text-xs opacity-80 sm:text-sm">Expected</p>
+          <p
+            className="mt-1 font-semibold tabular-nums"
+            style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
+          >
+            {cediFromPesewas(summary.expectedThisMonth)}
+          </p>
+        </div>
       </Card>
 
       {/* Rent collection chart */}
-      <Card className="col-span-2 lg:col-span-2 min-w-0 overflow-hidden min-h-[360px] sm:min-h-[400px] flex flex-col">
+      <Card className="col-span-2 lg:col-span-2 min-w-0 overflow-hidden min-h-[280px] sm:min-h-[380px] flex flex-col">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className="text-base font-semibold sm:text-xl">Rent collection</h3>
@@ -172,7 +186,7 @@ function Dashboard() {
         </div>
         {/* The chart grows into whatever height the card has, so the card never
             ends up with a large empty band under the plot. */}
-        <div className="mt-4 min-h-[11rem] flex-1 overflow-hidden">
+        <div className="mt-4 min-h-[10rem] flex-1 overflow-hidden">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthly} barGap={4} margin={{ left: -16, right: 8, top: 4, bottom: 0 }}>
               <XAxis
@@ -214,14 +228,16 @@ function Dashboard() {
       </Card>
 
       {/* Collection rate */}
-      <Card className="col-span-2 sm:col-span-1 min-h-[200px] sm:min-h-[400px] flex flex-col">
-        <h3 className="text-base font-semibold sm:text-xl">Collection rate</h3>
-        <p className="text-xs text-muted-foreground sm:text-sm">This month</p>
-        <div className="flex-1 flex flex-col justify-center pt-3 sm:pt-0">
+      <Card className="col-span-2 sm:col-span-1 min-h-[160px] sm:min-h-[380px] flex flex-col justify-between">
+        <div>
+          <h3 className="text-base font-semibold sm:text-xl">Collection rate</h3>
+          <p className="text-xs text-muted-foreground sm:text-sm">This month</p>
+        </div>
+        <div className="flex-1 flex flex-col justify-center py-3 sm:py-0">
           <p className="text-3xl font-semibold text-primary sm:text-4xl tabular-nums">
             {collectionRate}%
           </p>
-          <Progress value={collectionRate} className="mt-4 h-2" />
+          <Progress value={collectionRate} className="mt-3 h-2" />
           <p className="mt-2 text-[11px] text-muted-foreground">
             {cediFromPesewas(summary.collectedThisMonth)} of{" "}
             {cediFromPesewas(summary.expectedThisMonth)} expected
@@ -229,41 +245,63 @@ function Dashboard() {
         </div>
       </Card>
 
-      {/* Profile card — identity row hidden on mobile (the hero above covers it) */}
-      <Card className="col-span-2 sm:col-span-1 min-h-[200px] sm:min-h-[400px] flex flex-col justify-between">
-        <div className="hidden flex-row items-center gap-4 sm:flex sm:flex-col sm:text-center">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-base font-semibold text-ink-foreground sm:h-16 sm:w-16 sm:text-lg">
-            {initials(fullName)}
+      {/* Portfolio overview card — clean, structured, and no duplicate profile avatar or empty void */}
+      <Card className="col-span-2 sm:col-span-1 min-h-[160px] sm:min-h-[380px] flex flex-col justify-between">
+        <div>
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold sm:text-xl">Portfolio overview</h3>
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary-soft text-primary">
+              <Building2 className="h-4 w-4" />
+            </div>
           </div>
-          <div className="min-w-0">
-            <h3 className="truncate text-base font-semibold sm:mt-3 sm:text-lg">
-              {fullName || "Your profile"}
-            </h3>
-            <p className="truncate text-xs text-muted-foreground sm:text-sm">
-              {profile.businessName || profile.phone || "Add your business details in Settings"}
-            </p>
-          </div>
+          <p className="text-xs text-muted-foreground sm:text-sm mt-0.5">
+            Active rental spaces & occupancy
+          </p>
         </div>
-        <div className="mt-auto w-full border-t border-border pt-4">
-          <div className="grid grid-cols-3 gap-2">
-            {(
-              [
-                ["Properties", properties.length],
-                ["Units", unitCount],
-                ["Tenants", tenants.length],
-              ] as [string, number][]
-            ).map(([l, v]) => (
-              <div key={l}>
-                <p className="text-xs text-muted-foreground">{l}</p>
-                <p className="text-lg font-semibold sm:text-xl tabular-nums">{v}</p>
-              </div>
-            ))}
-          </div>
+
+        <div className="grid grid-cols-3 gap-2 my-4">
+          <Link
+            to="/properties"
+            className="rounded-xl bg-muted/40 p-2.5 sm:p-3 text-center transition hover:bg-muted pressable"
+          >
+            <p className="text-xs text-muted-foreground">Properties</p>
+            <p className="text-lg sm:text-2xl font-bold tabular-nums text-foreground mt-0.5">
+              {properties.length}
+            </p>
+          </Link>
+          <Link
+            to="/properties"
+            className="rounded-xl bg-muted/40 p-2.5 sm:p-3 text-center transition hover:bg-muted pressable"
+          >
+            <p className="text-xs text-muted-foreground">Units</p>
+            <p className="text-lg sm:text-2xl font-bold tabular-nums text-foreground mt-0.5">
+              {unitCount}
+            </p>
+          </Link>
+          <Link
+            to="/tenants"
+            className="rounded-xl bg-muted/40 p-2.5 sm:p-3 text-center transition hover:bg-muted pressable"
+          >
+            <p className="text-xs text-muted-foreground">Tenants</p>
+            <p className="text-lg sm:text-2xl font-bold tabular-nums text-foreground mt-0.5">
+              {tenants.length}
+            </p>
+          </Link>
+        </div>
+
+        <div className="border-t border-border pt-3">
+          <Link
+            to="/properties"
+            className="flex items-center justify-between text-xs font-semibold text-primary hover:underline pressable"
+          >
+            <span>Manage properties & units</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </Card>
 
       {/* Recent payments */}
-      <Card className="col-span-2 lg:col-span-2 min-h-[280px]">
+      <Card className="col-span-2 lg:col-span-2 min-h-[260px]">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold sm:text-xl">Recent payments</h3>
           <Link
@@ -273,12 +311,17 @@ function Dashboard() {
             View all <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 space-y-3">
           {payments.length === 0 && (
-            <p className="text-sm text-muted-foreground">No payments recorded yet.</p>
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              No payments recorded yet.
+            </p>
           )}
           {payments.slice(0, 4).map((p) => (
-            <div key={p._id} className="flex items-center justify-between gap-3 py-0.5">
+            <div
+              key={p._id}
+              className="flex items-center justify-between gap-3 py-1 border-b border-border/40 last:border-0"
+            >
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold text-sm">
                   {tenantById.get(p.tenantId)?.name ?? "Tenant"}
@@ -294,14 +337,14 @@ function Dashboard() {
       </Card>
 
       {/* Maintenance */}
-      <Card className="col-span-2 sm:col-span-1 min-h-[280px]">
+      <Card className="col-span-2 sm:col-span-1 min-h-[260px]">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold sm:text-xl">Maintenance</h3>
           <Wrench className="h-4 w-4 text-muted-foreground" />
         </div>
         <div className="mt-4 space-y-3">
           {maintenance.length === 0 && (
-            <p className="text-sm text-muted-foreground">No open requests.</p>
+            <p className="text-sm text-muted-foreground py-4 text-center">No open requests.</p>
           )}
           {maintenance
             .filter((m) => m.status !== "resolved")
@@ -310,9 +353,9 @@ function Dashboard() {
               <Link
                 key={m._id}
                 to="/maintenance"
-                className="block rounded-2xl transition active:opacity-70"
+                className="block rounded-xl p-2 bg-muted/30 transition hover:bg-muted/60 active:opacity-70"
               >
-                <p className="text-sm font-semibold">{m.title}</p>
+                <p className="text-sm font-semibold truncate">{m.title}</p>
                 <div className="mt-1 flex items-center justify-between gap-2">
                   <span className="min-w-0 truncate text-xs text-muted-foreground">
                     {(m.unitId ? unitById.get(m.unitId)?.property.name : undefined) ?? "Property"}
@@ -329,43 +372,68 @@ function Dashboard() {
       </Card>
 
       {/* MoMo card */}
-      <Card className="col-span-2 sm:col-span-1 lg:col-span-1 flex flex-col items-center justify-center text-center min-h-[220px] sm:min-h-[280px]">
-        <Smartphone className="h-10 w-10 text-primary sm:h-12 sm:w-12" strokeWidth={1.5} />
-        <h3 className="mt-3 text-base font-semibold sm:text-xl">Get paid by MoMo</h3>
-        <p className="mt-1 text-sm text-muted-foreground max-w-[22ch] sm:max-w-none">
-          Let tenants pay rent with MTN, Telecel or AirtelTigo and get instant receipts.
+      <Card className="col-span-2 sm:col-span-1 lg:col-span-1 flex flex-col items-center justify-center text-center p-5 sm:p-6 min-h-[200px] sm:min-h-[260px]">
+        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/10 text-primary">
+          <Smartphone className="h-6 w-6" strokeWidth={1.75} />
+        </div>
+        <h3 className="mt-2.5 text-base font-semibold sm:text-lg">Get paid by MoMo</h3>
+        <p className="mt-1 text-xs text-muted-foreground max-w-[24ch]">
+          Let tenants pay rent with MTN, Telecel or AirtelTigo with instant receipts.
         </p>
         <Link
           to="/settings"
           search={{ tab: "payments" }}
-          className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-muted px-4 text-sm font-semibold transition hover:bg-accent sm:h-12 sm:w-auto"
+          className="mt-3.5 inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-muted px-4 text-xs sm:text-sm font-semibold transition hover:bg-accent sm:w-auto pressable"
         >
-          Set up MoMo <ArrowUpRight className="h-4 w-4" />
+          Set up MoMo <ArrowUpRight className="h-3.5 w-3.5" />
         </Link>
       </Card>
 
-      {/* Pinned announcement */}
-      <Card className="col-span-2 lg:col-span-4">
-        <div className="flex flex-wrap items-start gap-4 sm:items-center">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary">
-            <Megaphone className="h-5 w-5" />
+      {/* Tenant Announcement & Notice Board banner */}
+      <Card className="col-span-2 lg:col-span-4 border border-border/80">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3 min-w-0">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+              <Megaphone className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                  Tenant Notice Board
+                </span>
+                {pinned && <Badge tone="gold">Pinned</Badge>}
+              </div>
+              {pinned ? (
+                <>
+                  <p className="font-semibold text-sm sm:text-base truncate mt-0.5">
+                    {pinned.title}
+                  </p>
+                  <p className="line-clamp-1 text-xs sm:text-sm text-muted-foreground mt-0.5">
+                    {pinned.body}
+                  </p>
+                </>
+              ) : (
+                <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                  Publish updates, maintenance alerts, or rent notices directly to your tenants.
+                </p>
+              )}
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            {pinned ? (
-              <>
-                <p className="truncate font-semibold">{pinned.title}</p>
-                <p className="line-clamp-2 text-sm text-muted-foreground">{pinned.body}</p>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">No announcements yet.</p>
-            )}
+          <div className="flex items-center gap-2 pt-1 sm:pt-0 shrink-0">
+            <Link
+              to="/notices"
+              className="inline-flex h-9 items-center gap-1 rounded-xl border border-input bg-card px-3 text-xs font-semibold text-foreground transition hover:bg-muted pressable"
+            >
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>Public Notice Board</span>
+            </Link>
+            <Link
+              to="/announcements"
+              className="inline-flex h-9 items-center gap-1 rounded-xl bg-primary px-3 text-xs font-semibold text-primary-foreground transition hover:opacity-90 pressable"
+            >
+              <span>Manage Notices</span>
+            </Link>
           </div>
-          <Link
-            to="/announcements"
-            className="-my-2 flex min-h-11 w-full shrink-0 items-center py-2 text-sm font-semibold text-primary sm:w-auto"
-          >
-            All announcements
-          </Link>
         </div>
       </Card>
     </div>
