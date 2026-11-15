@@ -356,7 +356,7 @@ function BottomTabBar({
                   </button>
                 </div>
                 <p className="mt-3 mb-2 text-center text-[11px] text-muted-foreground">
-                  Sankofa Rent · v1.0
+                  Sankofa Rent {"\u00B7"} v1.0
                 </p>
               </div>
             </motion.div>
@@ -422,7 +422,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   void platform;
 
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-dvh sm:h-dvh sm:overflow-hidden sm:flex sm:flex-col">
       {/* Mobile top bar */}
       <MobileTopBar
         path={path}
@@ -474,10 +474,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1400px] sm:px-6">
-        <div className="flex gap-6 sm:pt-6">
+      <div className="mx-auto max-w-[1400px] sm:px-6 sm:flex-1 sm:overflow-hidden sm:flex sm:flex-col">
+        <div className="flex gap-6 sm:pt-6 sm:flex-1 sm:overflow-hidden">
           {/* Desktop sidebar */}
-          <aside className="sticky top-[5.5rem] hidden h-[calc(100vh-7rem)] w-16 shrink-0 flex-col items-center justify-between rounded-full bg-card py-4 shadow-soft sm:flex">
+          <aside className="hidden h-full overflow-y-auto w-16 shrink-0 flex-col items-center justify-between rounded-full bg-card py-4 shadow-soft sm:flex">
             <nav className="flex flex-col items-center gap-1.5" aria-label="Primary">
               {DESKTOP_NAV.map((n) => {
                 const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
@@ -535,19 +535,20 @@ export function AppShell({ children }: { children: ReactNode }) {
               >
                 <LogOut className="h-[18px] w-[18px]" />
               </button>
-              <div
-                role="img"
-                aria-label={fullName ? `Account avatar for ${fullName}` : "Your account"}
-                className="mt-2 grid h-9 w-9 place-items-center rounded-full bg-ink text-[11px] font-semibold text-ink-foreground"
+              <Link
+                to="/settings"
+                title={fullName || "Your account"}
+                aria-label={fullName ? `Settings � ${fullName}` : "Settings"}
+                className="mt-2 grid h-11 w-11 place-items-center rounded-full bg-ink text-[11px] font-semibold text-ink-foreground pressable ring-2 ring-transparent hover:ring-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {avatar}
-              </div>
+              </Link>
             </div>
           </aside>
 
           {/* Main content */}
           <main
-            className="min-w-0 flex-1 px-3 pb-nav pt-[calc(3.75rem+var(--sat)+1rem)] sm:px-0 sm:pb-6 sm:pt-0"
+            className="min-w-0 flex-1 sm:overflow-y-auto px-3 pb-nav pt-[calc(3.75rem+var(--sat)+1rem)] sm:px-0 sm:pb-6 sm:pt-0"
             style={{ marginBottom: "var(--keyboard-offset, 0px)" }}
           >
             <AnimatePresence mode="wait" initial={false}>

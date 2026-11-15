@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   User,
@@ -41,12 +41,12 @@ export const Route = createFileRoute("/settings")({
   },
   head: () => ({
     meta: [
-      { title: "Settings — Sankofa Rent" },
+      { title: "Settings â€” Sankofa Rent" },
       {
         name: "description",
         content: "Manage your profile, business, notifications, payments and team.",
       },
-      { property: "og:title", content: "Settings — Sankofa Rent" },
+      { property: "og:title", content: "Settings â€” Sankofa Rent" },
       {
         property: "og:description",
         content: "Manage your profile, business, notifications, payments and team.",
@@ -65,7 +65,7 @@ const tabs = [
   { id: "security", label: "Security", icon: ShieldCheck },
 ] as const;
 
-// Curated accents — all clear 4.5:1 against white so button text stays readable.
+// Curated accents â€” all clear 4.5:1 against white so button text stays readable.
 const ACCENT_SWATCHES = [
   "#4E735A", // default brand green
   "#1F6F5C", // teal green
@@ -166,6 +166,7 @@ function SettingsRow({
   onClick,
   destructive,
   selected,
+  hideChevron,
 }: {
   icon: LucideIcon;
   tone: string;
@@ -174,6 +175,7 @@ function SettingsRow({
   onClick: () => void;
   destructive?: boolean;
   selected?: boolean;
+  hideChevron?: boolean;
 }) {
   return (
     <button
@@ -303,9 +305,10 @@ function SettingsListNav({
           label="Sign out"
           onClick={onSignOut}
           destructive
+          hideChevron
         />
       </div>
-      <p className="mt-2 text-center text-xs text-muted-foreground">{appName} · v1.0</p>
+      <p className="mt-2 text-center text-xs text-muted-foreground">{appName} Â· v1.0</p>
     </nav>
   );
 }
@@ -422,7 +425,7 @@ function Page() {
       .map((w) => w[0])
       .slice(0, 2)
       .join("")
-      .toUpperCase() || "—";
+      .toUpperCase() || "â€”";
 
   async function saveBrandingChanges() {
     if (!brand) return;
@@ -441,7 +444,7 @@ function Page() {
           headers: { "Content-Type": logoFile.type },
           body: logoFile,
         });
-        if (!res.ok) throw new Error("Upload failed — try a smaller image.");
+        if (!res.ok) throw new Error("Upload failed â€” try a smaller image.");
         const { storageId } = (await res.json()) as { storageId: string };
         logoArg = { logoId: storageId as Id<"_storage"> };
       }
@@ -462,7 +465,7 @@ function Page() {
   }
 
   // Stage the shipped defaults (name/tagline/accent, no custom logo) in the
-  // editor — the user still has to press Save to apply them.
+  // editor â€” the user still has to press Save to apply them.
   function resetBrandingForm() {
     setBrand({
       appName: DEFAULT_BRANDING.appName,
@@ -472,7 +475,7 @@ function Page() {
     setLogoFile(null);
     setLogoRemoved(true);
     setBrandError("");
-    setBrandMessage("Defaults staged — press Save branding to apply them.");
+    setBrandMessage("Defaults staged â€” press Save branding to apply them.");
   }
 
   return (
@@ -573,7 +576,7 @@ function Page() {
                   disabled={saving}
                   className="h-12 w-full justify-center sm:h-auto sm:w-auto"
                 >
-                  {saving ? "Saving…" : "Save changes"}
+                  {saving ? "Savingâ€¦" : "Save changes"}
                 </Button>
               </SaveBar>
             </Section>
@@ -601,7 +604,7 @@ function Page() {
                 <TextField
                   label="Currency"
                   name="currency"
-                  value="GH₵ Ghana cedi"
+                  value="GHâ‚µ Ghana cedi"
                   readOnly
                   className="h-11 sm:h-9"
                 />
@@ -631,7 +634,7 @@ function Page() {
                   disabled={saving}
                   className="h-12 w-full justify-center sm:h-auto sm:w-auto"
                 >
-                  {saving ? "Saving…" : "Save changes"}
+                  {saving ? "Savingâ€¦" : "Save changes"}
                 </Button>
               </SaveBar>
             </Section>
@@ -640,7 +643,7 @@ function Page() {
           {detailTab === "branding" && isAdmin && brand && (
             <Section
               title="Branding"
-              desc="The name, logo and colour shown across the app — including the login page and browser tab"
+              desc="The name, logo and colour shown across the app â€” including the login page and browser tab"
             >
               {/* Live preview of the header + login identity */}
               <div className="mb-6 overflow-hidden rounded-2xl border border-border">
@@ -676,7 +679,7 @@ function Page() {
                   </span>
                 </div>
                 <div className="border-t border-border bg-card px-4 py-2.5 text-xs text-muted-foreground">
-                  Browser tab: {brand.appName || "Untitled"} — Settings
+                  Browser tab: {brand.appName || "Untitled"} â€” Settings
                 </div>
               </div>
 
@@ -731,7 +734,7 @@ function Page() {
                 </div>
                 {!isUsableAccent(brand.accentColor) && (
                   <p className="mt-2 text-xs text-destructive" role="alert">
-                    Too light — white text on this colour wouldn't be readable. Pick a darker shade.
+                    Too light â€” white text on this colour wouldn't be readable. Pick a darker shade.
                   </p>
                 )}
               </div>
@@ -779,7 +782,7 @@ function Page() {
                     </button>
                   )}
                   <span className="text-xs text-muted-foreground">
-                    PNG, SVG or JPG · max 1 MB · falls back to the default mark
+                    PNG, SVG or JPG Â· max 1 MB Â· falls back to the default mark
                   </span>
                 </div>
               </div>
@@ -813,7 +816,7 @@ function Page() {
                     }
                     className="flex-1 h-12 justify-center sm:flex-none sm:h-auto"
                   >
-                    {brandSaving ? "Saving…" : "Save branding"}
+                    {brandSaving ? "Savingâ€¦" : "Save branding"}
                   </Button>
                 </div>
               </SaveBar>
@@ -846,7 +849,7 @@ function Page() {
                   disabled={saving}
                   className="h-12 w-full justify-center sm:h-auto sm:w-auto"
                 >
-                  {saving ? "Saving…" : "Save changes"}
+                  {saving ? "Savingâ€¦" : "Save changes"}
                 </Button>
               </SaveBar>
             </Section>
@@ -890,7 +893,7 @@ function Page() {
                   name="bankAccount"
                   value={form.bankAccount}
                   onChange={(e) => set("bankAccount", e.target.value)}
-                  placeholder="•••• 4410"
+                  placeholder="â€¢â€¢â€¢â€¢ 4410"
                   className="h-11 sm:h-9"
                 />
               </div>
@@ -900,7 +903,7 @@ function Page() {
                   disabled={saving}
                   className="h-12 w-full justify-center sm:h-auto sm:w-auto"
                 >
-                  {saving ? "Saving…" : "Save changes"}
+                  {saving ? "Savingâ€¦" : "Save changes"}
                 </Button>
               </SaveBar>
             </Section>
