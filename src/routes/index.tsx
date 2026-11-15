@@ -151,7 +151,7 @@ function Dashboard() {
       </Card>
 
       {/* Rent collection chart */}
-      <Card className="col-span-2 lg:col-span-2 min-w-0 overflow-hidden">
+      <Card className="col-span-2 lg:col-span-2 min-w-0 overflow-hidden min-h-[400px]">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className="text-base font-semibold sm:text-xl">Rent collection</h3>
@@ -159,13 +159,13 @@ function Dashboard() {
           </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-3">
-          <div className="rounded-2xl px-3 py-2 shadow-soft min-w-0">
+          <div className="rounded-2xl bg-muted/40 px-3 py-2 min-w-0">
             <p className="text-xs text-muted-foreground">Collected</p>
             <p className="font-semibold text-sm tabular-nums">
               {cediFromPesewas(monthly.reduce((s, m) => s + m.collected, 0))}
             </p>
           </div>
-          <div className="rounded-2xl px-3 py-2 shadow-soft min-w-0">
+          <div className="rounded-2xl bg-muted/40 px-3 py-2 min-w-0">
             <p className="text-xs text-muted-foreground">Invoiced</p>
             <p className="font-semibold text-sm tabular-nums">
               {cediFromPesewas(monthly.reduce((s, m) => s + m.due, 0))}
@@ -212,21 +212,23 @@ function Dashboard() {
       </Card>
 
       {/* Collection rate */}
-      <Card>
+      <Card className="min-h-[400px] flex flex-col">
         <h3 className="text-base font-semibold sm:text-xl">Collection rate</h3>
         <p className="text-xs text-muted-foreground sm:text-sm">This month</p>
-        <p className="mt-3 text-3xl font-semibold text-primary sm:text-4xl tabular-nums">
-          {collectionRate}%
-        </p>
-        <Progress value={collectionRate} className="mt-4 h-2" />
-        <p className="mt-2 text-[11px] text-muted-foreground">
-          {cediFromPesewas(summary.collectedThisMonth)} of{" "}
-          {cediFromPesewas(summary.expectedThisMonth)} expected
-        </p>
+        <div className="flex-1 flex flex-col justify-center">
+          <p className="text-3xl font-semibold text-primary sm:text-4xl tabular-nums">
+            {collectionRate}%
+          </p>
+          <Progress value={collectionRate} className="mt-4 h-2" />
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            {cediFromPesewas(summary.collectedThisMonth)} of{" "}
+            {cediFromPesewas(summary.expectedThisMonth)} expected
+          </p>
+        </div>
       </Card>
 
       {/* Profile card */}
-      <Card className="col-span-2 sm:col-span-1">
+      <Card className="col-span-2 sm:col-span-1 min-h-[400px] flex flex-col justify-between">
         <div className="flex flex-row items-center gap-4 sm:flex-col sm:text-center">
           <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-base font-semibold text-ink-foreground sm:h-16 sm:w-16 sm:text-lg">
             {initials(fullName)}
@@ -259,7 +261,7 @@ function Dashboard() {
       </Card>
 
       {/* Recent payments */}
-      <Card className="col-span-2 lg:col-span-2">
+      <Card className="col-span-2 lg:col-span-2 min-h-[280px]">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold sm:text-xl">Recent payments</h3>
           <Link
@@ -290,7 +292,7 @@ function Dashboard() {
       </Card>
 
       {/* Maintenance */}
-      <Card className="col-span-2 sm:col-span-1">
+      <Card className="col-span-2 sm:col-span-1 min-h-[280px]">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold sm:text-xl">Maintenance</h3>
           <Wrench className="h-4 w-4 text-muted-foreground" />
@@ -325,7 +327,7 @@ function Dashboard() {
       </Card>
 
       {/* MoMo card */}
-      <Card className="col-span-2 flex flex-col items-center justify-center text-center lg:col-span-1">
+      <Card className="col-span-2 flex flex-col items-center justify-center text-center lg:col-span-1 min-h-[280px]">
         <Smartphone className="h-10 w-10 text-primary sm:h-12 sm:w-12" strokeWidth={1.5} />
         <h3 className="mt-3 text-base font-semibold sm:text-xl">Get paid by MoMo</h3>
         <p className="text-sm text-muted-foreground">

@@ -477,8 +477,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="mx-auto max-w-[1400px] sm:px-6 sm:flex-1 sm:overflow-hidden sm:flex sm:flex-col">
         <div className="flex gap-6 sm:pt-6 sm:flex-1 sm:overflow-hidden">
           {/* Desktop sidebar */}
-          <aside className="hidden h-full overflow-y-auto w-16 shrink-0 flex-col items-center justify-between rounded-full bg-card py-4 shadow-soft sm:flex">
-            <nav className="flex flex-col items-center gap-1.5" aria-label="Primary">
+          <aside className="hidden h-full overflow-y-auto w-20 shrink-0 flex-col items-center justify-between rounded-3xl bg-card py-5 shadow-soft sm:flex">
+            <nav className="flex flex-col items-center gap-2" aria-label="Primary">
               {DESKTOP_NAV.map((n) => {
                 const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
                 return (
@@ -488,30 +488,36 @@ export function AppShell({ children }: { children: ReactNode }) {
                     title={n.label}
                     aria-label={n.label}
                     aria-current={active ? "page" : undefined}
-                    className={`grid h-11 w-11 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    className={`relative grid h-12 w-12 place-items-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                       active
-                        ? "bg-ink text-ink-foreground"
+                        ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`}
                   >
-                    <n.icon className="h-[18px] w-[18px]" />
+                    {active && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-primary" />
+                    )}
+                    <n.icon className="h-5 w-5" strokeWidth={active ? 2.2 : 1.8} />
                   </Link>
                 );
               })}
             </nav>
-            <div className="flex flex-col items-center gap-1.5">
+            <div className="flex flex-col items-center gap-2">
               <Link
                 to="/settings"
                 title="Settings"
                 aria-label="Settings"
                 aria-current={path.startsWith("/settings") ? "page" : undefined}
-                className={`grid h-11 w-11 place-items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors ${
+                className={`relative grid h-12 w-12 place-items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors ${
                   path.startsWith("/settings")
-                    ? "bg-ink text-ink-foreground"
+                    ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
-                <Settings className="h-[18px] w-[18px]" />
+                {path.startsWith("/settings") && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-primary" />
+                )}
+                <Settings className="h-5 w-5" strokeWidth={path.startsWith("/settings") ? 2.2 : 1.8} />
               </Link>
               <button
                 onClick={toggleTheme}
@@ -519,27 +525,27 @@ export function AppShell({ children }: { children: ReactNode }) {
                 aria-label={
                   effectiveTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"
                 }
-                className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+                className="grid h-12 w-12 place-items-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
               >
                 {effectiveTheme === "dark" ? (
-                  <Sun className="h-[18px] w-[18px]" />
+                  <Sun className="h-5 w-5" />
                 ) : (
-                  <Moon className="h-[18px] w-[18px]" />
+                  <Moon className="h-5 w-5" />
                 )}
               </button>
               <button
                 onClick={logout}
                 title="Log out"
                 aria-label="Log out"
-                className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+                className="grid h-12 w-12 place-items-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
               >
-                <LogOut className="h-[18px] w-[18px]" />
+                <LogOut className="h-5 w-5" />
               </button>
               <Link
                 to="/settings"
                 title={fullName || "Your account"}
-                aria-label={fullName ? `Settings � ${fullName}` : "Settings"}
-                className="mt-2 grid h-11 w-11 place-items-center rounded-full bg-ink text-[11px] font-semibold text-ink-foreground pressable ring-2 ring-transparent hover:ring-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={fullName ? `Settings – ${fullName}` : "Settings"}
+                className="mt-3 grid h-12 w-12 place-items-center rounded-xl bg-ink text-xs font-semibold text-ink-foreground pressable ring-2 ring-transparent hover:ring-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {avatar}
               </Link>
