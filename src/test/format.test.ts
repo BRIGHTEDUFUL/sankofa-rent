@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { cediFromPesewas, friendlyError, pesewasFromCedi } from "@/lib/format";
+import {
+  cediFromPesewas,
+  formatDate,
+  friendlyError,
+  initials,
+  pesewasFromCedi,
+} from "@/lib/format";
 
 describe("pesewasFromCedi", () => {
   it("parses plain amounts", () => {
@@ -40,5 +46,22 @@ describe("friendlyError", () => {
 describe("cediFromPesewas", () => {
   it("formats with the cedi symbol and two decimals", () => {
     expect(cediFromPesewas(160000)).toBe("GH₵ 1,600.00");
+  });
+});
+
+describe("initials and formatDate defensive handling", () => {
+  it("extracts initials correctly and handles null/undefined safely", () => {
+    expect(initials("Edith Mam")).toBe("EM");
+    expect(initials("Kwame")).toBe("K");
+    expect(initials("")).toBe("?");
+    expect(initials(undefined)).toBe("?");
+    expect(initials(null)).toBe("?");
+  });
+
+  it("formats dates safely without throwing on invalid values", () => {
+    expect(formatDate(1794629213373.109)).toContain("2026");
+    expect(formatDate(undefined)).toBe("—");
+    expect(formatDate(null)).toBe("—");
+    expect(formatDate(NaN)).toBe("—");
   });
 });

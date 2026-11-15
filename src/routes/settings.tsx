@@ -35,7 +35,7 @@ import { Badge, Button, Card } from "@/components/app/AppShell";
 import { ConfirmDialog, FormDialog, TextField } from "@/components/app/FormDialog";
 import { ResponsiveDialog } from "@/components/app/ResponsiveDialog";
 import { useBranding, isHexColor, isUsableAccent, DEFAULT_BRANDING } from "@/lib/branding";
-import { formatDate, friendlyError } from "@/lib/format";
+import { formatDate, friendlyError, initials } from "@/lib/format";
 
 const TAB_IDS = ["profile", "business", "accounts", "branding", "payments", "security"] as const;
 type Tab = (typeof TAB_IDS)[number];
@@ -484,7 +484,7 @@ function Page() {
     }
   }
 
-  const initials =
+  const userInitials =
     `${form.firstName} ${form.lastName}`
       .trim()
       .split(" ")
@@ -607,7 +607,7 @@ function Page() {
             <Section title="Profile" desc="Your personal details">
               <div className="mb-6 flex items-center gap-4">
                 <div className="grid h-16 w-16 place-items-center rounded-full bg-ink text-lg font-semibold text-ink-foreground">
-                  {initials}
+                  {userInitials}
                 </div>
                 <div>
                   <p className="text-sm font-medium">Avatar</p>

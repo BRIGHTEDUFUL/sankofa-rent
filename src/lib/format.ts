@@ -30,23 +30,37 @@ export function msFromDateInput(value: string): number {
   return Number.isNaN(ms) ? NaN : ms;
 }
 
-export function formatDate(ms: number): string {
-  return new Date(ms).toLocaleDateString("en-GH", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+export function formatDate(ms?: number | null): string {
+  if (!ms || Number.isNaN(ms)) return "—";
+  try {
+    const d = new Date(ms);
+    if (Number.isNaN(d.getTime())) return "—";
+    return d.toLocaleDateString("en-GH", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+  } catch {
+    return "—";
+  }
 }
 
-export function formatDateTime(ms: number): string {
-  return new Date(ms).toLocaleString("en-GH", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "UTC",
-  });
+export function formatDateTime(ms?: number | null): string {
+  if (!ms || Number.isNaN(ms)) return "—";
+  try {
+    const d = new Date(ms);
+    if (Number.isNaN(d.getTime())) return "—";
+    return d.toLocaleString("en-GH", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "UTC",
+    });
+  } catch {
+    return "—";
+  }
 }
 
 export function formatMonth(period: string): string {
@@ -71,7 +85,8 @@ export function formatMonth(period: string): string {
   return year ? `${label} ${year}` : period;
 }
 
-export function initials(name: string): string {
+export function initials(name?: string | null): string {
+  if (!name || typeof name !== "string") return "?";
   const result = name
     .split(" ")
     .filter(Boolean)
