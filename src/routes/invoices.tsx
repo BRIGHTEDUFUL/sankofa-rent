@@ -153,7 +153,8 @@ function Page() {
                         setActionError(friendlyError(err, "Could not send the invoice.")),
                       );
                     }}
-                    className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
+                    aria-label={`Send invoice ${r.number}`}
+                    className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1 pressable"
                   >
                     Send
                   </button>

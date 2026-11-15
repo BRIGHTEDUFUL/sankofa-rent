@@ -32,6 +32,7 @@ export function DataPage<T>({
 }) {
   return (
     <div className="space-y-5">
+      {/* Page header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
         <div className="min-w-0">
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{title}</h2>
@@ -47,6 +48,8 @@ export function DataPage<T>({
           </Button>
         </div>
       </div>
+
+      {/* Stats strip */}
       {stats && (
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {stats.map((s) => (
@@ -58,7 +61,9 @@ export function DataPage<T>({
           ))}
         </div>
       )}
+
       {aside}
+
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -76,21 +81,21 @@ export function DataPage<T>({
           <div className="stagger-children space-y-3 md:hidden">
             {rows.map((r, i) => (
               <Card key={i} className="!p-4 transition-colors active:bg-muted/40">
-                {/* Title + actions in one row */}
+                {/* Title + action */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1 text-sm">{columns[0]?.render(r)}</div>
                   {columns.length > 1 && (
                     <div className="shrink-0">{columns[columns.length - 1]?.render(r)}</div>
                   )}
                 </div>
-                {/* Middle fields */}
-                <dl className="mt-3 grid grid-cols-1 gap-y-2 border-t pt-3 text-sm min-[420px]:grid-cols-2">
+                {/* Middle fields — 2-col grid on most phones, 1-col at 320px */}
+                <dl className="mt-3 grid grid-cols-1 gap-y-2.5 border-t border-border/60 pt-3 text-sm min-[380px]:grid-cols-2">
                   {columns.slice(1, -1).map((c) => (
                     <div key={c.key} className="min-w-0">
-                      <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                      <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">
                         {c.label}
                       </dt>
-                      <dd className="min-w-0 overflow-hidden" style={{ overflowWrap: "anywhere" }}>
+                      <dd className="mt-0.5 min-w-0 overflow-hidden" style={{ overflowWrap: "anywhere" }}>
                         {c.render(r)}
                       </dd>
                     </div>
@@ -99,14 +104,15 @@ export function DataPage<T>({
               </Card>
             ))}
           </div>
+
           {/* Desktop table view */}
-          <Card className="hidden !p-0 md:block">
+          <Card className="hidden !p-0 md:block overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[720px] text-sm">
-                <thead>
-                  <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
+                <thead className="sticky top-0 z-10 bg-card">
+                  <tr className="border-b text-left text-xs uppercase tracking-widest text-muted-foreground">
                     {columns.map((c) => (
-                      <th key={c.key} className={`px-6 py-4 font-medium ${c.className ?? ""}`}>
+                      <th key={c.key} className={`px-6 py-4 font-semibold ${c.className ?? ""}`}>
                         {c.label}
                       </th>
                     ))}
@@ -116,7 +122,7 @@ export function DataPage<T>({
                   {rows.map((r, i) => (
                     <tr
                       key={i}
-                      className="border-b last:border-0 transition-colors hover:bg-muted/60"
+                      className="border-b last:border-0 transition-colors hover:bg-muted/50 group"
                     >
                       {columns.map((c) => (
                         <td key={c.key} className={`px-6 py-4 ${c.className ?? ""}`}>

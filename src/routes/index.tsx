@@ -92,7 +92,7 @@ function Dashboard() {
       {/* KPI: Collected this month */}
       <Card className="!p-4 flex items-center justify-between sm:!p-6">
         <div className="min-w-0">
-          <p className="text-xs text-muted-foreground sm:text-sm">Collected this month</p>
+          <p className="text-xs text-muted-foreground sm:text-sm">Collected</p>
           <p
             className="mt-1 font-semibold tabular-nums whitespace-nowrap"
             style={{ fontSize: "clamp(0.95rem, 4.2vw, 1.5rem)" }}
@@ -139,7 +139,7 @@ function Dashboard() {
 
       {/* KPI: Expected this month */}
       <Card className="relative overflow-hidden bg-gradient-primary text-primary-foreground !p-4 sm:!p-6">
-        <p className="text-xs opacity-80 sm:text-sm">Expected this month</p>
+        <p className="text-xs opacity-80 sm:text-sm">Expected</p>
         <p
           className="mt-1 font-semibold tabular-nums"
           style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
@@ -149,7 +149,7 @@ function Dashboard() {
       </Card>
 
       {/* Rent collection chart */}
-      <Card className="col-span-2 lg:col-span-2 min-w-0 overflow-hidden min-h-[400px] flex flex-col">
+      <Card className="col-span-2 lg:col-span-2 min-w-0 overflow-hidden min-h-[360px] sm:min-h-[400px] flex flex-col">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <h3 className="text-base font-semibold sm:text-xl">Rent collection</h3>
@@ -214,10 +214,10 @@ function Dashboard() {
       </Card>
 
       {/* Collection rate */}
-      <Card className="col-span-2 sm:col-span-1 min-h-[220px] sm:min-h-[400px] flex flex-col">
+      <Card className="col-span-2 sm:col-span-1 min-h-[200px] sm:min-h-[400px] flex flex-col">
         <h3 className="text-base font-semibold sm:text-xl">Collection rate</h3>
         <p className="text-xs text-muted-foreground sm:text-sm">This month</p>
-        <div className="flex-1 flex flex-col justify-center">
+        <div className="flex-1 flex flex-col justify-center pt-3 sm:pt-0">
           <p className="text-3xl font-semibold text-primary sm:text-4xl tabular-nums">
             {collectionRate}%
           </p>
@@ -229,10 +229,8 @@ function Dashboard() {
         </div>
       </Card>
 
-      {/* Profile card. The identity row is hidden on mobile because the hero
-          above already shows the same avatar and name — only the counts are
-          new information there. */}
-      <Card className="col-span-2 sm:col-span-1 min-h-[220px] sm:min-h-[400px] flex flex-col justify-between">
+      {/* Profile card — identity row hidden on mobile (the hero above covers it) */}
+      <Card className="col-span-2 sm:col-span-1 min-h-[200px] sm:min-h-[400px] flex flex-col justify-between">
         <div className="hidden flex-row items-center gap-4 sm:flex sm:flex-col sm:text-center">
           <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-base font-semibold text-ink-foreground sm:h-16 sm:w-16 sm:text-lg">
             {initials(fullName)}
@@ -246,7 +244,7 @@ function Dashboard() {
             </p>
           </div>
         </div>
-        <div className="mt-4 w-full border-t border-border pt-4">
+        <div className="mt-auto w-full border-t border-border pt-4">
           <div className="grid grid-cols-3 gap-2">
             {(
               [
@@ -331,16 +329,16 @@ function Dashboard() {
       </Card>
 
       {/* MoMo card */}
-      <Card className="col-span-2 sm:col-span-1 lg:col-span-1 flex flex-col items-center justify-center text-center min-h-[280px]">
+      <Card className="col-span-2 sm:col-span-1 lg:col-span-1 flex flex-col items-center justify-center text-center min-h-[220px] sm:min-h-[280px]">
         <Smartphone className="h-10 w-10 text-primary sm:h-12 sm:w-12" strokeWidth={1.5} />
         <h3 className="mt-3 text-base font-semibold sm:text-xl">Get paid by MoMo</h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground max-w-[22ch] sm:max-w-none">
           Let tenants pay rent with MTN, Telecel or AirtelTigo and get instant receipts.
         </p>
         <Link
           to="/settings"
           search={{ tab: "payments" }}
-          className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-muted px-4 text-sm font-semibold transition hover:bg-accent sm:w-auto"
+          className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-muted px-4 text-sm font-semibold transition hover:bg-accent sm:h-12 sm:w-auto"
         >
           Set up MoMo <ArrowUpRight className="h-4 w-4" />
         </Link>
@@ -348,7 +346,7 @@ function Dashboard() {
 
       {/* Pinned announcement */}
       <Card className="col-span-2 lg:col-span-4">
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-start gap-4 sm:items-center">
           <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary-soft text-primary">
             <Megaphone className="h-5 w-5" />
           </div>

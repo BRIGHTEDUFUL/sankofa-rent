@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
 import { Card, Button } from "@/components/app/AppShell";
-import { ConfirmDialog, FormDialog, TextField } from "@/components/app/FormDialog";
+import { ConfirmDialog, FormDialog, SelectField, TextField } from "@/components/app/FormDialog";
 import { cediFromPesewas, pesewasFromCedi, plural } from "@/lib/format";
 
 export const Route = createFileRoute("/properties")({
@@ -150,7 +150,7 @@ function Page() {
         </Card>
       )}
 
-      <div className="stagger-children grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="stagger-children grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {properties.map((p) => {
           const pct = p.units.length ? Math.round((p.occupied / p.units.length) * 100) : 0;
           const rentRoll = p.units.reduce((s, u) => s + u.rent, 0);
@@ -160,21 +160,23 @@ function Page() {
                 <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary-soft text-primary">
                   <Building2 className="h-5 w-5" />
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="mr-1 text-xs font-semibold text-muted-foreground">
-                    {p.units.length} units
+                <div className="flex items-center gap-0.5">
+                  <span className="mr-2 text-xs font-semibold text-muted-foreground">
+                    {p.units.length} {p.units.length === 1 ? "unit" : "units"}
                   </span>
                   <button
                     onClick={() => setEditing(p)}
-                    className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                    className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground pressable sm:h-8 sm:w-8"
                     title="Edit property"
+                    aria-label="Edit property"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setRemoving(p)}
-                    className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                    className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive pressable sm:h-8 sm:w-8"
                     title="Delete property"
+                    aria-label="Delete property"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -182,19 +184,18 @@ function Page() {
               </div>
               <h3 className="mt-4 text-lg font-semibold">{p.name}</h3>
               <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                <MapPin className="h-3.5 w-3.5" />
-                {p.area}
-                {p.region ? ` · ${p.region}` : ""}
+                <MapPin className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{p.area}{p.region ? ` · ${p.region}` : ""}</span>
               </p>
               <div className="mt-5 flex justify-between text-sm">
                 <span className="text-muted-foreground">Occupancy</span>
-                <span className="font-semibold">
+                <span className="font-semibold tabular-nums">
                   {p.occupied}/{p.units.length} · {pct}%
                 </span>
               </div>
-              <div className="mt-2 h-2 rounded-full bg-muted">
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-2 rounded-full bg-gradient-primary"
+                  className="h-2 rounded-full bg-gradient-primary transition-all duration-500"
                   style={{ width: pct + "%" }}
                 />
               </div>
@@ -212,14 +213,15 @@ function Page() {
                     key={u._id}
                     onClick={() => setEditingUnit({ property: p, unit: u })}
                     title={`${u.label} · ${u.status}`}
-                    className={`h-11 min-w-[2.5rem] rounded-md px-2 text-xs font-semibold sm:h-8 sm:min-w-[2rem] sm:px-1.5 ${u.status === "occupied" ? "bg-primary text-primary-foreground" : u.status === "maintenance" ? "bg-gold-soft text-gold" : "border-2 border-dashed border-border text-muted-foreground"}`}
+                    aria-label={`${u.label} – ${u.status}`}
+                    className={`h-11 min-w-[2.75rem] rounded-md px-2 text-xs font-semibold transition-colors pressable sm:h-8 sm:min-w-[2rem] sm:px-1.5 ${u.status === "occupied" ? "bg-primary text-primary-foreground" : u.status === "maintenance" ? "bg-gold-soft text-gold" : "border-2 border-dashed border-border text-muted-foreground hover:border-muted-foreground/50"}`}
                   >
                     {u.label}
                   </button>
                 ))}
                 <button
                   onClick={() => setUnitProperty(p)}
-                  className="grid h-11 w-11 place-items-center rounded-md border-2 border-dashed border-border text-muted-foreground hover:bg-muted sm:h-8 sm:w-8"
+                  className="grid h-11 w-11 place-items-center rounded-md border-2 border-dashed border-border text-muted-foreground hover:bg-muted hover:border-muted-foreground/50 pressable sm:h-8 sm:w-8"
                   title="Add unit"
                   aria-label="Add unit"
                 >
@@ -324,18 +326,16 @@ function Page() {
           inputMode="decimal"
           defaultValue={editingUnit ? String(editingUnit.unit.rent / 100) : ""}
         />
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium">Status</label>
-          <select
-            name="status"
-            defaultValue={editingUnit?.unit.status ?? "vacant"}
-            className="h-11 w-full rounded-md border border-input bg-transparent px-3 text-base focus:ring-1 focus:ring-ring sm:h-9 sm:text-sm"
-          >
-            <option value="vacant">Vacant</option>
-            <option value="occupied">Occupied</option>
-            <option value="maintenance">Maintenance</option>
-          </select>
-        </div>
+        <SelectField
+          label="Status"
+          name="status"
+          defaultValue={editingUnit?.unit.status ?? "vacant"}
+          options={[
+            { value: "vacant", label: "Vacant" },
+            { value: "occupied", label: "Occupied" },
+            { value: "maintenance", label: "Maintenance" },
+          ]}
+        />
       </FormDialog>
 
       <ConfirmDialog

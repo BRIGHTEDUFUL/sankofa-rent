@@ -237,6 +237,10 @@ function BottomTabBar({
               <span className="text-[10px] font-semibold leading-none tracking-tight">
                 {tab.label}
               </span>
+              {/* iOS active underline dot */}
+              {isActive(tab.to) && platform === "ios" && (
+                <span className="absolute bottom-1 h-1 w-1 rounded-full bg-primary" />
+              )}
             </Link>
           ))}
 
@@ -309,9 +313,9 @@ function BottomTabBar({
               </div>
 
               {/* Scrollable content */}
-              <div className="overflow-y-auto overscroll-contain flex-1 min-h-0">
+              <div className="overflow-y-auto overscroll-contain flex-1 min-h-0 pb-[calc(1rem+var(--sab,0px))]">
                 {/* Navigation items */}
-                <div className="grid grid-cols-3 gap-2 p-4">
+                <div className="grid grid-cols-3 gap-2 p-4 min-[380px]:grid-cols-4">
                   {MORE_ITEMS.filter((m) => m.to !== "/settings").map((m) => (
                     <Link
                       key={m.to}
@@ -320,7 +324,7 @@ function BottomTabBar({
                         hapticTap();
                         setMoreOpen(false);
                       }}
-                      className={`flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-muted px-2 py-4 pressable ${
+                      className={`flex flex-col items-center justify-center gap-2 rounded-2xl bg-muted px-2 py-4 pressable ${
                         path.startsWith(m.to) ? "bg-primary-soft text-primary" : ""
                       }`}
                     >
@@ -427,8 +431,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   if (isLoading || !isAuthenticated) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-background text-sm text-muted-foreground">
-        Loading…
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-background">
+        {/* Animated logo placeholder */}
+        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary animate-pulse">
+          <Sun className="h-6 w-6" strokeWidth={2} />
+        </div>
+        <p className="text-sm text-muted-foreground">Loading…</p>
       </div>
     );
   }
@@ -471,7 +479,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="min-w-0">
               {profileReady ? (
                 <h1 className="truncate text-lg font-semibold leading-tight">
-                  {firstName ? `Akwaaba, ${firstName}!` : "Akwaaba!"}
+                  {path === "/" ? (firstName ? `Akwaaba, ${firstName}!` : "Akwaaba!") : (PAGE_TITLES[path] ?? "Sankofa Rent")}
                 </h1>
               ) : (
                 <div className="h-5 w-36 animate-pulse rounded-md bg-muted" aria-hidden="true" />
@@ -479,7 +487,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <p className="truncate text-xs text-muted-foreground">
                 {path === "/"
                   ? "Here's what's happening across your properties"
-                  : (PAGE_TITLES[path] ?? "Sankofa Rent")}
+                  : `${PAGE_TITLES[path] ?? "Sankofa Rent"} · Sankofa Rent`}
               </p>
             </div>
           </div>
@@ -523,10 +531,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           {/* Desktop sidebar — an icon rail that expands to labelled sections */}
           <aside
             className={`hidden h-full shrink-0 flex-col justify-between overflow-hidden rounded-3xl bg-card py-5 shadow-soft transition-[width] duration-200 ease-out sm:flex ${
-              navExpanded ? "w-64 items-stretch px-3" : "w-20 items-center"
+              navExpanded ? "w-64 items-stretch px-3" : "w-[4.5rem] items-center"
             }`}
           >
-            <nav className="flex flex-col gap-1.5" id="primary-navigation" aria-label="Primary">
+            <nav className="flex flex-col gap-1" id="primary-navigation" aria-label="Primary">
               {DESKTOP_NAV.map((n) => {
                 const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
                 return (
@@ -545,7 +553,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     }`}
                   >
                     {active && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-primary" />
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-primary" />
                     )}
                     <n.icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.2 : 1.8} />
                     <span className={`truncate text-sm font-medium ${navExpanded ? "" : "hidden"}`}>
@@ -556,8 +564,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               })}
             </nav>
             <div
-              className={`flex flex-col gap-1.5 ${navExpanded ? "items-stretch" : "items-center"}`}
+              className={`flex flex-col gap-1 ${navExpanded ? "items-stretch" : "items-center"}`}
             >
+              {/* Settings link */}
               <Link
                 to="/settings"
                 title={navExpanded ? undefined : "Settings"}
@@ -572,7 +581,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 }`}
               >
                 {path.startsWith("/settings") && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-primary" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-primary" />
                 )}
                 <Settings
                   className="h-5 w-5 shrink-0"
@@ -582,6 +591,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                   Settings
                 </span>
               </Link>
+
+              {/* Log out */}
               <button
                 onClick={logout}
                 title={navExpanded ? undefined : "Log out"}
@@ -595,11 +606,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                   Log out
                 </span>
               </button>
+
+              {/* Account pill */}
               <Link
                 to="/settings"
                 title={navExpanded ? undefined : fullName || "Your account"}
                 aria-label={fullName ? `Settings – ${fullName}` : "Settings"}
-                className={`mt-1 flex h-12 items-center rounded-xl bg-ink ring-2 ring-transparent hover:ring-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                className={`mt-1 flex h-12 items-center rounded-xl bg-ink ring-2 ring-transparent hover:ring-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-shadow ${
                   navExpanded ? "gap-3 px-2" : "justify-center"
                 }`}
               >
@@ -613,19 +626,22 @@ export function AppShell({ children }: { children: ReactNode }) {
                   {profileReady && fullName ? fullName : "Account"}
                 </span>
               </Link>
+
+              {/* Expand / collapse */}
               <button
                 onClick={() => setNavExpanded((v) => !v)}
                 aria-expanded={navExpanded}
                 aria-controls="primary-navigation"
                 title={navExpanded ? "Collapse navigation" : "Expand navigation"}
-                className={`flex h-11 items-center rounded-xl border-t border-border/70 pt-2 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors ${
-                  navExpanded ? "gap-2 px-3" : "w-12 justify-center"
+                aria-label={navExpanded ? "Collapse navigation" : "Expand navigation"}
+                className={`flex h-10 items-center rounded-xl border-t border-border/70 pt-2 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors ${
+                  navExpanded ? "gap-2 px-3" : "w-full justify-center"
                 }`}
               >
                 {navExpanded ? (
-                  <ChevronsLeft className="h-5 w-5 shrink-0" />
+                  <ChevronsLeft className="h-4 w-4 shrink-0" />
                 ) : (
-                  <ChevronsRight className="h-5 w-5 shrink-0" />
+                  <ChevronsRight className="h-4 w-4 shrink-0" />
                 )}
                 <span className={`truncate text-xs font-semibold ${navExpanded ? "" : "hidden"}`}>
                   Collapse
@@ -703,12 +719,14 @@ const tones = {
   red: "bg-destructive-soft text-destructive",
   gold: "bg-gold-soft text-gold",
   gray: "bg-muted text-muted-foreground",
+  purple: "bg-primary-soft text-primary",
+  blue: "bg-primary-soft text-primary",
 } as const;
 export type Tone = keyof typeof tones;
-export function Badge({ tone = "gray", children }: { tone?: Tone; children: ReactNode }) {
+export function Badge({ tone = "gray", children, className = "" }: { tone?: Tone; children: ReactNode; className?: string }) {
   return (
     <span
-      className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${tones[tone]}`}
+      className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${tones[tone]} ${className}`}
     >
       {children}
     </span>
@@ -720,17 +738,22 @@ export function Button({
   variant = "primary",
   className = "",
   ...props
-}: { children: ReactNode; variant?: "primary" | "ghost"; className?: string } & Omit<
-  React.ComponentProps<"button">,
-  "children" | "className"
->) {
+}: {
+  children: ReactNode;
+  variant?: "primary" | "ghost" | "destructive" | "outline";
+  className?: string;
+} & Omit<React.ComponentProps<"button">, "children" | "className">) {
   const v =
     variant === "primary"
       ? "bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-90"
-      : "bg-muted text-foreground hover:bg-accent";
+      : variant === "destructive"
+        ? "bg-destructive text-destructive-foreground shadow-soft hover:opacity-90"
+        : variant === "outline"
+          ? "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+          : "bg-muted text-foreground hover:bg-accent";
   return (
     <button
-      className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${v} ${className}`}
+      className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition pressable ${v} ${className}`}
       {...props}
     >
       {children}

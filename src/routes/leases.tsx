@@ -157,7 +157,8 @@ function Page() {
                 {r.status !== "ended" && (
                   <button
                     onClick={() => setRenewing(r)}
-                    className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
+                    aria-label={`Renew lease for ${tenantName.get(r.tenantId) ?? "tenant"}`}
+                    className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1 pressable"
                   >
                     Renew
                   </button>
@@ -165,7 +166,8 @@ function Page() {
                 {r.status !== "ended" && (
                   <button
                     onClick={() => setEnding(r)}
-                    className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-destructive hover:bg-destructive-soft sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
+                    aria-label={`End lease for ${tenantName.get(r.tenantId) ?? "tenant"}`}
+                    className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-destructive hover:bg-destructive-soft sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1 pressable"
                   >
                     End
                   </button>

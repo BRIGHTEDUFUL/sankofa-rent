@@ -114,9 +114,9 @@ export function SelectField({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label>{label}</Label>
+      <Label htmlFor={name}>{label}</Label>
       <Select name={name} defaultValue={defaultValue} onValueChange={onValueChange}>
-        <SelectTrigger>
+        <SelectTrigger id={name}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
@@ -160,7 +160,10 @@ export function ConfirmDialog({
     >
       <p className="text-sm text-muted-foreground">{message}</p>
       {error && (
-        <p className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive">
+        <p
+          role="alert"
+          className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive"
+        >
           {error}
         </p>
       )}

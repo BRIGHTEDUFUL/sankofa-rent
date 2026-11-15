@@ -219,7 +219,7 @@ function RecordPaymentDialog({
     >
       <form className="space-y-4" onSubmit={submit}>
         <div className="space-y-1.5">
-          <Label>Tenant</Label>
+          <Label htmlFor="payment-tenant">Tenant</Label>
           <Select
             value={tenantId}
             onValueChange={(v) => {
@@ -227,7 +227,7 @@ function RecordPaymentDialog({
               setInvoiceId("");
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger id="payment-tenant">
               <SelectValue placeholder="Select a tenant" />
             </SelectTrigger>
             <SelectContent>
@@ -240,9 +240,9 @@ function RecordPaymentDialog({
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label>Invoice (optional)</Label>
+          <Label htmlFor="payment-invoice">Invoice (optional)</Label>
           <Select value={invoiceId} onValueChange={setInvoiceId} disabled={!tenantId}>
-            <SelectTrigger>
+            <SelectTrigger id="payment-invoice">
               <SelectValue placeholder="No specific invoice" />
             </SelectTrigger>
             <SelectContent>
@@ -266,9 +266,9 @@ function RecordPaymentDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Method</Label>
+            <Label htmlFor="payment-method">Method</Label>
             <Select value={method} onValueChange={setMethod}>
-              <SelectTrigger>
+              <SelectTrigger id="payment-method">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -291,11 +291,14 @@ function RecordPaymentDialog({
           />
         </div>
         {error && (
-          <p className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive">
+          <p
+            role="alert"
+            className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive"
+          >
             {error}
           </p>
         )}
-        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <div className="pt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button
             type="submit"
             disabled={submitting || busy}

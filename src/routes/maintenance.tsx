@@ -156,13 +156,15 @@ function Page() {
               <div className="flex justify-end gap-1">
                 <button
                   onClick={() => setEditing(r)}
-                  className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
+                  aria-label={`Update request ${r.title}`}
+                  className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1 pressable"
                 >
                   Update
                 </button>
                 <button
                   onClick={() => updateStatus({ id: r._id, status: nextStatus[r.status] })}
-                  className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-muted-foreground hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1"
+                  aria-label={`Advance status of ${r.title} to ${nextStatus[r.status].replace("_", " ")}`}
+                  className="min-h-[44px] rounded-xl px-3 text-sm font-semibold text-muted-foreground hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1 pressable"
                 >
                   {nextStatus[r.status].replace("_", " ")}
                 </button>
@@ -267,25 +269,27 @@ function MaintenanceDialog({
     >
       <form className="space-y-4" onSubmit={submit}>
         <div className="space-y-1.5">
-          <Label>Title</Label>
+          <Label htmlFor="maint-title">Title</Label>
           <Input
+            id="maint-title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Leaking kitchen tap"
           />
         </div>
         <div className="space-y-1.5">
-          <Label>Description</Label>
+          <Label htmlFor="maint-desc">Description</Label>
           <textarea
+            id="maint-desc"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
             placeholder="What happened? Any relevant details."
-            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-base focus:ring-1 focus:ring-ring"
+            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-base sm:text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring leading-relaxed placeholder:text-muted-foreground"
           />
         </div>
         <div className="space-y-1.5">
-          <Label>Property</Label>
+          <Label htmlFor="maint-prop">Property</Label>
           <Select
             value={propertyId}
             onValueChange={(v) => {
@@ -293,7 +297,7 @@ function MaintenanceDialog({
               setUnitId("");
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger id="maint-prop">
               <SelectValue placeholder="Select a property" />
             </SelectTrigger>
             <SelectContent>
@@ -307,9 +311,9 @@ function MaintenanceDialog({
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label>Unit</Label>
+            <Label htmlFor="maint-unit">Unit</Label>
             <Select value={unitId} onValueChange={setUnitId} disabled={!property}>
-              <SelectTrigger>
+              <SelectTrigger id="maint-unit">
                 <SelectValue placeholder="Whole property" />
               </SelectTrigger>
               <SelectContent>
@@ -322,9 +326,9 @@ function MaintenanceDialog({
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label>Priority</Label>
+            <Label htmlFor="maint-priority">Priority</Label>
             <Select value={priority} onValueChange={setPriority}>
-              <SelectTrigger>
+              <SelectTrigger id="maint-priority">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -336,19 +340,23 @@ function MaintenanceDialog({
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label>Reported by</Label>
+          <Label htmlFor="maint-reporter">Reported by</Label>
           <Input
+            id="maint-reporter"
             value={reportedBy}
             onChange={(e) => setReportedBy(e.target.value)}
             placeholder="Tenant or caretaker"
           />
         </div>
         {error && (
-          <p className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive">
+          <p
+            role="alert"
+            className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive"
+          >
             {error}
           </p>
         )}
-        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <div className="pt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button
             type="submit"
             disabled={submitting}
@@ -416,9 +424,9 @@ function StatusDialog({
       <form className="space-y-4" onSubmit={submit}>
         <p className="text-sm text-muted-foreground">{item?.title}</p>
         <div className="space-y-1.5">
-          <Label>Status</Label>
+          <Label htmlFor="status-select">Status</Label>
           <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger>
+            <SelectTrigger id="status-select">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -439,11 +447,14 @@ function StatusDialog({
           />
         </div>
         {error && (
-          <p className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive">
+          <p
+            role="alert"
+            className="rounded-xl bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive"
+          >
             {error}
           </p>
         )}
-        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <div className="pt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button
             type="submit"
             disabled={submitting}

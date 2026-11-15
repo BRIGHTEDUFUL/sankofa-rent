@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { Card, Badge, Button } from "@/components/app/AppShell";
-import { ConfirmDialog, FormDialog, TextField } from "@/components/app/FormDialog";
+import { ConfirmDialog, FormDialog, SelectField, TextField } from "@/components/app/FormDialog";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/announcements")({
@@ -120,15 +120,17 @@ function Page() {
                 <div className="flex shrink-0 gap-1">
                   <button
                     onClick={() => togglePin({ id: a._id })}
-                    className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
-                    title={a.pinned ? "Unpin" : "Pin"}
+                    className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted pressable"
+                    title={a.pinned ? "Unpin announcement" : "Pin announcement"}
+                    aria-label={a.pinned ? `Unpin announcement ${a.title}` : `Pin announcement ${a.title}`}
                   >
                     <Pin className={`h-4 w-4 ${a.pinned ? "text-primary" : ""}`} />
                   </button>
                   <button
                     onClick={() => setRemoving(a)}
-                    className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
-                    title="Delete"
+                    className="grid h-10 w-10 sm:h-8 sm:w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive pressable"
+                    title="Delete announcement"
+                    aria-label={`Delete announcement ${a.title}`}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -157,24 +159,18 @@ function Page() {
             required
             rows={4}
             placeholder="GWCL works on Saturday 14 Nov, 8am–4pm. Please store water ahead."
-            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-base focus:ring-1 focus:ring-ring"
+            className="w-full min-h-[6rem] rounded-lg border border-input bg-transparent px-3 py-2.5 text-base leading-relaxed text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:text-sm"
           />
         </div>
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium">Send to</label>
-          <select
-            name="propertyId"
-            defaultValue="none"
-            className="h-11 w-full rounded-md border border-input bg-transparent px-3 text-base focus:ring-1 focus:ring-ring sm:h-9 sm:text-sm"
-          >
-            <option value="none">All properties</option>
-            {properties.map((p) => (
-              <option key={p._id} value={p._id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <SelectField
+          label="Send to"
+          name="propertyId"
+          defaultValue="none"
+          options={[
+            { value: "none", label: "All properties" },
+            ...properties.map((p) => ({ value: p._id, label: p.name })),
+          ]}
+        />
         <div className="space-y-1.5">
           <span className="text-sm font-medium">Channels</span>
           <div className="flex flex-wrap gap-3">

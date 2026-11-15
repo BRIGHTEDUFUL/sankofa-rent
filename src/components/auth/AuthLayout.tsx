@@ -21,7 +21,7 @@ export function AuthLayout({
     <div className="grid min-h-dvh bg-card lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
       <div className="flex min-w-0 flex-col px-5 py-6 sm:px-10 sm:py-8 lg:px-16">
         {/* Brand header */}
-        <Link to="/" className="-my-1 flex items-center gap-2 rounded-lg px-1 py-1 text-primary">
+        <Link to="/" className="-my-1 flex w-fit items-center gap-2 rounded-lg px-1 py-1 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           {logoUrl ? (
             <img
               src={logoUrl}
@@ -38,11 +38,11 @@ export function AuthLayout({
 
         {/* Form content — centred, scrollable on very short screens */}
         <div className="mx-auto w-full max-w-md flex-1 animate-rise py-8 sm:py-12">
-          <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{title}</h1>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{subtitle}</p>
-          <div className="mt-7">{children}</div>
+          <h1 className="text-2xl font-semibold leading-tight sm:text-3xl lg:text-4xl">{title}</h1>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:mt-3">{subtitle}</p>
+          <div className="mt-6 sm:mt-7">{children}</div>
           {footer && (
-            <div className="mt-7 text-center text-sm leading-relaxed text-muted-foreground">
+            <div className="mt-6 text-center text-sm leading-relaxed text-muted-foreground sm:mt-7">
               {footer}
             </div>
           )}

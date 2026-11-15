@@ -240,6 +240,18 @@
   padding-bottom: calc(4.5rem + var(--sab));
 }
 
+/* ─── Scroll-offset so anchors & focus aren't hidden behind sticky top bars ── */
+@media (max-width: 639px) {
+  html {
+    scroll-padding-top: calc(3.75rem + var(--sat) + 0.5rem);
+  }
+}
+@media (min-width: 640px) {
+  html {
+    scroll-padding-top: calc(4.5rem);
+  }
+}
+
 /* ─── Sticky save bar utility ───────────────────────────────────────────────── */
 @utility sticky-save-bar {
   position: sticky;
@@ -252,6 +264,8 @@
   backdrop-filter: blur(8px);
   border-top: 1px solid var(--border);
   margin-top: auto;
+  /* Ensure save bar always clears the mobile keyboard */
+  z-index: 10;
 }
 
 /* ─── System font on mobile ──────────────────────────────────────────────────  */
@@ -298,6 +312,19 @@
   transition:
     opacity 200ms,
     transform 200ms;
+}
+
+/* ─── Focus ring utility (consistent across interactive elements) ─────────── */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: calc(var(--radius) - 6px);
+  }
+  /* Suppress focus ring for mouse clicks — only show on keyboard navigation */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
 }
 
 /* ─── Material 3 ripple ──────────────────────────────────────────────────────  */

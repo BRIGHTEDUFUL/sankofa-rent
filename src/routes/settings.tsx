@@ -548,12 +548,12 @@ function Page() {
   return (
     <div>
       <div className="mb-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Settings</h2>
+        <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Settings</h2>
         <p className="hidden text-sm text-muted-foreground sm:block">
           Manage your account and how {branding.appName} works for you
         </p>
       </div>
-      <div className="grid gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
+      <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
         <div className={showDetail ? "hidden lg:block" : ""}>
           <SettingsListNav
             form={form}
@@ -565,32 +565,34 @@ function Page() {
           />
         </div>
         <div className={`space-y-5 ${showDetail ? "" : "hidden lg:block"}`}>
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/settings", search: {}, replace: true })}
-            className="mb-3 inline-flex h-11 items-center gap-1.5 text-sm font-semibold text-primary lg:hidden"
-          >
-            <ChevronLeft className="h-5 w-5" />
-            Settings
-          </button>
-          {/* Mobile tab chips */}
-          <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1 -mx-1 px-1 lg:hidden">
-            {visibleTabs.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() =>
-                  navigate({ to: "/settings", search: { tab: t.id as Tab }, replace: true })
-                }
-                className={`shrink-0 h-9 px-4 rounded-full text-sm font-semibold transition pressable ${
-                  detailTab === t.id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
+          {/* Mobile: back button + horizontal tab chip strip */}
+          <div className="lg:hidden">
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/settings", search: {}, replace: true })}
+              className="mb-3 inline-flex h-11 items-center gap-1.5 text-sm font-semibold text-primary"
+            >
+              <ChevronLeft className="h-5 w-5" />
+              Settings
+            </button>
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1 -mx-1 px-1">
+              {visibleTabs.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() =>
+                    navigate({ to: "/settings", search: { tab: t.id as Tab }, replace: true })
+                  }
+                  className={`shrink-0 h-9 px-4 rounded-full text-sm font-semibold transition pressable ${
+                    detailTab === t.id
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
           </div>
           {(message || error) && (
             <p
@@ -753,7 +755,7 @@ function Page() {
                     setAccountActionMessage("");
                     setCreateAccountOpen(true);
                   }}
-                  className="inline-flex items-center gap-2 h-10 px-4 rounded-xl font-semibold shadow-sm"
+                  className="inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl font-semibold shadow-sm w-full sm:w-auto"
                 >
                   <UserPlus className="h-4 w-4" />
                   Add account
@@ -823,7 +825,7 @@ function Page() {
                       </div>
 
                       {/* Actions */}
-                      <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+                      <div className="flex flex-wrap items-center gap-1.5 self-stretch sm:self-auto justify-end shrink-0">
                         {acc.role === "user" ? (
                           <Button
                             variant="outline"

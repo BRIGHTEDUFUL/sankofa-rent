@@ -38,7 +38,7 @@ function Page() {
       <div className="mt-6">
         <Link
           to="/login"
-          className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-soft transition hover:opacity-90"
+          className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-soft transition hover:opacity-90 pressable focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           Back to sign in
         </Link>
