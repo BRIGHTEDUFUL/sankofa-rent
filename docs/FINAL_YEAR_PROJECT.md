@@ -278,16 +278,17 @@ Features were taken from real rental life, anchored in a single seeded demo case
 | FR-N3 | Pin/unpin; delete                                                          | ✅     |
 | FR-N4 | Record channels and pinned state; no delivery provider wired yet (see §10) | ✅     |
 
-**Settings (`/settings`) — six tabs**
+**Settings (`/settings`) — seven tabs**
 
 | ID    | Requirement                                                                                                                                                 | Status |
 | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | FR-S1 | Profile: avatar initials, first/last name, phone                                                                                                            | ✅     |
 | FR-S2 | Business: name, region, currency (GHS read-only), rent due day (1–31), late fee %                                                                           | ✅     |
-| FR-S3 | **Branding (admin-only):** live rename of app, tagline, accent colour (8 curated swatches + custom, 4.5:1 contrast enforced), logo upload to Convex storage | ✅     |
-| FR-S4 | Notifications: rent reminders (SMS), payment received (email), WhatsApp updates                                                                             | ✅     |
-| FR-S5 | Payment methods: MoMo number + network, bank name + account                                                                                                 | ✅     |
-| FR-S6 | Security: role badge, plan, currency, honest "password change unavailable" notice                                                                           | ✅     |
+| FR-S3 | **Accounts (admin-only):** multi-admin management, promote/demote roles, password resets, account creation and deletion                                     | ✅     |
+| FR-S4 | **Branding (admin-only):** live rename of app, tagline, accent colour (8 curated swatches + custom, 4.5:1 contrast enforced), logo upload to Convex storage | ✅     |
+| FR-S5 | Notifications: rent reminders (SMS), payment received (email), WhatsApp updates                                                                             | ✅     |
+| FR-S6 | Payment methods: MoMo number + network, bank name + account                                                                                                 | ✅     |
+| FR-S7 | Security: role badge, plan, currency, honest "password change unavailable" notice                                                                           | ✅     |
 
 **Mobile experience**
 
@@ -308,6 +309,8 @@ Features were taken from real rental life, anchored in a single seeded demo case
 | FR-X16 | Sticky save-bar above safe-area inset on mobile settings forms                                   | ✅     |
 | FR-X17 | Dark mode token set for both OS preference and manual toggle                                     | ✅     |
 | FR-X18 | Dual `theme-color` meta (light/dark `prefers-color-scheme`)                                      | ✅     |
+| FR-X19 | Standardized 44 px touch targets for selects & inputs (`SelectTrigger` + `Input` height `h-11 sm:h-9`) | ✅     |
+| FR-X20 | Accessible label-control associations & touch micro-interactions (`pressable`) across all data actions | ✅     |
 
 **Cross-cutting**
 

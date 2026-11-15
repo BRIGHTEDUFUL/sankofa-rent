@@ -56,6 +56,25 @@
 - [x] Settings status messages: pill banner pattern applied
 - [x] Automated detector run on all changed files: **0 findings**
 
+### Multi-Admin & Accounts Management (2026-11-15)
+
+- [x] Server-side multi-admin support (`convex/accounts.ts`) with strictly enforced `requireAdmin` checks
+- [x] Admin account management UI (`Settings → Accounts`) with user overview, stats cards, and search
+- [x] Self-service administrator promotion / demotion with last-standing-admin protection
+- [x] In-app password reset and account provisioning / deletion for system operators
+- [x] Operator migrations for syncing admin accounts and adoption of landlord data
+
+### Deep UI Consistency & Accessibility Sweep (2026-11-15)
+
+- [x] Unified 44 px mobile touch target for `<SelectTrigger>` (`h-11 sm:h-9`) matching `<Input>`
+- [x] Native `<select>` replaced with themed `<SelectField>` in `properties.tsx` and `announcements.tsx`
+- [x] Label-to-control association (`htmlFor` + `id`) across dialogs and custom forms
+- [x] `role="alert"` semantic attributes on all form error callouts
+- [x] Touch micro-interactions (`pressable`) and row-context `aria-label`s on all data table action buttons
+- [x] Native browser `title` tooltips on desktop sidebar to eliminate overflow clipping
+- [x] Safe area bottom inset support (`--sab`) in mobile navigation More drawer
+- [x] Extended badge tone mappings (`purple`, `blue`) for account status tags
+
 ## Next
 
 - [ ] Rotate the seeded admin password after the first production login

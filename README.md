@@ -53,6 +53,7 @@ It works equally well on the phone in a landlord's pocket and the laptop on thei
 | **Payments & receipts** | MoMo (MTN, Telecel, AirtelTigo), bank, cash — numbered receipts                    |
 | **Maintenance**         | Priority + status tracking per unit                                                |
 | **Announcements**       | SMS / email / WhatsApp channel selection                                           |
+| **Accounts & Admins**   | Multi-admin support, promote/demote, password resets, account provisioning         |
 | **Branding**            | Admin-only: live app name, tagline, 8 curated accents + custom colour, logo upload |
 | **Roles**               | First account on a deployment becomes admin, the rest members                      |
 | **Mobile-native**       | iOS translucency, Android M3 ripple + pill, page transitions, platform detection   |
@@ -199,8 +200,9 @@ public/            favicon.svg, manifest.webmanifest, icons, robots.txt
 - [x] Live on Cloudflare Workers (`final-year-rent-project`)
 - [x] Custom branding (name · tagline · logo · accent) with admin enforcement
 - [x] Roles (admin / member), first-account-becomes-admin
+- [x] Multi-admin support & full Account Management interface (`Settings → Accounts`)
 - [x] Full mobile-native experience: iOS translucency, Android M3, platform detection, page transitions, keyboard offset, safe areas
-- [x] Design system sweep: OKLCH tokens, browser surfaces themed, zero anti-patterns
+- [x] Design system & accessibility sweep: OKLCH tokens, 44 px unified touch targets, themed selects, zero anti-patterns
 - [x] Dark mode (OS preference + manual toggle)
 - [ ] Password-reset emails (Resend)
 - [ ] SMS / WhatsApp rent reminders (Arkesel/mNotify)

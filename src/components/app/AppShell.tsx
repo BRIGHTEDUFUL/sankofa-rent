@@ -736,11 +736,13 @@ export function Badge({ tone = "gray", children, className = "" }: { tone?: Tone
 export function Button({
   children,
   variant = "primary",
+  size = "default",
   className = "",
   ...props
 }: {
   children: ReactNode;
   variant?: "primary" | "ghost" | "destructive" | "outline";
+  size?: "sm" | "default" | "lg" | string;
   className?: string;
 } & Omit<React.ComponentProps<"button">, "children" | "className">) {
   const v =
@@ -751,9 +753,11 @@ export function Button({
         : variant === "outline"
           ? "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
           : "bg-muted text-foreground hover:bg-accent";
+  const s =
+    size === "sm" ? "px-2.5 py-1 text-xs" : size === "lg" ? "px-6 py-3 text-base" : "px-4 py-2.5 text-sm";
   return (
     <button
-      className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition pressable ${v} ${className}`}
+      className={`inline-flex items-center gap-2 rounded-xl font-semibold transition pressable ${s} ${v} ${className}`}
       {...props}
     >
       {children}
