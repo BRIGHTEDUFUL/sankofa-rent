@@ -87,7 +87,7 @@ It works equally well on the phone in a landlord's pocket and the laptop on thei
 | Charts    | **Recharts 2** — 6-month bar chart, collection gauge                       |
 | Money     | Integer pesewas (GH₵ 1 = 100 p) — never floats                             |
 | Deploy    | **Cloudflare Workers** (Nitro `cloudflare-module`), CI as npm-only         |
-| Tests     | **Vitest 4** + Testing Library — 14 unit tests                             |
+| Tests     | **Vitest 4** + Testing Library — 20 unit tests                             |
 
 ---
 
@@ -121,12 +121,45 @@ The app is fully native-feel on phones. Key implementation:
 Prerequisites: **Node.js ≥ 22** and **npm** (no bun/pnpm/yarn).
 
 ```sh
+git clone https://github.com/BRIGHTEDUFUL/sankofa-rent.git
+cd sankofa-rent
 npm install
-npx convex dev     # syncs backend to your dev deployment
-npm run dev        # → http://localhost:8081
+```
+
+### Set up environment files
+
+The repo ships `.env.production` (public, committed). You need **one local file** for dev:
+
+Create **`.env.local`** in the project root:
+
+```env
+CONVEX_DEPLOYMENT=dev:adorable-pig-437
+CONVEX_DEPLOY_KEY=<your-convex-deploy-key>
+VITE_CONVEX_URL=https://adorable-pig-437.convex.cloud
+VITE_CONVEX_SITE_URL=https://adorable-pig-437.convex.site
+```
+
+> **Don't have the deploy key?** Ask the project author, or create your own free Convex project at [dashboard.convex.dev](https://dashboard.convex.dev) and replace the deployment names above with yours.
+
+### Run locally
+
+```sh
+# Terminal 1 — sync backend functions to Convex
+npx convex dev
+
+# Terminal 2 — start the frontend dev server
+npm run dev        # → http://localhost:3000
 ```
 
 Create your first account — the first sign-up on a fresh deployment becomes the admin.
+
+### Verify everything works
+
+```sh
+npm test           # 20 tests across 4 files — all must pass
+npm run lint       # 0 errors (11 warnings in vendor files are normal)
+npm run build      # production build — must exit cleanly
+```
 
 ---
 
@@ -134,13 +167,13 @@ Create your first account — the first sign-up on a fresh deployment becomes th
 
 | Command                                              | What it does                                   |
 | ---------------------------------------------------- | ---------------------------------------------- |
-| `npm run dev`                                        | Vite dev server (SSR)                          |
+| `npm run dev`                                        | Vite dev server (SSR) on port 3000             |
 | `npx convex dev`                                     | Push schema/functions to dev, regenerate types |
 | `npx convex deploy --env-file .env.production.local` | Push backend to prod                           |
-| `npm test`                                           | Vitest (14 tests, 4 files)                     |
+| `npm test`                                           | Vitest (20 tests, 4 files)                     |
 | `npm run lint`                                       | ESLint — 0 errors                              |
 | `npm run build`                                      | Production build → `.output/` (Nitro)          |
-| `npx tsc --noEmit`                                   | Typecheck — 0 errors                           |
+| `npm run format`                                     | Prettier — auto-format all files               |
 
 ---
 
@@ -149,7 +182,7 @@ Create your first account — the first sign-up on a fresh deployment becomes th
 | Environment    | URL                                                          | Convex deployment         |
 | -------------- | ------------------------------------------------------------ | ------------------------- |
 | **Production** | **https://final-year-rent-project.edimamfaidol.workers.dev** | `prod:usable-penguin-827` |
-| Development    | localhost:8081                                               | `dev:adorable-pig-437`    |
+| Development    | localhost:3000                                               | `dev:adorable-pig-437`    |
 
 Backend and frontend deploy separately. The frontend auto-deploys to Cloudflare Workers on every push to `main` (Workers Builds). The backend deploys on demand with `npx convex deploy --env-file .env.production.local`.
 
@@ -183,7 +216,7 @@ public/            favicon.svg, manifest.webmanifest, icons, robots.txt
 - **Pesewas-safe money, friendly errors** — `GH₵ 1,850.00` renders correctly; a Convex `Uncaught Error` becomes "Invoice INV-1001 already covers this lease and period".
 - **Sign-out is bulletproof** — a hard reload recreates the module-level Convex client instead of leaving stale websocket state behind.
 - **Zero anti-patterns** — an automated design detector found 0 issues after the final design sweep (banned side-tab borders, decorative sparklines, and eyebrow kickers were all removed).
-- **14/14 unit tests** on branding validation, the cedi parser and auth rules; zero console errors in production.
+- **20/20 unit tests** on branding validation, the cedi parser, auth rules and routing; zero console errors in production.
 
 ---
 
