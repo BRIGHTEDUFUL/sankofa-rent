@@ -1,111 +1,114 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
 title Sankofa Rent — Setup ^& Run
 color 0A
 
 echo.
-echo  ============================================
+echo  ======================================================
 echo   Sankofa Rent — One-Click Setup ^& Run
-echo  ============================================
+echo  ======================================================
 echo.
 
-:: ── 1. Check Node.js ──────────────────────────
+:: ── 1. Navigate to script folder ──────────────
+cd /d "%~dp0"
+echo  [OK] Working directory: %cd%
+echo.
+
+:: ── 2. Check Node.js ──────────────────────────
 where node >nul 2>nul
 if %errorlevel% neq 0 (
     color 0C
-    echo  [ERROR] Node.js is not installed.
+    echo  [ERROR] Node.js is not found in your PATH.
     echo.
     echo  Please install Node.js 22 or later from:
     echo    https://nodejs.org/
     echo.
-    echo  Then double-click this file again.
+    echo  After installing Node.js, run this file again.
     echo.
     pause
     exit /b 1
 )
 
-echo  [OK] Node.js found:
-node -v
+echo  [OK] Node.js detected:
+call node -v
 echo.
 
-:: ── 2. Navigate to project folder ─────────────
-cd /d "%~dp0"
-echo  [OK] Working directory: %cd%
-echo.
-
-:: ── 3. Create .env.local if missing ───────────
+:: ── 3. Ensure .env.local exists ───────────────
 if not exist ".env.local" (
-    echo  [SETUP] Creating .env.local with credentials ...
-    (
-        echo CONVEX_DEPLOYMENT=dev:adorable-pig-437
-        echo CONVEX_DEPLOY_KEY=dev:adorable-pig-437^|eyJ2MiI6IjBlN2YxYTFiNjk4NzRjMDk5ODEzOTlmNzViMzFhMDJlIn0=
-        echo VITE_CONVEX_URL=https://adorable-pig-437.convex.cloud
-        echo VITE_CONVEX_SITE_URL=https://adorable-pig-437.convex.site
-    ) > ".env.local"
+    echo  [SETUP] Creating .env.local from .env.example ...
+    if exist ".env.example" (
+        copy /y ".env.example" ".env.local" >nul
+    ) else (
+        (
+            echo CONVEX_DEPLOYMENT=dev:adorable-pig-437
+            echo CONVEX_DEPLOY_KEY=dev:adorable-pig-437^|eyJ2MiI6IjBlN2YxYTFiNjk4NzRjMDk5ODEzOTlmNzViMzFhMDJlIn0=
+            echo VITE_CONVEX_URL=https://adorable-pig-437.convex.cloud
+            echo VITE_CONVEX_SITE_URL=https://adorable-pig-437.convex.site
+        ) > ".env.local"
+    )
     echo  [OK] .env.local created successfully
 ) else (
-    echo  [OK] .env.local already exists
+    echo  [OK] .env.local found
 )
 echo.
 
-:: ── 4. Install dependencies ───────────────────
-if not exist "node_modules" (
-    echo  [SETUP] Installing dependencies (npm install) ...
-    echo  This may take 1-2 minutes on first run. Please wait...
+:: ── 4. Install dependencies if needed ─────────
+if not exist "node_modules\" (
+    echo  [SETUP] Installing npm dependencies ...
+    echo  This takes 1-2 minutes on first run. Please wait...
     echo.
     call npm install
     if %errorlevel% neq 0 (
         color 0C
         echo.
-        echo  [ERROR] npm install failed.
+        echo  [ERROR] npm install encountered an error.
+        echo  Please check your internet connection and try again.
+        echo.
         pause
         exit /b 1
     )
     echo.
     echo  [OK] Dependencies installed successfully
 ) else (
-    echo  [OK] node_modules found — skipping install
-    echo       (Delete node_modules and re-run to force a fresh install)
+    echo  [OK] Dependencies already installed
 )
 echo.
 
-:: ── 5. Run tests to verify ────────────────────
-echo  [CHECK] Verifying setup with unit tests ...
-call npm test -- --run
+:: ── 5. Sync backend functions to Convex ───────
+echo  [SETUP] Synchronizing Convex backend functions ...
+call npx convex dev --once --env-file .env.local
 if %errorlevel% neq 0 (
     color 0E
-    echo.
-    echo  [WARNING] Some tests failed, but starting app anyway...
-    echo.
+    echo  [WARNING] Initial Convex sync had an issue. Continuing anyway...
 ) else (
-    echo  [OK] All 20 tests passed
+    echo  [OK] Convex backend functions verified and synced!
 )
 echo.
 
-:: ── 6. Start Convex backend sync ──────────────
-echo  [START] Launching Convex backend sync in a separate window ...
-start "Convex Backend — Sankofa Rent" cmd /k "cd /d "%~dp0" && title Convex Backend — Sankofa Rent && color 0B && echo [Convex Sync Running...] && npx convex dev"
+:: ── 6. Start Convex dev watcher in background ─
+echo  [START] Starting Convex watcher in background window ...
+start "Convex Backend — Sankofa Rent" cmd /k "title Convex Backend — Sankofa Rent && color 0B && npx convex dev --env-file .env.local"
 
-:: Wait 3 seconds for Convex to initialize
-timeout /t 3 /nobreak >nul
+:: Wait 2 seconds
+ping 127.0.0.1 -n 3 >nul
 
-:: ── 7. Auto-open browser in 4 seconds ─────────
-start "" cmd /c "timeout /t 4 /nobreak >nul & start http://localhost:3000"
+:: ── 7. Auto-open browser in 3 seconds ─────────
+start "" cmd /c "ping 127.0.0.1 -n 4 >nul && start http://localhost:3000"
 
-:: ── 8. Start the frontend dev server ──────────
-echo  [START] Launching Vite dev server ...
+:: ── 8. Start Vite frontend server ─────────────
 echo.
 echo  ======================================================
 echo   Sankofa Rent is starting at: http://localhost:3000
-echo   Your browser will open automatically in a few seconds!
+echo   Your default browser will open automatically!
 echo  ======================================================
 echo.
-echo  Two windows are running:
-echo    1. This window  = Vite Frontend Server
-echo    2. Other window = Convex Backend Sync
-echo.
-echo  Press Ctrl+C here to stop the frontend server.
-echo  Close the Convex window to stop the backend.
+echo   Press Ctrl+C in this window to stop the frontend.
+echo   Close the "Convex Backend" window to stop the backend.
 echo.
 
 call npm run dev
+if %errorlevel% neq 0 (
+    echo.
+    echo  [INFO] Vite dev server has stopped.
+)
+pause
