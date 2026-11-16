@@ -120,11 +120,36 @@ The app is fully native-feel on phones. Key implementation:
 
 Prerequisites: **Node.js ≥ 22** and **npm** (no bun/pnpm/yarn).
 
-```sh
-git clone https://github.com/BRIGHTEDUFUL/sankofa-rent.git
-cd sankofa-rent
-npm install
-```
+### 🚀 One-Click Run (Zero Setup Required)
+
+If moving to a new PC:
+
+1. Clone or copy the folder:
+   ```sh
+   git clone https://github.com/BRIGHTEDUFUL/sankofa-rent.git
+   cd sankofa-rent
+   ```
+2. **On Windows:** Double-click or run:
+   ```cmd
+   run.bat
+   ```
+3. **On Mac/Linux:** Run:
+   ```sh
+   chmod +x run.sh && ./run.sh
+   ```
+
+> **What `run.bat` does automatically:**
+>
+> - Checks Node.js installation
+> - Auto-generates `.env.local` with the backend keys
+> - Installs all `npm` dependencies
+> - Runs all 20 test suites to verify integrity
+> - Starts the Convex backend sync
+> - Starts Vite on `http://localhost:3000` and automatically opens your browser!
+
+---
+
+### Manual Setup (Optional)
 
 ### Set up environment files
 
