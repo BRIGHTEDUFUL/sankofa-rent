@@ -120,20 +120,52 @@ The app is fully native-feel on phones. Key implementation:
 
 Prerequisites: **Node.js ≥ 22** and **npm** (no bun/pnpm/yarn).
 
-### 🚀 One-Click Run (Zero Setup Required)
+### 🚀 Universal NPM Quick Start (Cross-Platform)
 
-If moving to a new PC:
+Works on any OS (Windows, macOS, Linux) without needing batch files or shell permissions:
 
-1. Clone or copy the folder:
-   ```sh
-   git clone https://github.com/BRIGHTEDUFUL/sankofa-rent.git
-   cd sankofa-rent
-   ```
-2. **On Windows:** Double-click or run:
+```sh
+# 1. Clone repository
+git clone https://github.com/BRIGHTEDUFUL/sankofa-rent.git
+cd sankofa-rent
+
+# 2. Install dependencies
+npm install
+
+# 3. One-step setup (auto-creates .env.local and syncs Convex backend)
+npm run setup
+
+# 4. Run the full stack (Convex backend + Vite frontend in one command)
+npm run dev:full
+```
+
+Your app will start at `http://localhost:3000`!
+
+---
+
+### Alternative: Run in Separate Terminals
+
+If you prefer separate terminal windows for backend and frontend:
+
+```sh
+# Terminal 1 — Convex backend watcher
+npm run dev:backend
+
+# Terminal 2 — Vite frontend
+npm run dev
+```
+
+---
+
+### One-Click Script Run (Windows & Unix)
+
+If you prefer double-clicking a script:
+
+1. **On Windows:** Run:
    ```cmd
    run.bat
    ```
-3. **On Mac/Linux:** Run:
+2. **On Mac/Linux:** Run:
    ```sh
    chmod +x run.sh && ./run.sh
    ```
