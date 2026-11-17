@@ -433,30 +433,45 @@ No installation required. Works on any device — phone, tablet, or computer.
 **Before you start, install Node.js:**
 Download and install **Node.js version 22 or later** from [nodejs.org](https://nodejs.org/) *(choose the LTS version)*.
 
-**Then:**
+Then choose either **Method 1 (Scripts)** or **Method 2 (Universal NPM Commands)**:
 
-#### On Windows:
-1. Copy the project folder to the new computer *(or clone from GitHub)*
-2. **Double-click `run.bat`**
-3. A terminal window opens — it sets everything up automatically
-4. Your browser will open to `http://localhost:3000` automatically
+#### Method 1 — One-Click Scripts
 
-#### On Mac or Linux:
-1. Copy the project folder to the new computer *(or clone from GitHub)*
-2. Open a Terminal in the project folder and run:
-   ```bash
-   chmod +x run.sh && ./run.sh
-   ```
-3. Your browser will open to `http://localhost:3000` automatically
+- **On Windows:** Double-click `run.bat` *(or run `.\run.bat` in PowerShell/CMD)*.
+- **On Mac/Linux:** Run `chmod +x run.sh && ./run.sh`.
 
-### What the script does automatically:
+---
+
+#### Method 2 — Universal NPM Commands *(Recommended if `.bat` files are blocked or fail)*
+
+Works in any terminal (PowerShell, Command Prompt, Mac/Linux Terminal) with standard Node & npm:
+
+```bash
+# 1. Install all dependencies
+npm install
+
+# 2. One-time setup (automatically creates .env.local and verifies Convex backend)
+npm run setup
+
+# 3. Start full stack (Convex backend + Vite frontend together)
+npm run dev:full
+```
+
+Open `http://localhost:3000` in your browser. Both the backend and frontend run together. Press `Ctrl+C` when you want to stop.
+
+> **Prefer separate windows?**
+> - Terminal 1: `npm run dev:backend`
+> - Terminal 2: `npm run dev`
+
+---
+
+### What the setup & scripts do automatically:
 - ✅ Checks that Node.js is installed
 - ✅ Creates the environment configuration file (`.env.local`) with all credentials
 - ✅ Installs all required libraries and dependencies (`npm install`)
-- ✅ Verifies the connection to the backend database
-- ✅ Runs all 20 unit tests to confirm everything is working
+- ✅ Verifies the connection to the backend database & syncs all indexes
 - ✅ Starts the backend sync and frontend server
-- ✅ Opens your browser at `http://localhost:3000`
+- ✅ Serves your app at `http://localhost:3000`
 
 ---
 

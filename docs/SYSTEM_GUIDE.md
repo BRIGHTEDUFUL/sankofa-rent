@@ -679,28 +679,31 @@ Every list page has an empty state shown when `rows.length === 0` — an icon + 
 - Node.js **≥ 22**
 - **npm** only — no bun, pnpm, or yarn (`package-lock.json` is the source of truth)
 
-### First-time setup
+### First-time setup (Option 2 / Universal NPM workflow)
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 npm install
 
-# Start the Convex dev backend (connects to dev:adorable-pig-437)
-npx convex dev
+# 2. Automated setup (creates .env.local + syncs Convex backend)
+npm run setup
 
-# In a second terminal: start the frontend dev server
-npm run dev
-# → http://localhost:8081
+# 3. Start full stack in one command
+npm run dev:full
+# → http://localhost:3000
 ```
 
-The first time you open http://localhost:8081 and sign up, that account becomes the admin.
+The first time you open http://localhost:3000 and sign up, that account becomes the admin.
 
 ### Available scripts
 
 | Command                                              | What it does                                               |
 | ---------------------------------------------------- | ---------------------------------------------------------- |
-| `npm run dev`                                        | Vite SSR dev server on port 8081                           |
-| `npm test`                                           | Run Vitest unit tests (14 tests, 4 files, ~6 s)            |
+| `npm run setup`                                      | Cross-platform setup: creates `.env.local` & verifies Convex|
+| `npm run dev:full`                                   | Starts Convex backend + Vite frontend concurrently         |
+| `npm run dev:backend`                                | Convex dev watcher in background window (`--env-file`)     |
+| `npm run dev`                                        | Vite SSR dev server on port 3000                           |
+| `npm test`                                           | Run Vitest unit tests (20 tests, 4 files)                  |
 | `npm run lint`                                       | ESLint check — must exit 0 before committing               |
 | `npm run build`                                      | Production Nitro build → `.output/`                        |
 | `npx tsc --noEmit`                                   | TypeScript check — must exit 0 before committing           |
