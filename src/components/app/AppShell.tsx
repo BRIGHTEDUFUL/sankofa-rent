@@ -220,7 +220,7 @@ function BottomTabBar({
               className="absolute top-1/2 -translate-y-1/2 h-8 w-16 rounded-full bg-primary/15 pointer-events-none"
               style={{ left: `calc(${activeTabIndex} * 20% + 10% - 2rem)` }}
               layoutId="tab-pill"
-              transition={{ type: "spring", stiffness: 500, damping: 40 }}
+              transition={{ type: "spring", stiffness: 380, damping: 36, mass: 0.8 }}
             />
           )}
 
@@ -296,7 +296,7 @@ function BottomTabBar({
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "spring", stiffness: 400, damping: 40 }}
+              transition={{ type: "spring", stiffness: 420, damping: 38 }}
               className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-card sm:hidden flex flex-col max-h-[90dvh]"
               style={{ paddingBottom: "calc(var(--sab) + 1.25rem)" }}
             >
@@ -696,13 +696,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <TemporaryPasswordBanner onOpenModal={() => setMustChangePwModalOpen(true)} />
               </div>
             )}
-            <AnimatePresence mode="wait" initial={false}>
+            <AnimatePresence mode="sync" initial={false}>
               <motion.div
                 key={path}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.15, ease: "easeOut" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.1, ease: "easeOut" }}
+                style={{ willChange: "opacity" }}
               >
                 {children}
               </motion.div>
@@ -762,7 +763,7 @@ export function AvatarCircle({
 
 export function Card({ children, className = "" }: { children?: ReactNode; className?: string }) {
   return (
-    <div className={`animate-rise rounded-3xl bg-card p-5 shadow-soft sm:p-6 ${className}`}>
+    <div className={`rounded-3xl bg-card p-5 shadow-soft sm:p-6 ${className}`}>
       {children}
     </div>
   );

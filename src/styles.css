@@ -135,7 +135,7 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -143,31 +143,31 @@
   }
 }
 @utility animate-rise {
-  animation: rise 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: rise 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Staggered list entrance — apply to container, children stagger */
 @utility stagger-children {
   & > * {
-    animation: rise 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: rise 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
   & > *:nth-child(1) {
     animation-delay: 0ms;
   }
   & > *:nth-child(2) {
-    animation-delay: 40ms;
+    animation-delay: 25ms;
   }
   & > *:nth-child(3) {
-    animation-delay: 80ms;
+    animation-delay: 50ms;
   }
   & > *:nth-child(4) {
-    animation-delay: 120ms;
+    animation-delay: 75ms;
   }
   & > *:nth-child(5) {
-    animation-delay: 160ms;
+    animation-delay: 100ms;
   }
   & > *:nth-child(n + 6) {
-    animation-delay: 200ms;
+    animation-delay: 120ms;
   }
 }
 
@@ -238,6 +238,12 @@
 /* ─── Nav bottom padding utility ────────────────────────────────────────────── */
 @utility pb-nav {
   padding-bottom: calc(4.5rem + var(--sab));
+}
+
+/* ─── Page transition layer — promoted by the browser for opacity-only fade ── */
+@utility page-transition {
+  will-change: opacity;
+  contain: layout style;
 }
 
 /* ─── Scroll-offset so anchors & focus aren't hidden behind sticky top bars ── */
