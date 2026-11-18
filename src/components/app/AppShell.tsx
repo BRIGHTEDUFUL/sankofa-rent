@@ -23,7 +23,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { api } from "../../../convex/_generated/api";
 import { useBranding } from "@/lib/branding";
 import { initials } from "@/lib/format";
@@ -393,8 +393,14 @@ function BottomTabBar({
 
 const NAV_KEY = "sankofa-nav-expanded";
 
+// Page transitions: a short exit, then a decelerating arrival. Transform
+// never affects layout, so there is no reflow — only the two pages swapping.
+const EASE_ARRIVE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const EASE_LEAVE: [number, number, number, number] = [0.4, 0, 1, 1];
+
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const reduceMotion = useReducedMotion();
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { signOut } = useAuthActions();
@@ -696,14 +702,16 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <TemporaryPasswordBanner onOpenModal={() => setMustChangePwModalOpen(true)} />
               </div>
             )}
-            <AnimatePresence mode="sync" initial={false}>
+            <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={path}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.1, ease: "easeOut" }}
-                style={{ willChange: "opacity" }}
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.24, ease: EASE_ARRIVE } }}
+                exit={{
+                  opacity: 0,
+                  y: reduceMotion ? 0 : -4,
+                  transition: { duration: 0.12, ease: EASE_LEAVE },
+                }}
               >
                 {children}
               </motion.div>
