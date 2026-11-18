@@ -6,13 +6,8 @@ import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { DataPage } from "@/components/app/DataPage";
 import { Badge, Card } from "@/components/app/AppShell";
 import { ConfirmDialog, FormDialog, SelectField, TextField } from "@/components/app/FormDialog";
-import {
-  cediFromPesewas,
-  formatDate,
-  msFromDateInput,
-  pesewasFromCedi,
-  plural,
-} from "@/lib/format";
+import { formatDate, msFromDateInput, pesewasFromCedi, plural } from "@/lib/format";
+import { useMoney } from "@/lib/currency";
 
 export const Route = createFileRoute("/leases")({
   head: () => ({
@@ -37,6 +32,7 @@ function Page() {
   const createLease = useMutation(api.leases.create);
   const renewLease = useMutation(api.leases.renew);
   const endLease = useMutation(api.leases.end);
+  const { money, symbol } = useMoney();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [createTenantId, setCreateTenantId] = useState("");
@@ -140,7 +136,7 @@ function Page() {
           {
             key: "r",
             label: "Rent",
-            render: (r) => <span className="font-semibold">{cediFromPesewas(r.rent)}</span>,
+            render: (r) => <span className="font-semibold">{money(r.rent)}</span>,
           },
           { key: "a", label: "Advance", render: (r) => `${r.advanceMonths} mo` },
           {
@@ -208,7 +204,7 @@ function Page() {
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <TextField
-            label="Monthly rent (GH₵)"
+            label={`Monthly rent (${symbol})`}
             name="rent"
             required
             inputMode="decimal"
@@ -223,7 +219,7 @@ function Page() {
           />
         </div>
         <TextField
-          label="Deposit (GH₵)"
+          label={`Deposit (${symbol})`}
           name="deposit"
           inputMode="decimal"
           placeholder="Optional"
@@ -245,7 +241,7 @@ function Page() {
           defaultValue={renewing ? new Date(renewing.end).toISOString().slice(0, 10) : ""}
         />
         <TextField
-          label="New monthly rent (GH₵)"
+          label={`New monthly rent (${symbol})`}
           name="rent"
           inputMode="decimal"
           defaultValue={renewing ? String(renewing.rent / 100) : ""}

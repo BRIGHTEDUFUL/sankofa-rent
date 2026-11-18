@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Plus } from "lucide-react";
+import { Banknote, Plus } from "lucide-react";
 import { Card, Button } from "./AppShell";
 
 export type Column<T> = {
@@ -14,6 +14,7 @@ export function DataPage<T>({
   subtitle,
   action,
   onAction,
+  secondaryAction,
   stats,
   columns,
   rows,
@@ -24,6 +25,7 @@ export function DataPage<T>({
   subtitle: string;
   action: string;
   onAction?: () => void;
+  secondaryAction?: { label: string; onClick: () => void };
   stats?: { label: string; value: string; hint?: string }[];
   columns: Column<T>[];
   rows: T[];
@@ -46,6 +48,16 @@ export function DataPage<T>({
             <Plus className="h-4 w-4" />
             {action}
           </Button>
+          {secondaryAction && (
+            <Button
+              variant="outline"
+              className="h-12 w-full justify-center sm:h-auto sm:w-auto sm:justify-start"
+              onClick={secondaryAction.onClick}
+            >
+              <Banknote className="h-4 w-4" />
+              {secondaryAction.label}
+            </Button>
+          )}
         </div>
       </div>
 

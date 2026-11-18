@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+  CURRENCY_CODES,
   cediFromPesewas,
+  currencyLabel,
   formatDate,
+  formatMoney,
   friendlyError,
   initials,
+  isCurrencyCode,
+  parseMoney,
   pesewasFromCedi,
 } from "@/lib/format";
 
@@ -19,6 +24,14 @@ describe("pesewasFromCedi", () => {
     expect(pesewasFromCedi("gh₵ 1600")).toBe(160000);
     expect(pesewasFromCedi("GHS 1,600")).toBe(160000);
     expect(pesewasFromCedi(" 2,750.50 ")).toBe(275050);
+  });
+  it("accepts the other supported currency marks", () => {
+    expect(parseMoney("$1,600.00")).toBe(160000);
+    expect(parseMoney("€1600")).toBe(160000);
+    expect(parseMoney("£1,600")).toBe(160000);
+    expect(parseMoney("₦ 1600")).toBe(160000);
+    expect(parseMoney("CFA 1,600")).toBe(160000);
+    expect(parseMoney("USD 1600")).toBe(160000);
   });
   it("rejects invalid or non-positive amounts", () => {
     for (const bad of ["", "abc", "0", "-5", "1e5.5.5", "1,2,3,4,5,x"]) {
@@ -43,15 +56,32 @@ describe("friendlyError", () => {
   });
 });
 
-describe("cediFromPesewas", () => {
-  it("formats with the cedi symbol and two decimals", () => {
+describe("cediFromPesewas and formatMoney", () => {
+  it("formats with the cedi symbol and two decimals by default", () => {
     expect(cediFromPesewas(160000)).toBe("GH₵ 1,600.00");
+    expect(formatMoney(160000)).toBe("GH₵ 1,600.00");
+  });
+
+  it("uses the selected currency's symbol", () => {
+    expect(formatMoney(160000, "USD")).toBe("$1,600.00");
+    expect(formatMoney(160000, "EUR")).toBe("€1,600.00");
+    expect(formatMoney(160000, "GBP")).toBe("£1,600.00");
+    expect(formatMoney(160000, "NGN")).toBe("₦1,600.00");
+    expect(formatMoney(160000, "XOF")).toBe("CFA 1,600.00");
+    expect(cediFromPesewas(160000, "USD")).toBe("$1,600.00");
+  });
+
+  it("exposes a validated currency list with human labels", () => {
+    expect(CURRENCY_CODES).toEqual(["GHS", "USD", "EUR", "GBP", "NGN", "XOF"]);
+    expect(CURRENCY_CODES.every(isCurrencyCode)).toBe(true);
+    expect(isCurrencyCode("ZAR")).toBe(false);
+    expect(currencyLabel("XOF")).toBe("West African CFA franc");
   });
 });
 
 describe("initials and formatDate defensive handling", () => {
   it("extracts initials correctly and handles null/undefined safely", () => {
-    expect(initials("Edith Mam")).toBe("EM");
+    expect(initials("Edith Mama")).toBe("EM");
     expect(initials("Kwame")).toBe("K");
     expect(initials("")).toBe("?");
     expect(initials(undefined)).toBe("?");

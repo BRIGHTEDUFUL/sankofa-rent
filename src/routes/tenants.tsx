@@ -7,7 +7,8 @@ import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { DataPage } from "@/components/app/DataPage";
 import { Badge, Card } from "@/components/app/AppShell";
 import { ConfirmDialog, FormDialog, SelectField, TextField } from "@/components/app/FormDialog";
-import { cediFromPesewas, formatDate, initials, plural } from "@/lib/format";
+import { formatDate, initials, plural } from "@/lib/format";
+import { useMoney } from "@/lib/currency";
 
 export const Route = createFileRoute("/tenants")({
   head: () => ({
@@ -29,6 +30,7 @@ function Page() {
   const createTenant = useMutation(api.tenants.create);
   const updateTenant = useMutation(api.tenants.update);
   const archiveTenant = useMutation(api.tenants.archive);
+  const { money } = useMoney();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<TenantRow | null>(null);
@@ -121,7 +123,7 @@ function Page() {
           { label: "New this month", value: String(newThisMonth) },
           {
             label: "Total arrears",
-            value: cediFromPesewas(withArrears.reduce((s, t) => s + t.balance, 0)),
+            value: money(withArrears.reduce((s, t) => s + t.balance, 0)),
           },
         ]}
         columns={[
@@ -150,7 +152,7 @@ function Page() {
             className: "text-right",
             render: (r) =>
               r.balance > 0 ? (
-                <Badge tone="red">{cediFromPesewas(r.balance)} owed</Badge>
+                <Badge tone="red">{money(r.balance)} owed</Badge>
               ) : (
                 <Badge tone="green">Up to date</Badge>
               ),

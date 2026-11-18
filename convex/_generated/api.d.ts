@@ -13,6 +13,7 @@ import type * as announcements from "../announcements.js";
 import type * as auth from "../auth.js";
 import type * as branding from "../branding.js";
 import type * as crons from "../crons.js";
+import type * as currency from "../currency.js";
 import type * as dashboard from "../dashboard.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   branding: typeof branding;
   crons: typeof crons;
+  currency: typeof currency;
   dashboard: typeof dashboard;
   files: typeof files;
   http: typeof http;

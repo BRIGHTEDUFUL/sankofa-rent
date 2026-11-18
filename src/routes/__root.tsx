@@ -74,7 +74,9 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
         </p>
         {error ? (
           <div className="mt-4 max-h-48 overflow-auto rounded-xl bg-muted p-3 text-left font-mono text-xs text-destructive whitespace-pre-wrap break-all select-text">
-            {error instanceof Error ? `${error.name}: ${error.message}\n\n${error.stack ?? ""}` : String(error)}
+            {error instanceof Error
+              ? `${error.name}: ${error.message}\n\n${error.stack ?? ""}`
+              : String(error)}
           </div>
         ) : null}
         <div className="mt-6 flex flex-wrap justify-center gap-2">
@@ -172,7 +174,8 @@ function RootComponent() {
   const normalizedPath = path.replace(/\/$/, "");
   const isStandalone =
     ["/login", "/signup", "/forgot-password", "/notices"].includes(normalizedPath) ||
-    path.startsWith("/notices");
+    path.startsWith("/notices") ||
+    path.startsWith("/receipts");
   usePlatform();
 
   return (

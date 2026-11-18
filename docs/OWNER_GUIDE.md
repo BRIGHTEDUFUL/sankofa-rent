@@ -286,7 +286,7 @@ Go to **Settings** (found in the left sidebar on desktop, or the **More** tab on
 ### Profile Tab:
 - First name, last name
 - Phone number
-- Business name *(e.g., "Nonnon Properties")*
+- Business name *(e.g., "Mama Properties")*
 - Region
 
 ### Payments Tab *(Important — set this up first)*:
@@ -524,5 +524,5 @@ The file `.env.local` contains the connection keys to the database. This file is
 
 ---
 
-*Sankofa Rent — Final Year Project, 2026. Developed by Edith Nonnon.*
+*Sankofa Rent — Final Year Project, 2026. Developed by Edith Mama.*
 *For technical support, contact the developer.*

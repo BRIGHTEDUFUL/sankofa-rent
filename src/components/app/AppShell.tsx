@@ -763,9 +763,7 @@ export function AvatarCircle({
 
 export function Card({ children, className = "" }: { children?: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-3xl bg-card p-5 shadow-soft sm:p-6 ${className}`}>
-      {children}
-    </div>
+    <div className={`rounded-3xl bg-card p-5 shadow-soft sm:p-6 ${className}`}>{children}</div>
   );
 }
 

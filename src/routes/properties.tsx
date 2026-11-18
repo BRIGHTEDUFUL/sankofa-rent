@@ -6,7 +6,8 @@ import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
 import { Card, Button } from "@/components/app/AppShell";
 import { ConfirmDialog, FormDialog, SelectField, TextField } from "@/components/app/FormDialog";
-import { cediFromPesewas, pesewasFromCedi, plural } from "@/lib/format";
+import { pesewasFromCedi, plural } from "@/lib/format";
+import { useMoney } from "@/lib/currency";
 
 export const Route = createFileRoute("/properties")({
   head: () => ({
@@ -33,6 +34,7 @@ function Page() {
   const removeProperty = useMutation(api.properties.remove);
   const addUnit = useMutation(api.properties.addUnit);
   const updateUnit = useMutation(api.properties.updateUnit);
+  const { money, symbol } = useMoney();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<PropertyRow | null>(null);
@@ -207,7 +209,7 @@ function Page() {
                   Monthly rent roll
                 </span>
                 <span className="shrink-0 whitespace-nowrap font-semibold tabular-nums">
-                  {cediFromPesewas(rentRoll)}
+                  {money(rentRoll)}
                 </span>
               </div>
               <div className="mt-3 flex flex-wrap gap-1.5">
@@ -294,7 +296,7 @@ function Page() {
         <TextField label="Unit label" name="label" required placeholder="A3" />
         <TextField label="Bedrooms" name="bedrooms" type="number" min={0} placeholder="2" />
         <TextField
-          label="Monthly rent (GH₵)"
+          label={`Monthly rent (${symbol})`}
           name="rent"
           required
           inputMode="decimal"
@@ -323,7 +325,7 @@ function Page() {
           defaultValue={editingUnit?.unit.bedrooms ?? ""}
         />
         <TextField
-          label="Monthly rent (GH₵)"
+          label={`Monthly rent (${symbol})`}
           name="rent"
           required
           inputMode="decimal"

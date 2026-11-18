@@ -22,6 +22,7 @@ import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as TenantsRouteImport } from './routes/tenants'
+import { Route as ReceiptsPaymentIdRouteImport } from './routes/receipts.$paymentId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,6 +89,11 @@ const TenantsRoute = TenantsRouteImport.update({
   path: '/tenants',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReceiptsPaymentIdRoute = ReceiptsPaymentIdRouteImport.update({
+  id: '/receipts/$paymentId',
+  path: '/receipts/$paymentId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/tenants': typeof TenantsRoute
+  '/receipts/$paymentId': typeof ReceiptsPaymentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/tenants': typeof TenantsRoute
+  '/receipts/$paymentId': typeof ReceiptsPaymentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/tenants': typeof TenantsRoute
+  '/receipts/$paymentId': typeof ReceiptsPaymentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/signup'
     | '/tenants'
+    | '/receipts/$paymentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/signup'
     | '/tenants'
+    | '/receipts/$paymentId'
   id:
     | '__root__'
     | '/'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/signup'
     | '/tenants'
+    | '/receipts/$paymentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -197,6 +209,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
   TenantsRoute: typeof TenantsRoute
+  ReceiptsPaymentIdRoute: typeof ReceiptsPaymentIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TenantsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/receipts/$paymentId': {
+      id: '/receipts/$paymentId'
+      path: '/receipts/$paymentId'
+      fullPath: '/receipts/$paymentId'
+      preLoaderRoute: typeof ReceiptsPaymentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -309,6 +329,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
   TenantsRoute: TenantsRoute,
+  ReceiptsPaymentIdRoute: ReceiptsPaymentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -34,8 +34,22 @@ import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { Badge, Button, Card } from "@/components/app/AppShell";
 import { ConfirmDialog, FormDialog, TextField } from "@/components/app/FormDialog";
 import { ResponsiveDialog } from "@/components/app/ResponsiveDialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useBranding, isHexColor, isUsableAccent, DEFAULT_BRANDING } from "@/lib/branding";
-import { formatDate, friendlyError, initials } from "@/lib/format";
+import {
+  CURRENCY_CODES,
+  currencyLabel,
+  formatDate,
+  friendlyError,
+  initials,
+  type CurrencyCode,
+} from "@/lib/format";
 
 const TAB_IDS = ["profile", "business", "accounts", "branding", "payments", "security"] as const;
 type Tab = (typeof TAB_IDS)[number];
@@ -107,6 +121,7 @@ type FormState = {
   phone: string;
   businessName: string;
   region: string;
+  currency: string;
   momoNumber: string;
   momoNetwork: string;
   bankName: string;
@@ -122,6 +137,7 @@ function fromProfile(p: Doc<"profiles">): FormState {
     phone: p.phone ?? "",
     businessName: p.businessName ?? "",
     region: p.region ?? "",
+    currency: p.currency ?? "GHS",
     momoNumber: p.momoNumber ?? "",
     momoNetwork: p.momoNetwork ?? "",
     bankName: p.bankName ?? "",
@@ -466,6 +482,7 @@ function Page() {
         phone: next.phone,
         businessName: next.businessName,
         region: next.region,
+        currency: next.currency as CurrencyCode,
         momoNumber: next.momoNumber,
         momoNetwork: next.momoNetwork
           ? (next.momoNetwork as "MTN" | "Telecel" | "AirtelTigo")
@@ -670,13 +687,26 @@ function Page() {
                   placeholder="Greater Accra"
                   className="h-11 sm:h-9"
                 />
-                <TextField
-                  label="Currency"
-                  name="currency"
-                  value="GH₵ Ghana cedi"
-                  readOnly
-                  className="h-11 sm:h-9"
-                />
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium" htmlFor="currency-select">
+                    Currency
+                  </label>
+                  <Select value={form.currency} onValueChange={(v) => set("currency", v)}>
+                    <SelectTrigger id="currency-select" className="h-11 sm:h-9">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CURRENCY_CODES.map((code) => (
+                        <SelectItem key={code} value={code}>
+                          {currencyLabel(code)} ({code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Used for every amount in the app. Existing amounts are not converted.
+                  </p>
+                </div>
                 <TextField
                   label="Rent due day"
                   name="rentDueDay"
@@ -1302,6 +1332,13 @@ function Page() {
                   placeholder="•••• 4410"
                   className="h-11 sm:h-9"
                 />
+                <div className="rounded-xl bg-primary-soft px-4 py-3 sm:col-span-2">
+                  <p className="text-sm font-semibold">Cash</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Accepted in person — use “Record cash payment” on the Payments page. Every cash
+                    payment gets a numbered receipt.
+                  </p>
+                </div>
               </div>
               <SaveBar>
                 <Button
@@ -1331,7 +1368,9 @@ function Page() {
                   </div>
                   <div className="flex min-h-[52px] items-center justify-between px-1">
                     <span className="text-sm font-medium">Currency</span>
-                    <span className="text-sm text-muted-foreground">{profile.currency}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {currencyLabel(profile.currency)} ({profile.currency})
+                    </span>
                   </div>
                 </div>
               </Section>

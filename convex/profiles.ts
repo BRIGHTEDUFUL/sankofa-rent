@@ -1,6 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { requireUser } from "./lib";
+import { currencyValidator } from "./currency";
 
 export const me = query({
   args: {},
@@ -13,7 +14,8 @@ export const me = query({
   },
 });
 
-// Only the fields below are writable. `plan` and `currency` are never client-controlled.
+// Only the fields below are writable. `plan` is never client-controlled;
+// `currency` is validated against the supported currency list.
 export const update = mutation({
   args: {
     firstName: v.optional(v.string()),
@@ -21,6 +23,7 @@ export const update = mutation({
     phone: v.optional(v.string()),
     businessName: v.optional(v.string()),
     region: v.optional(v.string()),
+    currency: v.optional(currencyValidator),
     momoNumber: v.optional(v.string()),
     momoNetwork: v.optional(
       v.union(v.literal("MTN"), v.literal("Telecel"), v.literal("AirtelTigo")),

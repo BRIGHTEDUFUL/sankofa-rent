@@ -50,3 +50,53 @@ export const list = query({
       .collect();
   },
 });
+
+/** Everything needed to render a tenant-facing receipt, scoped to the landlord. */
+export const receipt = query({
+  args: { paymentId: v.id("payments") },
+  handler: async (ctx, { paymentId }) => {
+    const me = await requireUser(ctx);
+    const payment = await ctx.db.get(paymentId);
+    if (!payment || payment.landlordId !== me) throw new Error("Receipt not found");
+
+    const tenant = await ctx.db.get(payment.tenantId);
+    const invoices = await ctx.db
+      .query("invoices")
+      .withIndex("by_tenant", (q) => q.eq("tenantId", payment.tenantId))
+      .collect();
+
+    const outstanding = invoices.filter(
+      (i) => i.status !== "paid" && i.status !== "draft" && i.amount - i.paid > 0,
+    );
+    const balance = outstanding.reduce((sum, i) => sum + (i.amount - i.paid), 0);
+    const nextInvoice = [...outstanding].sort((a, b) => a.dueDate - b.dueDate)[0];
+
+    const appliedInvoice = payment.invoiceId ? await ctx.db.get(payment.invoiceId) : null;
+    const lease = appliedInvoice?.leaseId ? await ctx.db.get(appliedInvoice.leaseId) : null;
+    const unitId = lease?.unitId ?? tenant?.unitId;
+    const unit = unitId ? await ctx.db.get(unitId) : null;
+    const property = unit?.propertyId ? await ctx.db.get(unit.propertyId) : null;
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_user", (q) => q.eq("userId", me))
+      .unique();
+
+    return {
+      payment,
+      tenantName: tenant?.name ?? "Tenant",
+      tenantPhone: tenant?.phone ?? null,
+      businessName: profile?.businessName?.trim() || null,
+      region: profile?.region?.trim() || null,
+      currency: profile?.currency ?? "GHS",
+      invoiceNumber: appliedInvoice?.number ?? null,
+      invoicePeriod: appliedInvoice?.period ?? null,
+      propertyName: property?.name ?? null,
+      unitLabel: unit?.label ?? null,
+      balance,
+      nextPayment: nextInvoice
+        ? { number: nextInvoice.number, dueDate: nextInvoice.dueDate, amount: nextInvoice.amount - nextInvoice.paid }
+        : null,
+    };
+  },
+});

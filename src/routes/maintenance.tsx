@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { friendlyError, pesewasFromCedi } from "@/lib/format";
+import { useMoney } from "@/lib/currency";
 
 export const Route = createFileRoute("/maintenance")({
   head: () => ({
@@ -381,6 +382,7 @@ function StatusDialog({
   item: MaintenanceRow | null;
   onSubmit: (values: { status: string; cost?: number }) => Promise<void>;
 }) {
+  const { symbol } = useMoney();
   const [status, setStatus] = useState<string>(item?.status ?? "open");
   const [cost, setCost] = useState(item?.cost ? String(item.cost / 100) : "");
   const [error, setError] = useState("");
@@ -437,7 +439,7 @@ function StatusDialog({
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="cost">Cost (GH₵)</Label>
+          <Label htmlFor="cost">Cost ({symbol})</Label>
           <Input
             id="cost"
             value={cost}

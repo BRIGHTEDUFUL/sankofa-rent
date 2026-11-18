@@ -17,7 +17,7 @@
   `npx convex deploy --env-file <file>` for prod; `npx convex dev --once` for dev.
 - **Frontend** (Cloudflare Workers, Nitro `cloudflare-module`): production is deployed by
   **Workers Builds** on pushes to `main`, to Worker `final-year-rent-project` — live at
-  https://final-year-rent-project.edimamfaidol.workers.dev. The `edith-nonnon-project` worker
+  https://final-year-rent-project.edimamfaidol.workers.dev. The `edith-mama-project` worker
   was the manual-deploy target and does not reflect the deployed site anymore; the two were
   never aligned (the Git-connected build always named its script `final-year-rent-project`).
   `npm run build` → `npx wrangler deploy` (root `wrangler.jsonc`) remains for emergencies only.

@@ -4,7 +4,7 @@
   //   .output/server/index.mjs  -> Worker entry (SSR shell)
   //   .output/public/           -> static assets, served by the ASSETS binding
   // No `vars` block: VITE_CONVEX_URL is inlined at build time, never at runtime.
-  "name": "edith-nonnon-project",
+  "name": "edith-mama-project",
   "main": "./.output/server/index.mjs",
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat"],

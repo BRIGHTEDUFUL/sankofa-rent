@@ -1,27 +1,67 @@
-// Convex stores money as integer pesewas (GH₵ 1 = 100) and dates as epoch ms.
-export function cediFromPesewas(pesewas: number): string {
-  return (
-    "GH₵ " +
-    (pesewas / 100).toLocaleString("en-GH", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-  );
+// Convex stores money as integer minor units (100 per major unit — pesewas for
+// GHS, cents for USD, etc.), and dates as epoch ms. Each landlord picks the
+// currency used for display and entry; stored amounts are never converted.
+export const CURRENCIES = {
+  GHS: { code: "GHS", symbol: "GH₵", label: "Ghana cedi", spaced: true },
+  USD: { code: "USD", symbol: "$", label: "US dollar", spaced: false },
+  EUR: { code: "EUR", symbol: "€", label: "Euro", spaced: false },
+  GBP: { code: "GBP", symbol: "£", label: "British pound", spaced: false },
+  NGN: { code: "NGN", symbol: "₦", label: "Nigerian naira", spaced: false },
+  XOF: { code: "XOF", symbol: "CFA", label: "West African CFA franc", spaced: true },
+} as const;
+
+export type CurrencyCode = keyof typeof CURRENCIES;
+export const CURRENCY_CODES = Object.keys(CURRENCIES) as CurrencyCode[];
+export const DEFAULT_CURRENCY: CurrencyCode = "GHS";
+
+export function isCurrencyCode(value: string): value is CurrencyCode {
+  return Object.prototype.hasOwnProperty.call(CURRENCIES, value);
 }
 
-/** Parse a cedi amount typed in the UI into integer pesewas. Returns NaN when invalid. */
-export function pesewasFromCedi(value: string): number {
+export function currencyLabel(code?: string | null): string {
+  return code && isCurrencyCode(code) ? CURRENCIES[code].label : (code ?? "Ghana cedi");
+}
+
+export function currencySymbol(code?: string | null): string {
+  return code && isCurrencyCode(code) ? CURRENCIES[code].symbol : CURRENCIES.GHS.symbol;
+}
+
+/** Format integer minor units with the landlord's currency symbol. */
+export function formatMoney(minor: number, currency: CurrencyCode = DEFAULT_CURRENCY): string {
+  const c = CURRENCIES[currency] ?? CURRENCIES.GHS;
+  const amount = (minor / 100).toLocaleString("en-GH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return `${c.symbol}${c.spaced ? " " : ""}${amount}`;
+}
+
+/** Backwards-compatible name used across the app; `currency` defaults to GHS. */
+export function cediFromPesewas(
+  pesewas: number,
+  currency: CurrencyCode = DEFAULT_CURRENCY,
+): string {
+  return formatMoney(pesewas, currency);
+}
+
+// Any currency mark a user might paste into an amount field, in any case.
+const CURRENCY_MARKS = /(gh₵|₵|ghc|ghs|usd|eur|gbp|ngn|xof|cfa|[$€£₦])/gi;
+
+/** Parse an amount typed in the UI into integer minor units. Returns NaN when invalid. */
+export function parseMoney(value: string): number {
   // Tolerate what people actually type and what our placeholders show:
-  // "1,600", "GH₵ 1,600.00", "GHS 1600" — strip currency marks, commas, spaces.
-  const normalized = value
-    .trim()
-    .replace(/(gh₵|₵|ghc|ghs)/gi, "")
-    .replace(/[,\s]/g, "");
-  const cedi = Number(normalized);
+  // "1,600", "GH₵ 1,600.00", "$1600", "GHS 1,600", "CFA 1,600" — strip marks.
+  const normalized = value.trim().replace(CURRENCY_MARKS, "").replace(/[,\s]/g, "");
+  const amount = Number(normalized);
   // Zero is rejected too: a zero-amount invoice, rent or deposit is always a
   // data-entry mistake, and it silently skews every total in the app.
-  if (!Number.isFinite(cedi) || cedi <= 0) return NaN;
-  return Math.round(cedi * 100);
+  if (!Number.isFinite(amount) || amount <= 0) return NaN;
+  return Math.round(amount * 100);
+}
+
+/** Backwards-compatible name; parsing is currency-agnostic. */
+export function pesewasFromCedi(value: string): number {
+  return parseMoney(value);
 }
 
 /** Parse an HTML date input (YYYY-MM-DD) into epoch ms at UTC midnight. */

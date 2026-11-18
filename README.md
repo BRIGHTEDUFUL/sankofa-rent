@@ -7,7 +7,7 @@
 ### Made for Ghanaian landlords.
 
 Property management, rent invoicing, payments and receipts — one calm dashboard.<br/>
-Built as a university final-year project by **Edith Nonnon**, engineered like a product launch.
+Built as a university final-year project by **Edith Mama**, engineered like a product launch.
 
 <a href="https://final-year-rent-project.edimamfaidol.workers.dev"><img src="https://img.shields.io/badge/Live%20App-Open%20%E2%86%92-4E735A?style=for-the-badge" alt="Live App"/></a>
 
@@ -50,12 +50,13 @@ It works equally well on the phone in a landlord's pocket and the laptop on thei
 | **Tenants**             | Profiles, unit assignment, balances derived from unpaid invoices                   |
 | **Leases**              | Create / renew / end; duplicate-safe unit assignment                               |
 | **Invoices**            | Draft → send → paid; monthly generation cron; duplicate guard                      |
-| **Payments & receipts** | MoMo (MTN, Telecel, AirtelTigo), bank, cash — numbered receipts                    |
+| **Payments & receipts** | MoMo (MTN, Telecel, AirtelTigo), bank, cash — numbered, printable tenant receipts with next-payment due date |
 | **Maintenance**         | Priority + status tracking per unit                                                |
 | **Announcements**       | In-app Tenant Notice Board (`/notices`) with property targeting & urgent pinning   |
 | **Accounts & Admins**   | Multi-admin support, promote/demote, password resets, account provisioning         |
 | **Branding**            | Admin-only: live app name, tagline, 8 curated accents + custom colour, logo upload |
 | **Roles**               | First account on a deployment becomes admin, the rest members                      |
+| **Currencies**          | Per-landlord choice of GHS, USD, EUR, GBP, NGN or XOF across every amount           |
 | **Mobile-native**       | iOS translucency, Android M3 ripple + pill, page transitions, platform detection   |
 | **Dark mode**           | Full OKLCH token set; OS preference + manual toggle                                |
 
@@ -85,7 +86,7 @@ It works equally well on the phone in a landlord's pocket and the laptop on thei
 | Styling   | **Tailwind CSS v4** — OKLCH tokens, `@utility` custom utilities, dark mode |
 | Animation | **Framer Motion 14** — page transitions, Android M3 pill, More drawer      |
 | Charts    | **Recharts 2** — 6-month bar chart, collection gauge                       |
-| Money     | Integer pesewas (GH₵ 1 = 100 p) — never floats                             |
+| Money     | Integer minor units (100 per major unit), never floats; display currency set per landlord |
 | Deploy    | **Cloudflare Workers** (Nitro `cloudflare-module`), CI as npm-only         |
 | Tests     | **Vitest 4** + Testing Library — 20 unit tests                             |
 
@@ -303,7 +304,7 @@ public/            favicon.svg, manifest.webmanifest, icons, robots.txt
 
 ## Author
 
-**Edith Nonnon** — Final-Year Project, 2026.
+**Edith Mama** — Final-Year Project, 2026.
 
 ---
 

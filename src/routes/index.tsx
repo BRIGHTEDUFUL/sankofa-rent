@@ -15,7 +15,8 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Card, Badge } from "@/components/app/AppShell";
 import { Progress } from "@/components/ui/progress";
-import { cediFromPesewas, formatDateTime, PAYMENT_METHODS } from "@/lib/format";
+import { formatDateTime, PAYMENT_METHODS } from "@/lib/format";
+import { useMoney } from "@/lib/currency";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -49,6 +50,7 @@ function Dashboard() {
   const tenants = useQuery(api.tenants.list, {});
   const announcements = useQuery(api.announcements.list, {});
   const profile = useQuery(api.profiles.me, {});
+  const { money } = useMoney();
 
   if (
     !summary ||
@@ -109,7 +111,7 @@ function Dashboard() {
             className="mt-1 font-semibold tabular-nums truncate"
             style={{ fontSize: "clamp(0.9rem, 3.8vw, 1.5rem)" }}
           >
-            {cediFromPesewas(summary.collectedThisMonth)}
+            {money(summary.collectedThisMonth)}
           </p>
         </div>
         <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-success-soft text-success sm:h-12 sm:w-12">
@@ -141,7 +143,7 @@ function Dashboard() {
             className="mt-1 font-semibold tabular-nums truncate"
             style={{ fontSize: "clamp(0.9rem, 3.8vw, 1.5rem)" }}
           >
-            {cediFromPesewas(summary.arrears)}
+            {money(summary.arrears)}
           </p>
         </div>
         <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold-soft text-gold sm:h-12 sm:w-12">
@@ -157,7 +159,7 @@ function Dashboard() {
             className="mt-1 font-semibold tabular-nums"
             style={{ fontSize: "clamp(1rem, 4.5vw, 1.5rem)" }}
           >
-            {cediFromPesewas(summary.expectedThisMonth)}
+            {money(summary.expectedThisMonth)}
           </p>
         </div>
       </Card>
@@ -174,13 +176,13 @@ function Dashboard() {
           <div className="rounded-2xl bg-muted/40 px-3 py-2 min-w-0">
             <p className="text-xs text-muted-foreground">Collected</p>
             <p className="font-semibold text-sm tabular-nums">
-              {cediFromPesewas(monthly.reduce((s, m) => s + m.collected, 0))}
+              {money(monthly.reduce((s, m) => s + m.collected, 0))}
             </p>
           </div>
           <div className="rounded-2xl bg-muted/40 px-3 py-2 min-w-0">
             <p className="text-xs text-muted-foreground">Invoiced</p>
             <p className="font-semibold text-sm tabular-nums">
-              {cediFromPesewas(monthly.reduce((s, m) => s + m.due, 0))}
+              {money(monthly.reduce((s, m) => s + m.due, 0))}
             </p>
           </div>
         </div>
@@ -198,7 +200,7 @@ function Dashboard() {
               />
               <Tooltip
                 cursor={{ fill: "var(--muted)" }}
-                formatter={(v) => cediFromPesewas(Number(v))}
+                formatter={(v) => money(Number(v))}
                 contentStyle={{
                   borderRadius: 12,
                   border: "none",
@@ -239,8 +241,7 @@ function Dashboard() {
           </p>
           <Progress value={collectionRate} className="mt-3 h-2" />
           <p className="mt-2 text-[11px] text-muted-foreground">
-            {cediFromPesewas(summary.collectedThisMonth)} of{" "}
-            {cediFromPesewas(summary.expectedThisMonth)} expected
+            {money(summary.collectedThisMonth)} of {money(summary.expectedThisMonth)} expected
           </p>
         </div>
       </Card>
@@ -330,7 +331,7 @@ function Dashboard() {
                   {PAYMENT_METHODS[p.method] ?? p.method} &middot; {formatDateTime(p.paidAt)}
                 </p>
               </div>
-              <Badge tone="green">+{cediFromPesewas(p.amount)}</Badge>
+              <Badge tone="green">+{money(p.amount)}</Badge>
             </div>
           ))}
         </div>

@@ -7,13 +7,13 @@ import { DataPage } from "@/components/app/DataPage";
 import { Badge, Card } from "@/components/app/AppShell";
 import { FormDialog, SelectField, TextField } from "@/components/app/FormDialog";
 import {
-  cediFromPesewas,
   formatDate,
   formatMonth,
   msFromDateInput,
   pesewasFromCedi,
   friendlyError,
 } from "@/lib/format";
+import { useMoney } from "@/lib/currency";
 
 export const Route = createFileRoute("/invoices")({
   head: () => ({
@@ -43,6 +43,7 @@ function Page() {
   const leases = useQuery(api.leases.list, {});
   const createInvoice = useMutation(api.invoices.create);
   const sendInvoice = useMutation(api.invoices.send);
+  const { money, symbol } = useMoney();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -106,11 +107,11 @@ function Page() {
           onAction={() => setCreateOpen(true)}
           loading={false}
           stats={[
-            { label: "Invoiced", value: cediFromPesewas(invoiced) },
-            { label: "Collected", value: cediFromPesewas(collected) },
+            { label: "Invoiced", value: money(invoiced) },
+            { label: "Collected", value: money(collected) },
             {
               label: "Overdue",
-              value: cediFromPesewas(overdue),
+              value: money(overdue),
               hint: `${cycle.filter((i) => i.status === "overdue").length} overdue`,
             },
             { label: "Collection rate", value: `${rate}%` },
@@ -133,7 +134,7 @@ function Page() {
             {
               key: "a",
               label: "Amount",
-              render: (r) => <span className="font-semibold">{cediFromPesewas(r.amount)}</span>,
+              render: (r) => <span className="font-semibold">{money(r.amount)}</span>,
             },
             {
               key: "s",
@@ -159,9 +160,7 @@ function Page() {
                     Send
                   </button>
                 ) : (
-                  <span className="text-xs text-muted-foreground">
-                    {cediFromPesewas(r.paid)} paid
-                  </span>
+                  <span className="text-xs text-muted-foreground">{money(r.paid)} paid</span>
                 ),
             },
           ]}
@@ -187,7 +186,7 @@ function Page() {
           <TextField label="Due date" name="dueDate" type="date" required />
         </div>
         <TextField
-          label="Amount (GH₵)"
+          label={`Amount (${symbol})`}
           name="amount"
           required
           inputMode="decimal"

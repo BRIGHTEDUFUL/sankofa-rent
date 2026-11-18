@@ -1,7 +1,7 @@
 # Sankofa Rent — System Guide
 
 > The practical reference for understanding, operating, and extending the app.
-> Authored by **Edith Nonnon**, Final-Year Project 2026.
+> Authored by **Edith Mama**, Final-Year Project 2026.
 
 This document explains the system from the inside out: what every core module does,
 how the pieces connect, the rules the backend enforces, and the things you must
@@ -872,4 +872,4 @@ Repo:            https://github.com/BRIGHTEDUFUL/sankofa-rent
 
 ---
 
-_Sankofa Rent — authored by Edith Nonnon, 2026._
+_Sankofa Rent — authored by Edith Mama, 2026._

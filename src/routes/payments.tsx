@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Doc, Id } from "../../convex/_generated/dataModel";
@@ -16,13 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  cediFromPesewas,
-  formatDateTime,
-  PAYMENT_METHODS,
-  pesewasFromCedi,
-  friendlyError,
-} from "@/lib/format";
+import { formatDateTime, PAYMENT_METHODS, pesewasFromCedi, friendlyError } from "@/lib/format";
+import { useMoney } from "@/lib/currency";
 
 export const Route = createFileRoute("/payments")({
   head: () => ({
@@ -52,8 +47,11 @@ function Page() {
   const tenants = useQuery(api.tenants.list, {});
   const invoices = useQuery(api.invoices.list, {});
   const recordPayment = useMutation(api.payments.record);
+  const { money, symbol } = useMoney();
 
   const [open, setOpen] = useState(false);
+  const [defaultMethod, setDefaultMethod] = useState("mtn_momo");
+  const [receiptId, setReceiptId] = useState<Id<"payments"> | null>(null);
 
   if (!payments || !tenants || !invoices) {
     return (
@@ -81,27 +79,63 @@ function Page() {
     method: string;
     reference?: string;
   }) {
-    await recordPayment({
+    const paymentId = await recordPayment({
       tenantId: values.tenantId,
       invoiceId: values.invoiceId,
       amount: values.amount,
       method: values.method as "mtn_momo" | "telecel_cash" | "airteltigo_money" | "bank" | "cash",
       reference: values.reference,
     });
+    setReceiptId(paymentId);
     setOpen(false);
   }
 
   return (
     <>
+      {receiptId && (
+        <div
+          role="status"
+          className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-primary-soft px-4 py-3"
+        >
+          <span className="text-sm font-medium text-primary">
+            Payment recorded — the receipt is ready to print or share with the tenant.
+          </span>
+          <div className="flex gap-2">
+            <Link
+              to="/receipts/$paymentId"
+              params={{ paymentId: receiptId }}
+              className="inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground pressable"
+            >
+              View receipt
+            </Link>
+            <button
+              onClick={() => setReceiptId(null)}
+              className="inline-flex h-10 items-center rounded-lg px-3 text-sm font-semibold text-muted-foreground hover:bg-muted pressable"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
       <DataPage
         title="Payments & receipts"
-        subtitle="Every cedi received, with a receipt"
+        subtitle="Every payment received, with a receipt"
         action="Record payment"
-        onAction={() => setOpen(true)}
+        onAction={() => {
+          setDefaultMethod("mtn_momo");
+          setOpen(true);
+        }}
+        secondaryAction={{
+          label: "Record cash payment",
+          onClick: () => {
+            setDefaultMethod("cash");
+            setOpen(true);
+          },
+        }}
         loading={false}
         stats={[
-          { label: "Received this month", value: cediFromPesewas(thisMonth) },
-          { label: "Total received", value: cediFromPesewas(total) },
+          { label: "Received this month", value: money(thisMonth) },
+          { label: "Total received", value: money(total) },
           { label: "Receipts issued", value: String(payments.length) },
           { label: "Overdue invoices", value: String(overdueCount) },
         ]}
@@ -124,7 +158,21 @@ function Page() {
             key: "a",
             label: "Amount",
             className: "text-right",
-            render: (r) => <Badge tone="green">+{cediFromPesewas(r.amount)}</Badge>,
+            render: (r) => <Badge tone="green">+{money(r.amount)}</Badge>,
+          },
+          {
+            key: "rc",
+            label: "Receipt",
+            className: "text-right",
+            render: (r) => (
+              <Link
+                to="/receipts/$paymentId"
+                params={{ paymentId: r._id }}
+                className="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-primary hover:bg-muted sm:min-h-0 sm:rounded-full sm:px-2.5 sm:py-1 pressable"
+              >
+                View
+              </Link>
+            ),
           },
         ]}
         rows={payments}
@@ -137,6 +185,7 @@ function Page() {
         invoices={invoices}
         onSubmit={submit}
         busy={false}
+        defaultMethod={defaultMethod}
       />
     </>
   );
@@ -149,6 +198,7 @@ function RecordPaymentDialog({
   invoices,
   onSubmit,
   busy,
+  defaultMethod,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -162,7 +212,10 @@ function RecordPaymentDialog({
     reference?: string;
   }) => Promise<void>;
   busy: boolean;
+  defaultMethod: string;
 }) {
+  const { money, symbol } = useMoney();
+
   const [tenantId, setTenantId] = useState("");
   const [invoiceId, setInvoiceId] = useState("");
   const [amount, setAmount] = useState("");
@@ -170,6 +223,10 @@ function RecordPaymentDialog({
   const [reference, setReference] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (open) setMethod(defaultMethod);
+  }, [open, defaultMethod]);
 
   const unpaid = tenantId
     ? invoices.filter((i) => i.tenantId === tenantId && i.status !== "paid" && i.status !== "draft")
@@ -199,7 +256,7 @@ function RecordPaymentDialog({
       setTenantId("");
       setInvoiceId("");
       setAmount("");
-      setMethod("mtn_momo");
+      setMethod(defaultMethod);
       setReference("");
     } catch (err) {
       setError(friendlyError(err, "Could not record the payment."));
@@ -248,7 +305,7 @@ function RecordPaymentDialog({
             <SelectContent>
               {unpaid.map((i) => (
                 <SelectItem key={i._id} value={i._id}>
-                  {i.number} · {cediFromPesewas(i.amount - i.paid)} outstanding
+                  {i.number} · {money(i.amount - i.paid)} outstanding
                 </SelectItem>
               ))}
             </SelectContent>
@@ -256,7 +313,7 @@ function RecordPaymentDialog({
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="amount">Amount (GH₵)</Label>
+            <Label htmlFor="amount">Amount ({symbol})</Label>
             <Input
               id="amount"
               value={amount}
@@ -287,7 +344,7 @@ function RecordPaymentDialog({
             id="reference"
             value={reference}
             onChange={(e) => setReference(e.target.value)}
-            placeholder="MoMo transaction ID"
+            placeholder={method === "cash" ? "Optional note (e.g. received by)" : "Transaction ID"}
           />
         </div>
         {error && (

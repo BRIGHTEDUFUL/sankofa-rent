@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import { authTables } from "@convex-dev/auth/server";
+import { currencyValidator } from "./currency";
 
 export default defineSchema({
   ...authTables,
@@ -27,7 +28,7 @@ export default defineSchema({
     phone: v.optional(v.string()),
     businessName: v.optional(v.string()),
     region: v.optional(v.string()),
-    currency: v.literal("GHS"),
+    currency: currencyValidator,
     momoNumber: v.optional(v.string()),
     momoNetwork: v.optional(
       v.union(v.literal("MTN"), v.literal("Telecel"), v.literal("AirtelTigo")),

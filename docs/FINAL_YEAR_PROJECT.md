@@ -2,7 +2,7 @@
 
 ### "Rent, handled beautifully." A full-stack rent-management platform for Ghanaian landlords
 
-**Author:** Edith Nonnon
+**Author:** Edith Mama
 **Programme:** Final-Year Project · 2026
 **Supervisor:** __________________________ _(complete before submission)_
 **Live system:** https://final-year-rent-project.edimamfaidol.workers.dev
@@ -824,4 +824,4 @@ repo         github.com/BRIGHTEDUFUL/sankofa-rent
 
 ---
 
-_Sankofa Rent — Ghana, 2026. Authored by Edith Nonnon._
+_Sankofa Rent — Ghana, 2026. Authored by Edith Mama._
