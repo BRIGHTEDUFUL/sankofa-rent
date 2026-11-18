@@ -44,7 +44,6 @@ import {
   formatMoney,
   friendlyError,
   initials,
-  isCurrencyCode,
   type CurrencyCode,
 } from "@/lib/format";
 
@@ -750,27 +749,19 @@ function Page() {
 
           {detailTab === "currency" && (
             <Section title="Currency" desc="How amounts are shown across Sankofa Rent">
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-primary-soft px-4 py-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-card text-lg font-bold text-primary">
-                    {isCurrencyCode(form.currency) ? CURRENCIES[form.currency].symbol : "GH₵"}
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm text-muted-foreground">
+                  Current:{" "}
+                  <span className="font-semibold text-foreground">
+                    {currencyLabel(profile.currency ?? "GHS")} ({profile.currency ?? "GHS"})
                   </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold">
-                      {currencyLabel(form.currency)} ({form.currency})
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Example:{" "}
-                      {formatMoney(185000, isCurrencyCode(form.currency) ? form.currency : "GHS")}
-                    </p>
-                  </div>
-                </div>
+                </p>
                 {form.currency !== (profile.currency ?? "GHS") && (
-                  <Badge tone="gold">Unsaved</Badge>
+                  <Badge tone="gold">Unsaved changes</Badge>
                 )}
               </div>
 
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {CURRENCY_CODES.map((code) => {
                   const currency = CURRENCIES[code];
                   const selected = form.currency === code;
