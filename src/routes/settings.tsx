@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   User,
   Building2,
+  Banknote,
   CreditCard,
   ShieldCheck,
   Palette,
@@ -34,24 +35,28 @@ import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { Badge, Button, Card } from "@/components/app/AppShell";
 import { ConfirmDialog, FormDialog, TextField } from "@/components/app/FormDialog";
 import { ResponsiveDialog } from "@/components/app/ResponsiveDialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useBranding, isHexColor, isUsableAccent, DEFAULT_BRANDING } from "@/lib/branding";
 import {
+  CURRENCIES,
   CURRENCY_CODES,
   currencyLabel,
   formatDate,
+  formatMoney,
   friendlyError,
   initials,
+  isCurrencyCode,
   type CurrencyCode,
 } from "@/lib/format";
 
-const TAB_IDS = ["profile", "business", "accounts", "branding", "payments", "security"] as const;
+const TAB_IDS = [
+  "profile",
+  "business",
+  "currency",
+  "accounts",
+  "branding",
+  "payments",
+  "security",
+] as const;
 type Tab = (typeof TAB_IDS)[number];
 
 function generateMemorablePassword() {
@@ -97,6 +102,7 @@ export const Route = createFileRoute("/settings")({
 const tabs = [
   { id: "profile", label: "Profile", icon: User },
   { id: "business", label: "Business", icon: Building2 },
+  { id: "currency", label: "Currency", icon: Banknote },
   { id: "accounts", label: "Accounts", icon: Users },
   { id: "branding", label: "Branding", icon: Palette },
   { id: "payments", label: "Payment methods", icon: CreditCard },
@@ -289,6 +295,14 @@ function SettingsListNav({
       )}
 
       <SettingsGroup title="Money">
+        <SettingsRow
+          icon={Banknote}
+          tone="bg-primary-soft text-primary"
+          label="Currency"
+          value={currencyLabel(form.currency)}
+          onClick={() => onSelect("currency")}
+          selected={detailTab === "currency"}
+        />
         <SettingsRow
           icon={CreditCard}
           tone="bg-success-soft text-success"
@@ -687,26 +701,21 @@ function Page() {
                   placeholder="Greater Accra"
                   className="h-11 sm:h-9"
                 />
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium" htmlFor="currency-select">
-                    Currency
-                  </label>
-                  <Select value={form.currency} onValueChange={(v) => set("currency", v)}>
-                    <SelectTrigger id="currency-select" className="h-11 sm:h-9">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CURRENCY_CODES.map((code) => (
-                        <SelectItem key={code} value={code}>
-                          {currencyLabel(code)} ({code})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Used for every amount in the app. Existing amounts are not converted.
-                  </p>
-                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate({ to: "/settings", search: { tab: "currency" }, replace: true })
+                  }
+                  className="flex h-11 items-center justify-between gap-3 rounded-md border border-input px-3 text-left text-base transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-9 sm:text-sm pressable"
+                >
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium">Currency</span>
+                    <span className="block truncate text-xs text-muted-foreground">
+                      {currencyLabel(form.currency)} ({form.currency})
+                    </span>
+                  </span>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                </button>
                 <TextField
                   label="Rent due day"
                   name="rentDueDay"
@@ -734,6 +743,86 @@ function Page() {
                   className="h-12 w-full justify-center sm:h-auto sm:w-auto"
                 >
                   {saving ? "Saving…" : "Save changes"}
+                </Button>
+              </SaveBar>
+            </Section>
+          )}
+
+          {detailTab === "currency" && (
+            <Section title="Currency" desc="How amounts are shown across Sankofa Rent">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-primary-soft px-4 py-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-card text-lg font-bold text-primary">
+                    {isCurrencyCode(form.currency) ? CURRENCIES[form.currency].symbol : "GH₵"}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold">
+                      {currencyLabel(form.currency)} ({form.currency})
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Example:{" "}
+                      {formatMoney(185000, isCurrencyCode(form.currency) ? form.currency : "GHS")}
+                    </p>
+                  </div>
+                </div>
+                {form.currency !== (profile.currency ?? "GHS") && (
+                  <Badge tone="gold">Unsaved</Badge>
+                )}
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                {CURRENCY_CODES.map((code) => {
+                  const currency = CURRENCIES[code];
+                  const selected = form.currency === code;
+                  return (
+                    <button
+                      key={code}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => set("currency", code)}
+                      className={`flex min-h-[88px] items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring pressable ${
+                        selected
+                          ? "border-primary bg-primary-soft"
+                          : "border-border bg-card hover:bg-muted/40"
+                      }`}
+                    >
+                      <span
+                        className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl text-lg font-bold ${
+                          selected
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-foreground"
+                        }`}
+                      >
+                        {currency.symbol}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold">
+                          {currency.label}
+                        </span>
+                        <span className="block text-xs text-muted-foreground">
+                          {code} · {formatMoney(185000, code)}
+                        </span>
+                      </span>
+                      {selected && (
+                        <Check className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+                Changing the currency updates how every amount is displayed and entered. Existing
+                balances and invoices are not converted.
+              </p>
+
+              <SaveBar>
+                <Button
+                  onClick={() => save()}
+                  disabled={saving || form.currency === (profile.currency ?? "GHS")}
+                  className="h-12 w-full justify-center sm:h-auto sm:w-auto"
+                >
+                  {saving ? "Saving…" : "Save currency"}
                 </Button>
               </SaveBar>
             </Section>
