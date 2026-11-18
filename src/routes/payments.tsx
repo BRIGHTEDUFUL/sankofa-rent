@@ -104,13 +104,13 @@ function Page() {
             <Link
               to="/receipts/$paymentId"
               params={{ paymentId: receiptId }}
-              className="inline-flex h-10 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground pressable"
+              className="inline-flex h-11 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground pressable"
             >
               View receipt
             </Link>
             <button
               onClick={() => setReceiptId(null)}
-              className="inline-flex h-10 items-center rounded-lg px-3 text-sm font-semibold text-muted-foreground hover:bg-muted pressable"
+              className="inline-flex h-11 items-center rounded-lg px-3 text-sm font-semibold text-muted-foreground hover:bg-muted pressable"
             >
               Dismiss
             </button>

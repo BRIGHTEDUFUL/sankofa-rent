@@ -78,12 +78,19 @@ function ReceiptPage() {
             <ArrowLeft className="h-4 w-4" />
             Payments
           </Link>
-          <div className="flex gap-2">
-            <Button variant="outline" className="h-11" onClick={copyLink}>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <Button
+              variant="outline"
+              className="h-12 w-full justify-center sm:h-auto sm:w-auto"
+              onClick={copyLink}
+            >
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               {copied ? "Link copied" : "Copy link"}
             </Button>
-            <Button className="h-11" onClick={() => window.print()}>
+            <Button
+              className="h-12 w-full justify-center sm:h-auto sm:w-auto"
+              onClick={() => window.print()}
+            >
               <Printer className="h-4 w-4" />
               Print / PDF
             </Button>
@@ -93,7 +100,7 @@ function ReceiptPage() {
         <Card className="!p-6 sm:!p-10">
           <div className="flex items-start justify-between gap-4 border-b-2 border-primary pb-6">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+              <p className="text-base font-bold tracking-tight text-foreground sm:text-lg">
                 {receipt.businessName ?? "Sankofa Rent"}
               </p>
               {receipt.region ? (
